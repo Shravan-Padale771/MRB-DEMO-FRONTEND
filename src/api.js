@@ -1,22 +1,22 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = '';
+const API_URL = "http://localhost:8000/";
 
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 // --- STUDENT ENDPOINTS ---
 export const getAllStudents = async () => {
-  const response = await api.get('/getAllStudents');
+  const response = await api.get("/getAllStudents");
   return response.data;
 };
 
 export const addStudent = async (studentData) => {
-  const response = await api.post('/addStudent', studentData);
+  const response = await api.post("/addStudent", studentData);
   return response.data;
 };
 
@@ -27,13 +27,12 @@ export const getStudentById = async (id) => {
 
 // --- EXAM ENDPOINTS ---
 export const getAllExams = async () => {
-  const response = await api.get('/getAllExams');
+  const response = await api.get("/getAllExams");
   return response.data;
 };
 
 export const addExam = async (examData) => {
-  // Try sending as body first
-  const response = await api.post('/addExam', examData);
+  const response = await api.post("/addExam", examData);
   return response.data;
 };
 
@@ -41,12 +40,14 @@ export const addExam = async (examData) => {
 export const applyForExam = async (applicationData) => {
   // applicationData should look like:
   // { student: { studentId: 1 }, exam: { examNo: 1 }, formData: "...", status: "PENDING" }
-  const response = await api.post('/fill-form', applicationData);
+  const response = await api.post("/fill-form", applicationData);
   return response.data;
 };
 
 export const getApplicationStatus = async (appId, examNo) => {
-  const response = await api.get(`/get-form?applicationId=${appId}&examNo=${examNo}`);
+  const response = await api.get(
+    `/get-form?applicationId=${appId}&examNo=${examNo}`,
+  );
   return response.data;
 };
 
@@ -54,25 +55,27 @@ export const getApplicationStatus = async (appId, examNo) => {
 
 // --- RESULT ENDPOINTS ---
 export const addExamResult = async (resultData) => {
-  // resultData structure: 
+  // resultData structure:
   // { application: { applicationId: 123 }, resultData: "Passed", publishedAt: "2026-..." }
-  const response = await api.post('/addExamResult', resultData);
+  const response = await api.post("/addExamResult", resultData);
   return response.data;
 };
 
 export const getExamResult = async (applicationId) => {
-  const response = await api.get(`/getExamResult?applicationId=${applicationId}`);
+  const response = await api.get(
+    `/getExamResult?applicationId=${applicationId}`,
+  );
   return response.data;
 };
 
 // Add these to src/api.js
 export const getAllApplications = async () => {
-  const response = await api.get('/getAllApplications'); // New Endpoint
+  const response = await api.get("/getAllApplications"); // New Endpoint
   return response.data;
 };
 
 export const getAllResults = async () => {
-  const response = await api.get('/getAllResults'); // New Endpoint
+  const response = await api.get("/getAllResults"); // New Endpoint
   return response.data;
 };
 
