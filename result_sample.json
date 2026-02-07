@@ -1,0 +1,31 @@
+﻿{
+    "application":  {
+                        "applicationId":  1,
+                        "exam":  {
+                                     "application_end_date":  null,
+                                     "application_start_date":  null,
+                                     "examNo":  1,
+                                     "exam_code":  "",
+                                     "exam_details":  null,
+                                     "exam_end_date":  null,
+                                     "exam_fees":  1000.0,
+                                     "exam_name":  "Hindi FInal Exam",
+                                     "exam_start_date":  null,
+                                     "no_of_papers":  1,
+                                     "papers":  null,
+                                     "status":  null
+                                 },
+                        "formData":  "{\"phone\": \"99988877766\", \"gender\": \"Male\", \"address\": \"Pune\", \"fullName\": \"Sumit\"}",
+                        "status":  "APPLIED",
+                        "student":  {
+                                        "password":  "123",
+                                        "studentId":  3,
+                                        "username":  "sumit"
+                                    }
+                    },
+    "id":  1,
+    "percentage":  null,
+    "publishedAt":  "2026-02-03T10:43:40.752",
+    "resultData":  "{\"score\": \"89\", \"remarks\": \"Pass\"}",
+    "totalMarks":  null
+}

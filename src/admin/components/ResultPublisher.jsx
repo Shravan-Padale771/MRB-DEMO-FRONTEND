@@ -32,6 +32,8 @@ const ResultPublisher = ({
                 applicationId: appId,
                 examPapers: papers,
                 paperMarks: papers.reduce((acc, p) => ({ ...acc, [p.name]: 0 }), {}),
+                oralMarks: 0,
+                projectMarks: 0,
                 score: "",
             }));
             toast.success(`Loaded papers for App #${appId}`);
@@ -41,6 +43,8 @@ const ResultPublisher = ({
                 ...prev,
                 examPapers: [],
                 paperMarks: {},
+                oralMarks: 0,
+                projectMarks: 0,
                 score: "",
             }));
         }
@@ -114,6 +118,71 @@ const ResultPublisher = ({
                         <h3 className="font-bold text-gray-700 border-b pb-2">
                             Final Result
                         </h3>
+
+                        {/* Special Components: Oral & Project */}
+                        {(() => {
+                            const app = applications.find(a => a.applicationId === parseInt(resultForm.applicationId));
+                            if (!app || !app.exam) return null;
+
+                            let details = {};
+                            try {
+                                details = typeof app.exam.exam_details === 'string'
+                                    ? JSON.parse(app.exam.exam_details)
+                                    : (app.exam.exam_details || {});
+                            } catch (e) {
+                                console.error("Error parsing exam_details:", e);
+                            }
+
+                            const hasOral = details.structure?.hasOral;
+                            const hasProject = details.structure?.hasProject;
+
+                            return (
+                                <div className="space-y-4 mb-6 bg-indigo-50/30 p-4 rounded-xl border border-indigo-100/50">
+                                    {hasOral && (
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-sm font-bold text-indigo-900 flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+                                                Oral Marks (Max 50)
+                                            </label>
+                                            <input
+                                                type="number"
+                                                max="50"
+                                                min="0"
+                                                className="w-20 p-2 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-black text-indigo-600 bg-white"
+                                                value={resultForm.oralMarks}
+                                                onChange={(e) => setResultForm({
+                                                    ...resultForm,
+                                                    oralMarks: parseFloat(e.target.value) || 0
+                                                })}
+                                            />
+                                        </div>
+                                    )}
+                                    {hasProject && (
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-sm font-bold text-indigo-900 flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+                                                Project Marks (Max 50)
+                                            </label>
+                                            <input
+                                                type="number"
+                                                max="50"
+                                                min="0"
+                                                className="w-20 p-2 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-black text-indigo-600 bg-white"
+                                                value={resultForm.projectMarks}
+                                                onChange={(e) => setResultForm({
+                                                    ...resultForm,
+                                                    projectMarks: parseFloat(e.target.value) || 0
+                                                })}
+                                            />
+                                        </div>
+                                    )}
+                                    {!hasOral && !hasProject && (
+                                        <p className="text-[10px] text-gray-400 italic text-center uppercase tracking-widest">No extra components enabled</p>
+                                    )}
+                                </div>
+                            )
+                        })()}
+
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
                                 Total Percentage

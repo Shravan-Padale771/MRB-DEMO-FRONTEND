@@ -75,6 +75,18 @@ const MyResults = ({ myResults }) => {
                                                                 </div>
                                                             )
                                                         )}
+                                                        {data.oralMarks > 0 && (
+                                                            <div className="flex justify-between text-sm text-indigo-600 font-medium">
+                                                                <span>Oral Exam</span>
+                                                                <span className="font-bold">{data.oralMarks}</span>
+                                                            </div>
+                                                        )}
+                                                        {data.projectMarks > 0 && (
+                                                            <div className="flex justify-between text-sm text-indigo-600 font-medium">
+                                                                <span>Project Work</span>
+                                                                <span className="font-bold">{data.projectMarks}</span>
+                                                            </div>
+                                                        )}
                                                         <div className="flex justify-between pt-2 border-t text-sm font-bold text-gray-800">
                                                             <span>Total Marks</span>
                                                             <span>

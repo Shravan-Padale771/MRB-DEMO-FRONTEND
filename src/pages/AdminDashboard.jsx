@@ -78,7 +78,11 @@ const AdminDashboard = () => {
         departmentName: "परीक्षा विभाग",
         marksCalculationNote: "मात्र हिंदी के लिखित प्रश्नपत्रों के अंकों के आधार पर परिणाम घोषित किया जाता है।",
         instructions: "परीक्षार्थी को परीक्षा केंद्र पर प्रवेश पत्र अनिवार्य रूप से साथ लाना होगा।",
-        disclaimer: "यह अंकसूची मूल प्रमाणपत्र नहीं है।"
+        disclaimer: "यह अंकसूची मूल प्रमाणपत्र नहीं है。"
+      },
+      structure: {
+        hasOral: true,
+        hasProject: true
       }
     },
   });
@@ -91,6 +95,10 @@ const AdminDashboard = () => {
     score: "",
     remarks: "Pass",
     paperMarks: {}, // { "Math": 80, "English": 70 }
+    oralMarks: 0,
+    projectMarks: 0,
+    hasOral: false,
+    hasProject: false,
     examPapers: [], // [{ name: "Math", maxMarks: 100 }, ...]
   });
 
@@ -107,21 +115,32 @@ const AdminDashboard = () => {
   // Auto-calculate percentage
   useEffect(() => {
     if (resultForm.examPapers.length > 0) {
-      const totalObtained = Object.values(resultForm.paperMarks).reduce(
+      let totalObtained = Object.values(resultForm.paperMarks).reduce(
         (sum, m) => sum + (parseFloat(m) || 0),
         0
       );
-      const totalMax = resultForm.examPapers.reduce(
+      let totalMax = resultForm.examPapers.reduce(
         (sum, p) => sum + (p.maxMarks || 0),
         0
       );
+
+      // Add Oral & Project if active
+      if (resultForm.hasOral) {
+        totalObtained += (parseFloat(resultForm.oralMarks) || 0);
+        totalMax += 50;
+      }
+      if (resultForm.hasProject) {
+        totalObtained += (parseFloat(resultForm.projectMarks) || 0);
+        totalMax += 50;
+      }
+
       const percentage = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
       setResultForm((prev) => ({
         ...prev,
         score: `${percentage.toFixed(2)}%`,
       }));
     }
-  }, [resultForm.paperMarks, resultForm.examPapers]);
+  }, [resultForm.paperMarks, resultForm.examPapers, resultForm.oralMarks, resultForm.projectMarks, resultForm.hasOral, resultForm.hasProject]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -211,6 +230,10 @@ const AdminDashboard = () => {
             marksCalculationNote: "मात्र हिंदी के लिखित प्रश्नपत्रों के अंकों के आधार पर परिणाम घोषित किया जाता है।",
             instructions: "परीक्षार्थी को परीक्षा केंद्र पर प्रवेश पत्र अनिवार्य रूप से साथ लाना होगा।",
             disclaimer: "यह अंकसूची मूल प्रमाणपत्र नहीं है।"
+          },
+          structure: {
+            hasOral: false,
+            hasProject: false
           }
         },
       });
@@ -255,6 +278,8 @@ const AdminDashboard = () => {
         totalObtained,
         totalMax,
         breakdown: resultForm.paperMarks,
+        oralMarks: resultForm.oralMarks,
+        projectMarks: resultForm.projectMarks,
       }),
       publishedAt: new Date().toISOString(),
     };
@@ -276,13 +301,27 @@ const AdminDashboard = () => {
   };
 
   const selectApplication = (appId) => {
-    const app = applications.find((a) => a.applicationId === appId);
     let papers = [];
-    if (app && app.exam && app.exam.papers) {
-      try {
-        papers = JSON.parse(app.exam.papers);
-      } catch (e) {
-        console.error("Error parsing papers:", e);
+    let hasOral = false;
+    let hasProject = false;
+    if (app && app.exam) {
+      if (app.exam.papers) {
+        try {
+          papers = JSON.parse(app.exam.papers);
+        } catch (e) {
+          console.error("Error parsing papers:", e);
+        }
+      }
+      if (app.exam.exam_details) {
+        try {
+          const details = typeof app.exam.exam_details === 'string'
+            ? JSON.parse(app.exam.exam_details)
+            : app.exam.exam_details;
+          hasOral = details.structure?.hasOral || false;
+          hasProject = details.structure?.hasProject || false;
+        } catch (e) {
+          console.error("Error parsing exam_details:", e);
+        }
       }
     }
 
@@ -291,6 +330,10 @@ const AdminDashboard = () => {
       applicationId: appId,
       examPapers: papers,
       paperMarks: papers.reduce((acc, p) => ({ ...acc, [p.name]: 0 }), {}),
+      oralMarks: 0,
+      projectMarks: 0,
+      hasOral,
+      hasProject,
       score: "",
     });
     setActiveTab("publish");
