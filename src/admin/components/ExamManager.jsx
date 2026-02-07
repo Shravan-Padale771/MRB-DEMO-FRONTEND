@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, BookOpen, ChevronRight, ChevronLeft, Check } from 'lucide-react';
+import { Plus, BookOpen, ChevronRight, ChevronLeft, Check, Edit, Trash2, X } from 'lucide-react';
 
 const ExamManager = ({
     examForm,
     setExamForm,
     handleCreateExam,
+    handleUpdateExam,
+    handleDeleteExam,
+    startEditing,
+    isEditing,
+    resetExamForm,
     exams
 }) => {
     const [activeStep, setActiveStep] = useState(0);
@@ -37,11 +42,25 @@ const ExamManager = ({
             <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                        <Plus size={24} className="text-indigo-600" /> Create Exam
+                        {isEditing ? (
+                            <><Edit size={24} className="text-amber-500" /> Edit Exam</>
+                        ) : (
+                            <><Plus size={24} className="text-indigo-600" /> Create Exam</>
+                        )}
                     </h2>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                        Step {activeStep + 1} of {steps.length}
-                    </span>
+                    <div className="flex flex-col items-end">
+                        {isEditing && (
+                            <button
+                                onClick={resetExamForm}
+                                className="text-xs font-bold text-red-500 hover:text-red-600 flex items-center gap-1 mb-1 transition-colors"
+                            >
+                                <X size={14} /> Cancel Edit
+                            </button>
+                        )}
+                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                            Step {activeStep + 1} of {steps.length}
+                        </span>
+                    </div>
                 </div>
 
                 {/* Step Indicator */}
@@ -55,7 +74,7 @@ const ExamManager = ({
                     ))}
                 </div>
 
-                <form onSubmit={handleCreateExam} className="min-h-[400px] flex flex-col">
+                <form onSubmit={isEditing ? handleUpdateExam : handleCreateExam} className="min-h-[400px] flex flex-col">
                     <div className="flex-1">
                         <AnimatePresence mode="wait">
                             <motion.div
@@ -468,9 +487,12 @@ const ExamManager = ({
                         ) : (
                             <button
                                 type="submit"
-                                className="flex items-center gap-2 bg-green-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-green-700 transition-all shadow-md shadow-green-100"
+                                className={`flex items-center gap-2 px-8 py-2 rounded-lg font-bold transition-all shadow-md ${isEditing
+                                    ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-100 text-white'
+                                    : 'bg-green-600 hover:bg-green-700 shadow-green-100 text-white'
+                                    }`}
                             >
-                                <Check size={20} /> Finish & Create
+                                <Check size={20} /> {isEditing ? 'Finish & Save' : 'Finish & Create'}
                             </button>
                         )}
                     </div>
@@ -508,14 +530,32 @@ const ExamManager = ({
                                             {ex.exam_code}
                                         </p>
                                     </div>
-                                    <span className={`text-[9px] font-bold px-2 py-1 rounded-full border ${ex.status === 'PUBLISHED'
-                                        ? 'bg-green-50 text-green-700 border-green-100'
-                                        : ex.status === 'DRAFT'
-                                            ? 'bg-yellow-50 text-yellow-700 border-yellow-100'
-                                            : 'bg-gray-50 text-gray-700 border-gray-100'
-                                        }`}>
-                                        {ex.status}
-                                    </span>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <span className={`text-[9px] font-bold px-2 py-1 rounded-full border ${ex.status === 'PUBLISHED'
+                                            ? 'bg-green-50 text-green-700 border-green-100'
+                                            : ex.status === 'DRAFT'
+                                                ? 'bg-yellow-50 text-yellow-700 border-yellow-100'
+                                                : 'bg-gray-50 text-gray-700 border-gray-100'
+                                            }`}>
+                                            {ex.status}
+                                        </span>
+                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={() => startEditing(ex)}
+                                                className="p-1.5 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-600 hover:text-white transition-all border border-amber-100"
+                                                title="Edit Exam"
+                                            >
+                                                <Edit size={14} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteExam(ex.examNo)}
+                                                className="p-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all border border-red-100"
+                                                title="Delete Exam"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </motion.div>
                         ))}

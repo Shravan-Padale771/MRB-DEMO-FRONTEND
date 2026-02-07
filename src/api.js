@@ -36,6 +36,16 @@ export const addExam = async (examData) => {
   return response.data;
 };
 
+export const updateExam = async (id, examData) => {
+  const response = await api.put(`/updateExam?exam_no=${id}`, examData);
+  return response.data;
+};
+
+export const deleteExam = async (id) => {
+  const response = await api.delete(`/deleteExam?id=${id}`);
+  return response.data;
+};
+
 // --- APPLICATION ENDPOINTS ---
 export const applyForExam = async (applicationData) => {
   // applicationData should look like:

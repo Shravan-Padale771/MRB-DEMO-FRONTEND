@@ -1,13 +1,4 @@
 import React, { useState, useEffect } from "react";
-import {
-  addExam,
-  addStudent,
-  getAllStudents,
-  getAllExams,
-  addExamResult,
-  getAllApplications,
-  getAllResults,
-} from "../api";
 import toast from "react-hot-toast";
 import {
   RefreshCw,
@@ -25,8 +16,22 @@ import ApplicationManager from "../admin/components/ApplicationManager";
 import ResultPublisher from "../admin/components/ResultPublisher";
 import ResultViewer from "../admin/components/ResultViewer";
 
+import {
+  addExam,
+  updateExam,
+  deleteExam,
+  addStudent,
+  getAllStudents,
+  getAllExams,
+  addExamResult,
+  getAllApplications,
+  getAllResults,
+} from "../api";
+
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedExamNo, setSelectedExamNo] = useState(null);
 
   const [examForm, setExamForm] = useState({
     exam_name: "राष्ट्रभाषा प्रवीण परीक्षा (सितंबर 2024)",
@@ -75,21 +80,23 @@ const AdminDashboard = () => {
         syllabusYear: "2024–2025",
         signatoryName: "सौ. सुनीता कुलकर्णी",
         signatoryDesignation: "सचिव, परीक्षा विभाग",
-        departmentName: "परीक्षा विभाग",
+        departmentName: " परीक्षा विभाग",
         marksCalculationNote: "मात्र हिंदी के लिखित प्रश्नपत्रों के अंकों के आधार पर परिणाम घोषित किया जाता है।",
         instructions: "परीक्षार्थी को परीक्षा केंद्र पर प्रवेश पत्र अनिवार्य रूप से साथ लाना होगा।",
-        disclaimer: "यह अंकसूची मूल प्रमाणपत्र नहीं है。"
+        disclaimer: "यह अंकसूची मूल प्रमाणपत्र नहीं है।"
       },
       structure: {
-        hasOral: true,
-        hasProject: true
+        hasOral: false,
+        hasProject: false
       }
     },
   });
+
   const [studentForm, setStudentForm] = useState({
     username: "",
     password: "",
   });
+
   const [resultForm, setResultForm] = useState({
     applicationId: "",
     score: "",
@@ -168,10 +175,72 @@ const AdminDashboard = () => {
     setLoading(false);
   };
 
+  const resetExamForm = () => {
+    setExamForm({
+      exam_name: "राष्ट्रभाषा प्रवीण परीक्षा (सितंबर 2024)",
+      exam_code: "PRAVIN_SEP_2024",
+      status: "DRAFT",
+      no_of_papers: 2,
+      exam_fees: 700,
+      application_start_date: "2024-06-01",
+      application_end_date: "2024-07-31",
+      exam_start_date: "2024-09-01",
+      exam_end_date: "2024-09-10",
+      papers: [
+        { name: "प्रथम प्रश्नपत्र", maxMarks: 100 },
+        { name: "द्वितीय प्रश्नपत्र", maxMarks: 100 },
+      ],
+      exam_details: {
+        identity: {
+          examFullTitle: "राष्ट्रभाषा प्रवीण परीक्षा",
+          conductingBody: "महाराष्ट्र राष्ट्रभाषा सभा, पुणे",
+          board: "Rashtrabhasha Sabha",
+          recognitionText: "भारत सरकार द्वारा मान्य, इंटर स्तर की हिंदी के समकक्ष",
+          examLevel: "PRAVIN",
+          language: "Hindi"
+        },
+        schedule: {
+          session: "September 2024",
+          mode: "WRITTEN",
+          medium: "Hindi",
+          totalDuration: "3 Hours"
+        },
+        rules: {
+          eligibility: "प्रबोध या समकक्ष परीक्षा उत्तीर्ण",
+          passingCriteria: "प्रत्येक प्रश्नपत्र में न्यूनतम 40% तथा कुल अंकों में उत्तीर्ण होना आवश्यक",
+          gradingScheme: {
+            firstClass: "300 और ऊपर",
+            secondClass: "250 से 299",
+            thirdClass: "175 से 249",
+            fail: "174 से कम"
+          },
+          graceMarksAllowed: true,
+          revaluationAllowed: true,
+          maxAttempts: "5"
+        },
+        administrative: {
+          certificateIssued: "Pravin Certificate",
+          syllabusYear: "2024–2025",
+          signatoryName: "सौ. सुनीता कुलकर्णी",
+          signatoryDesignation: "सचिव, परीक्षा विभाग",
+          departmentName: " परीक्षा विभाग",
+          marksCalculationNote: "मात्र हिंदी के लिखित प्रश्नपत्रों के अंकों के आधार पर परिणाम घोषित किया जाता है।",
+          instructions: "परीक्षार्थी को परीक्षा केंद्र पर प्रवेश पत्र अनिवार्य रूप से साथ लाना होगा।",
+          disclaimer: "यह अंकसूची मूल प्रमाणपत्र नहीं है।"
+        },
+        structure: {
+          hasOral: false,
+          hasProject: false
+        }
+      },
+    });
+    setIsEditing(false);
+    setSelectedExamNo(null);
+  };
+
   const handleCreateExam = async (e) => {
     e.preventDefault();
     try {
-      // Stringify papers and details before sending to backend
       const payload = {
         ...examForm,
         papers: JSON.stringify(examForm.papers),
@@ -179,67 +248,54 @@ const AdminDashboard = () => {
       };
       await addExam(payload);
       toast.success("Exam Created!");
-      setExamForm({
-        exam_name: "राष्ट्रभाषा प्रवीण परीक्षा (सितंबर 2024)",
-        exam_code: "PRAVIN_SEP_2024",
-        status: "DRAFT",
-        no_of_papers: 2,
-        exam_fees: 700,
-        application_start_date: "2024-06-01",
-        application_end_date: "2024-07-31",
-        exam_start_date: "2024-09-01",
-        exam_end_date: "2024-09-10",
-        papers: [
-          { name: "प्रथम प्रश्नपत्र", maxMarks: 100 },
-          { name: "द्वितीय प्रश्नपत्र", maxMarks: 100 },
-        ],
-        exam_details: {
-          identity: {
-            examFullTitle: "राष्ट्रभाषा प्रवीण परीक्षा",
-            conductingBody: "महाराष्ट्र राष्ट्रभाषा सभा, पुणे",
-            board: "Rashtrabhasha Sabha",
-            recognitionText: "भारत सरकार द्वारा मान्य, इंटर स्तर की हिंदी के समकक्ष",
-            examLevel: "PRAVIN",
-            language: "Hindi"
-          },
-          schedule: {
-            session: "September 2024",
-            mode: "WRITTEN",
-            medium: "Hindi",
-            totalDuration: "3 Hours"
-          },
-          rules: {
-            eligibility: "प्रबोध या समकक्ष परीक्षा उत्तीर्ण",
-            passingCriteria: "प्रत्येक प्रश्नपत्र में न्यूनतम 40% तथा कुल अंकों में उत्तीर्ण होना आवश्यक",
-            gradingScheme: {
-              firstClass: "300 और ऊपर",
-              secondClass: "250 से 299",
-              thirdClass: "175 से 249",
-              fail: "174 से कम"
-            },
-            graceMarksAllowed: true,
-            revaluationAllowed: true,
-            maxAttempts: "5"
-          },
-          administrative: {
-            certificateIssued: "Pravin Certificate",
-            syllabusYear: "2024–2025",
-            signatoryName: "सौ. सुनीता कुलकर्णी",
-            signatoryDesignation: "सचिव, परीक्षा विभाग",
-            departmentName: "परीक्षा विभाग",
-            marksCalculationNote: "मात्र हिंदी के लिखित प्रश्नपत्रों के अंकों के आधार पर परिणाम घोषित किया जाता है।",
-            instructions: "परीक्षार्थी को परीक्षा केंद्र पर प्रवेश पत्र अनिवार्य रूप से साथ लाना होगा।",
-            disclaimer: "यह अंकसूची मूल प्रमाणपत्र नहीं है।"
-          },
-          structure: {
-            hasOral: false,
-            hasProject: false
-          }
-        },
-      });
+      resetExamForm();
       fetchData();
     } catch (error) {
       toast.error("Failed to create exam");
+    }
+  };
+
+  const handleUpdateExam = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        ...examForm,
+        papers: JSON.stringify(examForm.papers),
+        exam_details: JSON.stringify(examForm.exam_details),
+      };
+      await updateExam(selectedExamNo, payload);
+      toast.success("Exam Updated!");
+      resetExamForm();
+      fetchData();
+    } catch (error) {
+      toast.error("Failed to update exam");
+    }
+  };
+
+  const handleDeleteExam = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this exam?")) return;
+    try {
+      await deleteExam(id);
+      toast.success("Exam Deleted!");
+      fetchData();
+    } catch (error) {
+      toast.error("Failed to delete exam");
+    }
+  };
+
+  const startEditing = (exam) => {
+    try {
+      setExamForm({
+        ...exam,
+        papers: typeof exam.papers === 'string' ? JSON.parse(exam.papers) : exam.papers,
+        exam_details: typeof exam.exam_details === 'string' ? JSON.parse(exam.exam_details) : exam.exam_details
+      });
+      setIsEditing(true);
+      setSelectedExamNo(exam.examNo);
+      // Scroll to top of the exam section if needed, or just let the user see it
+    } catch (e) {
+      console.error("Error parsing exam data for edit:", e);
+      toast.error("Failed to load exam data");
     }
   };
 
@@ -494,6 +550,11 @@ const AdminDashboard = () => {
             examForm={examForm}
             setExamForm={setExamForm}
             handleCreateExam={handleCreateExam}
+            handleUpdateExam={handleUpdateExam}
+            handleDeleteExam={handleDeleteExam}
+            startEditing={startEditing}
+            isEditing={isEditing}
+            resetExamForm={resetExamForm}
             exams={exams}
           />
         )}
