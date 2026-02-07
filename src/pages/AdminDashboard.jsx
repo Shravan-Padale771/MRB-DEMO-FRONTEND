@@ -11,23 +11,76 @@ import {
 import toast from "react-hot-toast";
 import {
   RefreshCw,
-  CheckCircle,
-  AlertTriangle,
   Users,
   BookOpen,
   FileText,
   Award,
-  Plus,
 } from "lucide-react";
-import { motion } from "framer-motion";
+
+// Sub-components
+import StatCard from "../common/components/StatCard";
+import ExamManager from "../admin/components/ExamManager";
+import StudentManager from "../admin/components/StudentManager";
+import ApplicationManager from "../admin/components/ApplicationManager";
+import ResultPublisher from "../admin/components/ResultPublisher";
+import ResultViewer from "../admin/components/ResultViewer";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const [examForm, setExamForm] = useState({
-    exam_name: "",
-    no_of_papers: 1,
-    exam_fees: 0,
+    exam_name: "राष्ट्रभाषा प्रवीण परीक्षा (सितंबर 2024)",
+    exam_code: "PRAVIN_SEP_2024",
+    status: "DRAFT",
+    no_of_papers: 2,
+    exam_fees: 700,
+    application_start_date: "2024-06-01",
+    application_end_date: "2024-07-31",
+    exam_start_date: "2024-09-01",
+    exam_end_date: "2024-09-10",
+    papers: [
+      { name: "प्रथम प्रश्नपत्र", maxMarks: 100 },
+      { name: "द्वितीय प्रश्नपत्र", maxMarks: 100 },
+    ],
+    exam_details: {
+      identity: {
+        examFullTitle: "राष्ट्रभाषा प्रवीण परीक्षा",
+        conductingBody: "महाराष्ट्र राष्ट्रभाषा सभा, पुणे",
+        board: "Rashtrabhasha Sabha",
+        recognitionText: "भारत सरकार द्वारा मान्य, इंटर स्तर की हिंदी के समकक्ष",
+        examLevel: "PRAVIN",
+        language: "Hindi"
+      },
+      schedule: {
+        session: "September 2024",
+        mode: "WRITTEN",
+        medium: "Hindi",
+        totalDuration: "3 Hours"
+      },
+      rules: {
+        eligibility: "प्रबोध या समकक्ष परीक्षा उत्तीर्ण",
+        passingCriteria: "प्रत्येक प्रश्नपत्र में न्यूनतम 40% तथा कुल अंकों में उत्तीर्ण होना आवश्यक",
+        gradingScheme: {
+          firstClass: "300 और ऊपर",
+          secondClass: "250 से 299",
+          thirdClass: "175 से 249",
+          fail: "174 से कम"
+        },
+        graceMarksAllowed: true,
+        revaluationAllowed: true,
+        maxAttempts: "5"
+      },
+      administrative: {
+        certificateIssued: "Pravin Certificate",
+        syllabusYear: "2024–2025",
+        signatoryName: "सौ. सुनीता कुलकर्णी",
+        signatoryDesignation: "सचिव, परीक्षा विभाग",
+        departmentName: "परीक्षा विभाग",
+        marksCalculationNote: "मात्र हिंदी के लिखित प्रश्नपत्रों के अंकों के आधार पर परिणाम घोषित किया जाता है।",
+        instructions: "परीक्षार्थी को परीक्षा केंद्र पर प्रवेश पत्र अनिवार्य रूप से साथ लाना होगा।",
+        disclaimer: "यह अंकसूची मूल प्रमाणपत्र नहीं है।"
+      }
+    },
   });
   const [studentForm, setStudentForm] = useState({
     username: "",
@@ -37,6 +90,8 @@ const AdminDashboard = () => {
     applicationId: "",
     score: "",
     remarks: "Pass",
+    paperMarks: {}, // { "Math": 80, "English": 70 }
+    examPapers: [], // [{ name: "Math", maxMarks: 100 }, ...]
   });
 
   const [students, setStudents] = useState([]);
@@ -48,6 +103,25 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Auto-calculate percentage
+  useEffect(() => {
+    if (resultForm.examPapers.length > 0) {
+      const totalObtained = Object.values(resultForm.paperMarks).reduce(
+        (sum, m) => sum + (parseFloat(m) || 0),
+        0
+      );
+      const totalMax = resultForm.examPapers.reduce(
+        (sum, p) => sum + (p.maxMarks || 0),
+        0
+      );
+      const percentage = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
+      setResultForm((prev) => ({
+        ...prev,
+        score: `${percentage.toFixed(2)}%`,
+      }));
+    }
+  }, [resultForm.paperMarks, resultForm.examPapers]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -78,9 +152,68 @@ const AdminDashboard = () => {
   const handleCreateExam = async (e) => {
     e.preventDefault();
     try {
-      await addExam(examForm);
+      // Stringify papers and details before sending to backend
+      const payload = {
+        ...examForm,
+        papers: JSON.stringify(examForm.papers),
+        exam_details: JSON.stringify(examForm.exam_details),
+      };
+      await addExam(payload);
       toast.success("Exam Created!");
-      setExamForm({ exam_name: "", no_of_papers: 1, exam_fees: 0 });
+      setExamForm({
+        exam_name: "राष्ट्रभाषा प्रवीण परीक्षा (सितंबर 2024)",
+        exam_code: "PRAVIN_SEP_2024",
+        status: "DRAFT",
+        no_of_papers: 2,
+        exam_fees: 700,
+        application_start_date: "2024-06-01",
+        application_end_date: "2024-07-31",
+        exam_start_date: "2024-09-01",
+        exam_end_date: "2024-09-10",
+        papers: [
+          { name: "प्रथम प्रश्नपत्र", maxMarks: 100 },
+          { name: "द्वितीय प्रश्नपत्र", maxMarks: 100 },
+        ],
+        exam_details: {
+          identity: {
+            examFullTitle: "राष्ट्रभाषा प्रवीण परीक्षा",
+            conductingBody: "महाराष्ट्र राष्ट्रभाषा सभा, पुणे",
+            board: "Rashtrabhasha Sabha",
+            recognitionText: "भारत सरकार द्वारा मान्य, इंटर स्तर की हिंदी के समकक्ष",
+            examLevel: "PRAVIN",
+            language: "Hindi"
+          },
+          schedule: {
+            session: "September 2024",
+            mode: "WRITTEN",
+            medium: "Hindi",
+            totalDuration: "3 Hours"
+          },
+          rules: {
+            eligibility: "प्रबोध या समकक्ष परीक्षा उत्तीर्ण",
+            passingCriteria: "प्रत्येक प्रश्नपत्र में न्यूनतम 40% तथा कुल अंकों में उत्तीर्ण होना आवश्यक",
+            gradingScheme: {
+              firstClass: "300 और ऊपर",
+              secondClass: "250 से 299",
+              thirdClass: "175 से 249",
+              fail: "174 से कम"
+            },
+            graceMarksAllowed: true,
+            revaluationAllowed: true,
+            maxAttempts: "5"
+          },
+          administrative: {
+            certificateIssued: "Pravin Certificate",
+            syllabusYear: "2024–2025",
+            signatoryName: "सौ. सुनीता कुलकर्णी",
+            signatoryDesignation: "सचिव, परीक्षा विभाग",
+            departmentName: "परीक्षा विभाग",
+            marksCalculationNote: "मात्र हिंदी के लिखित प्रश्नपत्रों के अंकों के आधार पर परिणाम घोषित किया जाता है।",
+            instructions: "परीक्षार्थी को परीक्षा केंद्र पर प्रवेश पत्र अनिवार्य रूप से साथ लाना होगा।",
+            disclaimer: "यह अंकसूची मूल प्रमाणपत्र नहीं है।"
+          }
+        },
+      });
       fetchData();
     } catch (error) {
       toast.error("Failed to create exam");
@@ -104,11 +237,24 @@ const AdminDashboard = () => {
     if (!resultForm.applicationId || !resultForm.score) {
       return toast.error("Please fill all fields");
     }
+
+    const totalObtained = Object.values(resultForm.paperMarks).reduce(
+      (sum, m) => sum + (parseFloat(m) || 0),
+      0
+    );
+    const totalMax = resultForm.examPapers.reduce(
+      (sum, p) => sum + (p.maxMarks || 0),
+      0
+    );
+
     const payload = {
       application: { applicationId: parseInt(resultForm.applicationId) },
       resultData: JSON.stringify({
         score: resultForm.score,
         remarks: resultForm.remarks,
+        totalObtained,
+        totalMax,
+        breakdown: resultForm.paperMarks,
       }),
       publishedAt: new Date().toISOString(),
     };
@@ -116,7 +262,13 @@ const AdminDashboard = () => {
     try {
       await addExamResult(payload);
       toast.success("Result Published!");
-      setResultForm({ applicationId: "", score: "", remarks: "Pass" });
+      setResultForm({
+        applicationId: "",
+        score: "",
+        remarks: "Pass",
+        paperMarks: {},
+        examPapers: [],
+      });
       fetchData();
     } catch (error) {
       toast.error("Failed to publish result");
@@ -124,26 +276,26 @@ const AdminDashboard = () => {
   };
 
   const selectApplication = (appId) => {
-    setResultForm({ ...resultForm, applicationId: appId });
+    const app = applications.find((a) => a.applicationId === appId);
+    let papers = [];
+    if (app && app.exam && app.exam.papers) {
+      try {
+        papers = JSON.parse(app.exam.papers);
+      } catch (e) {
+        console.error("Error parsing papers:", e);
+      }
+    }
+
+    setResultForm({
+      ...resultForm,
+      applicationId: appId,
+      examPapers: papers,
+      paperMarks: papers.reduce((acc, p) => ({ ...acc, [p.name]: 0 }), {}),
+      score: "",
+    });
     setActiveTab("publish");
     toast("Selected Application #" + appId);
   };
-
-  const StatCard = ({ icon: Icon, label, value, color }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`bg-white p-6 rounded-xl shadow-md border-l-4 ${color}`}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-gray-500 text-sm font-medium">{label}</p>
-          <p className="text-3xl font-bold text-gray-800 mt-1">{value}</p>
-        </div>
-        <Icon className="text-gray-300" size={40} />
-      </div>
-    </motion.div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
@@ -172,11 +324,10 @@ const AdminDashboard = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-6 py-3 rounded-lg capitalize font-medium transition-all whitespace-nowrap ${
-                activeTab === tab
-                  ? "bg-indigo-600 text-white shadow"
-                  : "text-gray-600 hover:bg-gray-50"
-              }`}
+              className={`px-6 py-3 rounded-lg capitalize font-medium transition-all whitespace-nowrap ${activeTab === tab
+                ? "bg-indigo-600 text-white shadow"
+                : "text-gray-600 hover:bg-gray-50"
+                }`}
             >
               {tab}
             </button>
@@ -261,7 +412,7 @@ const AdminDashboard = () => {
                         className="p-3 bg-gray-50 rounded-lg border"
                       >
                         <p className="font-semibold text-gray-800">
-                          App ##{res.application?.applicationId}
+                          App #{res.application?.applicationId}
                         </p>
                         <p className="text-xs text-gray-600 font-mono truncate">
                           {res.resultData}
@@ -276,379 +427,41 @@ const AdminDashboard = () => {
         )}
 
         {activeTab === "applications" && (
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-              <FileText size={24} /> Student Applications
-            </h2>
-
-            {applications.length === 0 ? (
-              <div className="text-center p-12 bg-gray-50 rounded-lg border-2 border-dashed">
-                <AlertTriangle
-                  className="mx-auto text-yellow-500 mb-3"
-                  size={40}
-                />
-                <p className="text-gray-500 font-medium">
-                  No applications found
-                </p>
-                <p className="text-xs text-gray-400 mt-2">
-                  Students who apply for exams will appear here
-                </p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-indigo-50 text-gray-700">
-                    <tr>
-                      <th className="p-4 text-left font-semibold">App ID</th>
-                      <th className="p-4 text-left font-semibold">Student</th>
-                      <th className="p-4 text-left font-semibold">Exam</th>
-                      <th className="p-4 text-left font-semibold">Status</th>
-                      <th className="p-4 text-left font-semibold">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {applications.map((app) => (
-                      <tr
-                        key={app.applicationId}
-                        className="hover:bg-gray-50 transition"
-                      >
-                        <td className="p-4 font-bold text-indigo-600">
-                          #{app.applicationId}
-                        </td>
-                        <td className="p-4">
-                          {app.student?.username || "N/A"}
-                        </td>
-                        <td className="p-4">{app.exam?.exam_name || "N/A"}</td>
-                        <td className="p-4">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-bold ${
-                              app.status === "APPLIED"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-green-100 text-green-800"
-                            }`}
-                          >
-                            {app.status}
-                          </span>
-                        </td>
-                        <td className="p-4">
-                          <button
-                            onClick={() => selectApplication(app.applicationId)}
-                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-sm font-medium transition"
-                          >
-                            Publish Result
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          <ApplicationManager
+            applications={applications}
+            selectApplication={selectApplication}
+          />
         )}
 
         {activeTab === "publish" && (
-          <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg border-t-4 border-indigo-600">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-              <Award size={24} /> Publish Exam Result
-            </h2>
-            <form onSubmit={handlePublishResult} className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Application ID
-                </label>
-                <input
-                  type="number"
-                  required
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                  value={resultForm.applicationId}
-                  onChange={(e) =>
-                    setResultForm({
-                      ...resultForm,
-                      applicationId: e.target.value,
-                    })
-                  }
-                  placeholder="Enter Application ID"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Score
-                  </label>
-                  <input
-                    required
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={resultForm.score}
-                    onChange={(e) =>
-                      setResultForm({ ...resultForm, score: e.target.value })
-                    }
-                    placeholder="e.g. 85%"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Status
-                  </label>
-                  <select
-                    required
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={resultForm.remarks}
-                    onChange={(e) =>
-                      setResultForm({ ...resultForm, remarks: e.target.value })
-                    }
-                  >
-                    <option>Pass</option>
-                    <option>Fail</option>
-                    <option>Withheld</option>
-                  </select>
-                </div>
-              </div>
-              <button className="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors">
-                Publish Result
-              </button>
-            </form>
-          </div>
+          <ResultPublisher
+            resultForm={resultForm}
+            setResultForm={setResultForm}
+            handlePublishResult={handlePublishResult}
+            applications={applications}
+          />
         )}
 
         {activeTab === "results" && (
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-              <Award size={24} /> Published Results
-            </h2>
-            {results.length === 0 ? (
-              <div className="text-center p-12 bg-gray-50 rounded-lg border-2 border-dashed">
-                <Award className="mx-auto text-gray-400 mb-3" size={40} />
-                <p className="text-gray-500 font-medium">
-                  No results published yet
-                </p>
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {results.map((res) => (
-                  <motion.div
-                    key={res.id || Math.random()}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="border p-5 rounded-lg hover:shadow-lg transition bg-gradient-to-br from-green-50 to-white"
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <p className="font-bold text-lg text-gray-800">
-                          App ID: #{res.application?.applicationId}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {res.application?.student?.username}
-                        </p>
-                      </div>
-                      <CheckCircle className="text-green-500" size={24} />
-                    </div>
-                    <div className="bg-white p-3 rounded border border-green-200 mb-3">
-                      <p className="text-sm font-mono text-gray-700 break-words font-semibold">
-                        {res.resultData}
-                      </p>
-                    </div>
-                    <p className="text-xs text-gray-500">
-                      Published:{" "}
-                      {res.publishedAt
-                        ? new Date(res.publishedAt).toLocaleDateString()
-                        : "N/A"}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </div>
+          <ResultViewer results={results} />
         )}
 
         {activeTab === "exams" && (
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <Plus size={24} /> Create Exam
-              </h2>
-              <form onSubmit={handleCreateExam} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Exam Name
-                  </label>
-                  <input
-                    required
-                    placeholder="e.g. Hindi Final Exam"
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={examForm.exam_name}
-                    onChange={(e) =>
-                      setExamForm({ ...examForm, exam_name: e.target.value })
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Number of Papers
-                  </label>
-                  <input
-                    required
-                    type="number"
-                    min="1"
-                    placeholder="e.g. 3"
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={examForm.no_of_papers}
-                    onChange={(e) =>
-                      setExamForm({
-                        ...examForm,
-                        no_of_papers: parseInt(e.target.value) || 1,
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Exam Fees ($)
-                  </label>
-                  <input
-                    required
-                    type="number"
-                    step="0.01"
-                    placeholder="e.g. 500.00"
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={examForm.exam_fees}
-                    onChange={(e) =>
-                      setExamForm({
-                        ...examForm,
-                        exam_fees: parseFloat(e.target.value) || 0,
-                      })
-                    }
-                  />
-                </div>
-                <button className="w-full bg-indigo-600 text-white font-bold p-3 rounded-lg hover:bg-indigo-700 transition-colors">
-                  Create Exam
-                </button>
-              </form>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <BookOpen size={24} /> All Exams
-              </h2>
-              {exams.length === 0 ? (
-                <p className="text-gray-400 text-center py-8">
-                  No exams created yet
-                </p>
-              ) : (
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {exams.map((ex) => (
-                    <motion.div
-                      key={ex.examNo}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="p-4 border rounded-lg hover:bg-indigo-50 transition cursor-pointer"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <p className="font-bold text-gray-800">
-                            {ex.exam_name}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Exam No: #{ex.examNo}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-mono font-bold text-green-600">
-                            ${ex.exam_fees}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {ex.no_of_papers} papers
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          <ExamManager
+            examForm={examForm}
+            setExamForm={setExamForm}
+            handleCreateExam={handleCreateExam}
+            exams={exams}
+          />
         )}
 
         {activeTab === "students" && (
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <Plus size={24} /> Add Student
-              </h2>
-              <form onSubmit={handleCreateStudent} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Username
-                  </label>
-                  <input
-                    required
-                    placeholder="e.g. Raj Kumar"
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={studentForm.username}
-                    onChange={(e) =>
-                      setStudentForm({
-                        ...studentForm,
-                        username: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Password
-                  </label>
-                  <input
-                    required
-                    type="password"
-                    placeholder="Enter password"
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={studentForm.password}
-                    onChange={(e) =>
-                      setStudentForm({
-                        ...studentForm,
-                        password: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <button className="w-full bg-green-600 text-white font-bold p-3 rounded-lg hover:bg-green-700 transition-colors">
-                  Add Student
-                </button>
-              </form>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <Users size={24} /> All Students
-              </h2>
-              {students.length === 0 ? (
-                <p className="text-gray-400 text-center py-8">
-                  No students added yet
-                </p>
-              ) : (
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {students.map((st) => (
-                    <motion.div
-                      key={st.studentId}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="p-4 border rounded-lg hover:bg-blue-50 transition flex justify-between items-center"
-                    >
-                      <div>
-                        <p className="font-bold text-gray-800">{st.username}</p>
-                        <p className="text-xs text-gray-500">
-                          ID: #{st.studentId}
-                        </p>
-                      </div>
-                      <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
-                        Active
-                      </span>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          <StudentManager
+            studentForm={studentForm}
+            setStudentForm={setStudentForm}
+            handleCreateStudent={handleCreateStudent}
+            students={students}
+          />
         )}
       </div>
     </div>
