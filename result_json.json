@@ -1,0 +1,14 @@
+{
+  "application_end_date": "2024-07-31",
+  "application_start_date": "2024-06-01",
+  "examNo": 13,
+  "exam_code": "PROBODH_SEP_2024",
+  "exam_details": "{\"rules\": {\"eligibility\": \"प्रबोध या समकक्ष परीक्षा उत्तीर्ण\", \"maxAttempts\": \"5\", \"gradingScheme\": {\"fail\": \"174 से कम\", \"firstClass\": \"300 और ऊपर\", \"thirdClass\": \"175 से 249\", \"secondClass\": \"250 से 299\"}, \"passingCriteria\": \"प्रत्येक प्रश्नपत्र में न्यूनतम 40% तथा कुल अंकों में उत्तीर्ण होना आवश्यक\", \"graceMarksAllowed\": true, \"revaluationAllowed\": true}, \"identity\": {\"board\": \"Rashtrabhasha Sabha\", \"language\": \"Hindi\", \"examLevel\": \"PRAVIN\", \"examFullTitle\": \"राष्ट्रभाषा प्रवीण परीक्षा\", \"conductingBody\": \"महाराष्ट्र राष्ट्रभाषा सभा, पुणे\", \"recognitionText\": \"भारत सरकार द्वारा मान्य, इंटर स्तर की हिंदी के समकक्ष\"}, \"schedule\": {\"mode\": \"WRITTEN\", \"medium\": \"Hindi\", \"session\": \"September 2024\", \"totalDuration\": \"3 Hours\"}, \"structure\": {\"hasOral\": true, \"hasProject\": true}, \"administrative\": {\"disclaimer\": \"यह अंकसूची मूल प्रमाणपत्र नहीं है।\", \"instructions\": \"परीक्षार्थी को परीक्षा केंद्र पर प्रवेश पत्र अनिवार्य रूप से साथ लाना होगा।\", \"syllabusYear\": \"2024–2025\", \"signatoryName\": \"सौ. सुनीता कुलकर्णी\", \"departmentName\": \" परीक्षा विभाग\", \"certificateIssued\": \"Pravin Certificate\", \"marksCalculationNote\": \"मात्र हिंदी के लिखित प्रश्नपत्रों के अंकों के आधार पर परिणाम घोषित किया जाता है।\", \"signatoryDesignation\": \"सचिव, परीक्षा विभाग\"}}",
+  "exam_end_date": "2024-09-10",
+  "exam_fees": 4,
+  "exam_name": "राष्ट्रभाषा प्रबोध परीक्षा",
+  "exam_start_date": "2024-09-01",
+  "no_of_papers": 1,
+  "papers": "[{\"name\": \"प्रथम प्रश्नपत्र\", \"maxMarks\": 100}]",
+  "status": "DRAFT"
+}

@@ -222,7 +222,7 @@ const Marksheet = ({ result, onClose }) => {
                 )}
                 {!examDetails.structure?.hasOral && !examDetails.structure?.hasProject && (
                   <div className="h-4 flex items-center">
-                    <p className="text-[12px] text-gray-400 uppercase tracking-[4px] font-black">No additional components</p>
+                    {/* Empty spacer when no additional components exist */}
                   </div>
                 )}
               </div>

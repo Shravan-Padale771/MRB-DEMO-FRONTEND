@@ -136,6 +136,8 @@ const ResultPublisher = ({
                             const hasOral = details.structure?.hasOral;
                             const hasProject = details.structure?.hasProject;
 
+                            if (!hasOral && !hasProject) return null;
+
                             return (
                                 <div className="space-y-4 mb-6 bg-indigo-50/30 p-4 rounded-xl border border-indigo-100/50">
                                     {hasOral && (
@@ -175,9 +177,6 @@ const ResultPublisher = ({
                                                 })}
                                             />
                                         </div>
-                                    )}
-                                    {!hasOral && !hasProject && (
-                                        <p className="text-[10px] text-gray-400 italic text-center uppercase tracking-widest">No extra components enabled</p>
                                     )}
                                 </div>
                             )

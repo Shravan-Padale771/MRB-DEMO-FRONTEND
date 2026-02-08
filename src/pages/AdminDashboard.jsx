@@ -326,6 +326,16 @@ const AdminDashboard = () => {
       0
     );
 
+    // Add Oral & Project if active
+    if (resultForm.hasOral) {
+      totalObtained += (parseFloat(resultForm.oralMarks) || 0);
+      totalMax += 50;
+    }
+    if (resultForm.hasProject) {
+      totalObtained += (parseFloat(resultForm.projectMarks) || 0);
+      totalMax += 50;
+    }
+
     const payload = {
       application: { applicationId: parseInt(resultForm.applicationId) },
       resultData: JSON.stringify({
@@ -339,6 +349,8 @@ const AdminDashboard = () => {
       }),
       publishedAt: new Date().toISOString(),
     };
+
+    console.log("Publishing Result Payload:", payload);
 
     try {
       await addExamResult(payload);
@@ -357,6 +369,7 @@ const AdminDashboard = () => {
   };
 
   const selectApplication = (appId) => {
+    const app = applications.find((a) => a.applicationId === appId);
     let papers = [];
     let hasOral = false;
     let hasProject = false;
