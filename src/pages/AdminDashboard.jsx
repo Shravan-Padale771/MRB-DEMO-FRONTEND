@@ -15,6 +15,9 @@ import StudentManager from "../admin/components/StudentManager";
 import ApplicationManager from "../admin/components/ApplicationManager";
 import ResultPublisher from "../admin/components/ResultPublisher";
 import ResultViewer from "../admin/components/ResultViewer";
+import RegionManager from "../admin/components/RegionManager";
+import ExamCentreManager from "../admin/components/ExamCentreManager";
+import SchoolManager from "../admin/components/SchoolManager";
 
 import {
   addExam,
@@ -26,6 +29,7 @@ import {
   addExamResult,
   getAllApplications,
   getAllResults,
+  getAllSchools,
 } from "../api";
 
 const AdminDashboard = () => {
@@ -95,6 +99,7 @@ const AdminDashboard = () => {
   const [studentForm, setStudentForm] = useState({
     username: "",
     password: "",
+    schoolId: "",
   });
 
   const [resultForm, setResultForm] = useState({
@@ -113,6 +118,7 @@ const AdminDashboard = () => {
   const [exams, setExams] = useState([]);
   const [applications, setApplications] = useState([]);
   const [results, setResults] = useState([]);
+  const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -152,11 +158,12 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [s, e, a, r] = await Promise.allSettled([
+      const [s, e, a, r, sc] = await Promise.allSettled([
         getAllStudents(),
         getAllExams(),
         getAllApplications(),
         getAllResults(),
+        getAllSchools(),
       ]);
 
       if (s.status === "fulfilled" && Array.isArray(s.value))
@@ -168,6 +175,9 @@ const AdminDashboard = () => {
       if (r.status === "fulfilled" && Array.isArray(r.value))
         setResults(r.value);
       else setResults([]);
+      if (sc.status === "fulfilled" && Array.isArray(sc.value))
+        setSchools(sc.value);
+      else setSchools([]);
     } catch (err) {
       console.error("Error fetching data:", err);
       toast.error("Error loading dashboard data");
@@ -301,10 +311,14 @@ const AdminDashboard = () => {
 
   const handleCreateStudent = async (e) => {
     e.preventDefault();
+    if (!studentForm.schoolId) {
+      return toast.error("Please select a school");
+    }
     try {
-      await addStudent(studentForm);
+      const { schoolId, ...studentData } = studentForm;
+      await addStudent(schoolId, studentData);
       toast.success("Student Added!");
-      setStudentForm({ username: "", password: "" });
+      setStudentForm({ username: "", password: "", schoolId: "" });
       fetchData();
     } catch (error) {
       toast.error("Failed to add student");
@@ -317,11 +331,11 @@ const AdminDashboard = () => {
       return toast.error("Please fill all fields");
     }
 
-    const totalObtained = Object.values(resultForm.paperMarks).reduce(
+    let totalObtained = Object.values(resultForm.paperMarks).reduce(
       (sum, m) => sum + (parseFloat(m) || 0),
       0
     );
-    const totalMax = resultForm.examPapers.reduce(
+    let totalMax = resultForm.examPapers.reduce(
       (sum, p) => sum + (p.maxMarks || 0),
       0
     );
@@ -427,6 +441,9 @@ const AdminDashboard = () => {
         <div className="bg-white p-1 rounded-xl shadow-sm inline-flex mb-8 overflow-x-auto max-w-full border">
           {[
             "dashboard",
+            "regions",
+            "exam_centres",
+            "schools",
             "applications",
             "publish",
             "results",
@@ -441,7 +458,7 @@ const AdminDashboard = () => {
                 : "text-gray-600 hover:bg-gray-50"
                 }`}
             >
-              {tab}
+              {tab.replace("_", " ")}
             </button>
           ))}
         </div>
@@ -538,6 +555,10 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        {activeTab === "regions" && <RegionManager />}
+        {activeTab === "exam_centres" && <ExamCentreManager />}
+        {activeTab === "schools" && <SchoolManager />}
+
         {activeTab === "applications" && (
           <ApplicationManager
             applications={applications}
@@ -578,6 +599,7 @@ const AdminDashboard = () => {
             setStudentForm={setStudentForm}
             handleCreateStudent={handleCreateStudent}
             students={students}
+            schools={schools}
           />
         )}
       </div>

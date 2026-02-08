@@ -15,8 +15,8 @@ export const getAllStudents = async () => {
   return response.data;
 };
 
-export const addStudent = async (studentData) => {
-  const response = await api.post("/addStudent", studentData);
+export const addStudent = async (schoolId, studentData) => {
+  const response = await api.post(`/addStudent?schoolId=${schoolId}`, studentData);
   return response.data;
 };
 
@@ -91,6 +91,40 @@ export const getAllResults = async () => {
 
 export const getStudentResults = async (studentId) => {
   const response = await api.get(`/getStudentResults?studentId=${studentId}`);
+  return response.data;
+};
+
+// --- REGION ENDPOINTS ---
+export const getAllRegions = async () => {
+  const response = await api.get("/getRegions");
+  return response.data;
+};
+
+export const addRegion = async (regionData) => {
+  console.log("API: POST /addregion Payload:", regionData);
+  const response = await api.post("/addregion", regionData);
+  return response.data;
+};
+
+// --- EXAM CENTRE ENDPOINTS ---
+export const getAllExamCentres = async () => {
+  const response = await api.get("/getAllExamCentres");
+  return response.data;
+};
+
+export const addExamCentre = async (regionId, centreData) => {
+  const response = await api.post(`/addExamCentre?regionId=${regionId}`, centreData);
+  return response.data;
+};
+
+// --- SCHOOL ENDPOINTS ---
+export const getAllSchools = async () => {
+  const response = await api.get("/getAllSchools");
+  return response.data;
+};
+
+export const addSchool = async (centreId, schoolData) => {
+  const response = await api.post(`/addSchool?centreId=${centreId}`, schoolData);
   return response.data;
 };
 
