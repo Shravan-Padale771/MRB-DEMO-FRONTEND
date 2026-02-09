@@ -11,6 +11,7 @@ import {
   X,
   Award,
   User,
+  UserPlus,
   LogOut,
   CheckCircle,
   BookOpen,
@@ -96,33 +97,67 @@ const StudentDashboard = () => {
         <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-gray-100">
           <div className="text-center mb-6">
             <User size={48} className="mx-auto text-indigo-600 mb-3" />
-            <h2 className="text-3xl font-bold text-gray-800">Student Login</h2>
+            <h2 className="text-3xl font-bold text-gray-800">Student Portal</h2>
             <p className="text-gray-500 text-sm mt-2">
-              Select your account to continue
+              Login or create a new account
             </p>
           </div>
-          <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
-            {students.length === 0 ? (
-              <div className="text-center p-8 text-gray-400">
-                <p>No students available</p>
-              </div>
-            ) : (
-              students.map((s) => (
-                <motion.button
-                  key={s.studentId}
-                  whileHover={{ scale: 1.02 }}
-                  onClick={() => setCurrentUser(s)}
-                  className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-indigo-50 border border-transparent hover:border-indigo-200 rounded-xl transition-all duration-200"
-                >
-                  <span className="font-semibold text-gray-700">
-                    {s.username}
-                  </span>
-                  <span className="text-xs bg-white border px-2 py-1 rounded text-gray-400">
-                    ID: {s.studentId}
-                  </span>
-                </motion.button>
-              ))
-            )}
+
+          <div className="space-y-4">
+            {/* Login Button */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                // For now, show student selection for login
+                // You can replace this with actual login form later
+              }}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 rounded-xl hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <User size={20} />
+              Login to Existing Account
+            </motion.button>
+
+            {/* Register Button */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => window.location.href = '/student/register'}
+              className="w-full bg-white border-2 border-indigo-600 text-indigo-600 font-bold py-4 rounded-xl hover:bg-indigo-50 transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <UserPlus size={20} />
+              Create New Account
+            </motion.button>
+          </div>
+
+          {/* Temporary: Student Selection for Demo */}
+          <div className="mt-8 pt-6 border-t border-gray-200">
+            <p className="text-xs text-gray-500 text-center mb-3">
+              Demo: Select existing student
+            </p>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {students.length === 0 ? (
+                <div className="text-center p-4 text-gray-400 text-sm">
+                  <p>No students available</p>
+                </div>
+              ) : (
+                students.map((s) => (
+                  <motion.button
+                    key={s.studentId}
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => setCurrentUser(s)}
+                    className="w-full flex justify-between items-center p-3 bg-gray-50 hover:bg-indigo-50 border border-transparent hover:border-indigo-200 rounded-lg transition-all duration-200 text-sm"
+                  >
+                    <span className="font-semibold text-gray-700">
+                      {s.username}
+                    </span>
+                    <span className="text-xs bg-white border px-2 py-1 rounded text-gray-400">
+                      ID: {s.studentId}
+                    </span>
+                  </motion.button>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>

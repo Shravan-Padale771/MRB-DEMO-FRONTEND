@@ -20,6 +20,12 @@ export const addStudent = async (studentData) => {
   return response.data;
 };
 
+export const registerStudent = async (studentData, schoolId = 1) => {
+  // Backend expects schoolId as query param and student data in body
+  const response = await api.post(`/addStudent?schoolId=${schoolId}`, studentData);
+  return response.data;
+};
+
 export const getStudentById = async (id) => {
   const response = await api.get(`/getStudent?id=${id}`);
   return response.data;
