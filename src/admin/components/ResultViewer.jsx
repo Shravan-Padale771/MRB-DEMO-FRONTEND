@@ -1,100 +1,269 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Award, CheckCircle } from 'lucide-react';
+import { Award, CheckCircle, Trophy, Filter, XCircle, Search, TrendingUp } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { getAllRegions, getAllExamCentres, getAllSchools } from '../../api';
 
-const ResultViewer = ({ results }) => {
+const ResultViewer = ({ results = [] }) => {
+    // Filter State
+    const [filterRegion, setFilterRegion] = useState("");
+    const [filterCentre, setFilterCentre] = useState("");
+    const [filterSchool, setFilterSchool] = useState("");
+    const [isRankingsMode, setIsRankingsMode] = useState(false);
+
+    // Metadata Queries
+    const { data: regions = [] } = useQuery({ queryKey: ['regions'], queryFn: getAllRegions });
+    const { data: centres = [] } = useQuery({ queryKey: ['examCentres'], queryFn: getAllExamCentres });
+    const { data: schools = [] } = useQuery({ queryKey: ['schools'], queryFn: getAllSchools });
+
+    // Cascading Filter Options
+    const availableCentres = useMemo(() => {
+        if (!filterRegion) return centres;
+        return centres.filter(c => (c.region?.regionId?.toString() === filterRegion));
+    }, [filterRegion, centres]);
+
+    const availableSchools = useMemo(() => {
+        if (!filterCentre) return schools;
+        return schools.filter(s => s.examCentre?.centreId?.toString() === filterCentre);
+    }, [filterCentre, schools]);
+
+    // Processed Results (Parsed and Filtered)
+    const processedResults = useMemo(() => {
+        const parsed = results.map(res => {
+            let score = 0;
+            let remarks = "N/A";
+            try {
+                const data = JSON.parse(res.resultData);
+                score = parseFloat(data.score) || 0;
+                remarks = data.remarks || "N/A";
+            } catch (e) {
+                console.error("Error parsing resultData:", e);
+            }
+
+            const student = res.application?.student;
+            const school = student?.school;
+            const centre = school?.examCentre;
+            const region = centre?.region;
+
+            return {
+                ...res,
+                numericScore: score,
+                remarks,
+                student,
+                school,
+                centre,
+                region
+            };
+        });
+
+        // Filter
+        let filtered = parsed.filter(res => {
+            const matchesRegion = !filterRegion || res.region?.regionId?.toString() === filterRegion;
+            const matchesCentre = !filterCentre || res.centre?.centreId?.toString() === filterCentre;
+            const matchesSchool = !filterSchool || res.school?.schoolId?.toString() === filterSchool;
+            return matchesRegion && matchesCentre && matchesSchool;
+        });
+
+        // Sort if Rankings Mode
+        if (isRankingsMode) {
+            filtered.sort((a, b) => b.numericScore - a.numericScore);
+        } else {
+            // Default: newest first
+            filtered.sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
+        }
+
+        return filtered;
+    }, [results, filterRegion, filterCentre, filterSchool, isRankingsMode]);
+
+    const clearFilters = () => {
+        setFilterRegion("");
+        setFilterCentre("");
+        setFilterSchool("");
+    };
+
+    const getRankBadge = (index) => {
+        if (!isRankingsMode) return null;
+        if (index === 0) return <Trophy size={16} className="text-amber-500" />;
+        if (index === 1) return <Trophy size={16} className="text-slate-400" />;
+        if (index === 2) return <Trophy size={16} className="text-amber-700" />;
+        return <span className="text-[10px] font-black text-gray-400">#{index + 1}</span>;
+    };
+
     return (
-        <div className="bg-white p-6 rounded-xl shadow-md">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                <Award size={24} /> Published Results
-            </h2>
-            {results.length === 0 ? (
-                <div className="text-center p-12 bg-gray-50 rounded-lg border-2 border-dashed">
-                    <Award className="mx-auto text-gray-400 mb-3" size={40} />
-                    <p className="text-gray-500 font-medium">
-                        No results published yet
-                    </p>
-                </div>
-            ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {results.map((res) => (
-                        <motion.div
-                            key={res.id || Math.random()}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="border p-5 rounded-lg hover:shadow-lg transition bg-gradient-to-br from-green-50 to-white"
+        <div className="space-y-6">
+            <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-indigo-600">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                            <Award size={24} /> Published Results
+                        </h2>
+                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">
+                            {isRankingsMode ? "Rankings & Toppers View" : "Recent Publications View"}
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 bg-indigo-50 p-1 rounded-xl border border-indigo-100">
+                        <button
+                            onClick={() => setIsRankingsMode(false)}
+                            className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${!isRankingsMode ? "bg-white text-indigo-600 shadow-sm" : "text-indigo-400 hover:text-indigo-600"}`}
                         >
-                            <div className="flex justify-between items-start mb-3">
-                                <div>
-                                    <p className="font-bold text-lg text-gray-800">
-                                        App ID: #{res.application?.applicationId}
-                                    </p>
-                                    <p className="text-sm text-gray-600">
-                                        {res.application?.student?.username}
-                                    </p>
+                            Recent
+                        </button>
+                        <button
+                            onClick={() => setIsRankingsMode(true)}
+                            className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${isRankingsMode ? "bg-white text-indigo-600 shadow-sm" : "text-indigo-400 hover:text-indigo-600"}`}
+                        >
+                            <TrendingUp size={14} /> Toppers
+                        </button>
+                    </div>
+                </div>
+
+                {/* Filter Controls */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+                    <div className="col-span-full flex justify-between items-center mb-2">
+                        <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                            <Filter size={12} /> Filter Results to find Toppers
+                        </h4>
+                        {(filterRegion || filterCentre || filterSchool) && (
+                            <button onClick={clearFilters} className="text-[10px] font-black text-red-500 uppercase flex items-center gap-1 hover:underline">
+                                <XCircle size={12} /> Reset
+                            </button>
+                        )}
+                    </div>
+                    <div>
+                        <select
+                            className="w-full text-xs p-2.5 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-indigo-900 shadow-sm"
+                            value={filterRegion}
+                            onChange={(e) => {
+                                setFilterRegion(e.target.value);
+                                setFilterCentre("");
+                                setFilterSchool("");
+                            }}
+                        >
+                            <option value="">All Regions</option>
+                            {regions.map(r => (
+                                <option key={r.regionId} value={r.regionId}>{r.regionName}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <select
+                            className="w-full text-xs p-2.5 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-indigo-900 shadow-sm"
+                            value={filterCentre}
+                            onChange={(e) => {
+                                setFilterCentre(e.target.value);
+                                setFilterSchool("");
+                            }}
+                        >
+                            <option value="">All Centres</option>
+                            {availableCentres.map(c => (
+                                <option key={c.centreId} value={c.centreId}>{c.centreName}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <select
+                            className="w-full text-xs p-2.5 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-indigo-900 shadow-sm"
+                            value={filterSchool}
+                            onChange={(e) => setFilterSchool(e.target.value)}
+                        >
+                            <option value="">All Schools</option>
+                            {availableSchools.map(s => (
+                                <option key={s.schoolId} value={s.schoolId}>{s.schoolName}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="flex items-center px-4 py-2.5 bg-indigo-600 rounded-lg text-white font-black text-xs uppercase tracking-widest shadow-md">
+                        <Search size={14} className="mr-2" /> {processedResults.length} Found
+                    </div>
+                </div>
+
+                {processedResults.length === 0 ? (
+                    <div className="text-center p-16 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                        <Award className="mx-auto text-gray-200 mb-4" size={64} />
+                        <p className="text-gray-400 font-bold italic text-lg">No results match your filters</p>
+                        <button onClick={clearFilters} className="mt-4 text-indigo-600 font-black text-xs uppercase tracking-widest hover:underline">
+                            Load all results
+                        </button>
+                    </div>
+                ) : (
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {processedResults.map((res, index) => (
+                            <motion.div
+                                key={res.id || Math.random()}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className={`relative p-6 rounded-2xl border-2 transition-all group overflow-hidden ${isRankingsMode && index < 3 ? "bg-gradient-to-br from-indigo-50 to-white border-indigo-200 shadow-xl" : "bg-white border-gray-100 hover:border-indigo-100 hover:shadow-lg"}`}
+                            >
+                                {isRankingsMode && index < 3 && (
+                                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                        <Trophy size={80} />
+                                    </div>
+                                )}
+
+                                <div className="flex justify-between items-start mb-4 relative z-10">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg shadow-inner ${isRankingsMode && index === 0 ? "bg-amber-100 text-amber-600" : isRankingsMode && index === 1 ? "bg-slate-100 text-slate-500" : isRankingsMode && index === 2 ? "bg-amber-50 text-amber-800" : "bg-indigo-50 text-indigo-600"}`}>
+                                            {getRankBadge(index) || (res.student?.username?.charAt(0) || "?")}
+                                        </div>
+                                        <div>
+                                            <p className="font-black text-gray-900 group-hover:text-indigo-700 transition-colors truncate max-w-[150px]">
+                                                {res.student?.username || "Unknown Student"}
+                                            </p>
+                                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">
+                                                App ID: #{res.application?.applicationId}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <CheckCircle className="text-emerald-500" size={20} />
                                 </div>
-                                <CheckCircle className="text-green-500" size={24} />
-                            </div>
-                            <div className="bg-white p-3 rounded border border-green-200 mb-3">
-                                {(() => {
-                                    try {
-                                        const data = JSON.parse(res.resultData);
-                                        return (
-                                            <div className="space-y-2">
-                                                <div className="flex justify-between items-center pb-2 border-b">
-                                                    <span className="text-lg font-bold text-indigo-600">
-                                                        {data.score}
-                                                    </span>
-                                                    <span
-                                                        className={`text-xs font-bold px-2 py-0.5 rounded ${data.remarks === "Pass" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
-                                                    >
-                                                        {data.remarks}
-                                                    </span>
-                                                </div>
-                                                {data.breakdown && (
-                                                    <div className="text-xs space-y-1">
-                                                        {Object.entries(data.breakdown).map(
-                                                            ([name, marks]) => (
-                                                                <div
-                                                                    key={name}
-                                                                    className="flex justify-between text-gray-600"
-                                                                >
-                                                                    <span>{name}</span>
-                                                                    <span className="font-semibold">
-                                                                        {marks}
-                                                                    </span>
-                                                                </div>
-                                                            )
-                                                        )}
-                                                        <div className="flex justify-between pt-1 border-t font-bold text-gray-800">
-                                                            <span>Total</span>
-                                                            <span>
-                                                                {data.totalObtained} / {data.totalMax}
-                                                            </span>
+
+                                <div className="space-y-3 relative z-10">
+                                    <div className="flex flex-col gap-1.5 p-3 bg-gray-50/50 rounded-xl border border-gray-100">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-tighter">🏫 {res.school?.schoolName || "N/A"}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">📍 {res.region?.regionName || "N/A"}</span>
+                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">🏢 {res.centre?.centreName || "N/A"}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-2xl font-black text-indigo-600 italic">
+                                                {res.numericScore}%
+                                            </span>
+                                            <span className={`text-[10px] font-black px-3 py-1 rounded-full border shadow-sm uppercase tracking-widest ${res.remarks === "Pass" ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-red-50 text-red-700 border-red-100"}`}>
+                                                {res.remarks}
+                                            </span>
+                                        </div>
+
+                                        {(() => {
+                                            try {
+                                                const data = JSON.parse(res.resultData);
+                                                if (!data.breakdown) return null;
+                                                return (
+                                                    <div className="pt-2 border-t border-dashed mt-2 space-y-1">
+                                                        <div className="flex justify-between text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                                                            <span>Total Marks</span>
+                                                            <span>{data.totalObtained} / {data.totalMax}</span>
                                                         </div>
                                                     </div>
-                                                )}
-                                            </div>
-                                        );
-                                    } catch (e) {
-                                        return (
-                                            <p className="text-xs font-mono text-gray-700 break-words font-semibold">
-                                                {res.resultData}
-                                            </p>
-                                        );
-                                    }
-                                })()}
-                            </div>
-                            <p className="text-xs text-gray-500">
-                                Published:{" "}
-                                {res.publishedAt
-                                    ? new Date(res.publishedAt).toLocaleDateString()
-                                    : "N/A"}
-                            </p>
-                        </motion.div>
-                    ))}
-                </div>
-            )}
+                                                );
+                                            } catch (e) { return null; }
+                                        })()}
+                                    </div>
+
+                                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest text-center mt-2">
+                                        Published: {res.publishedAt ? new Date(res.publishedAt).toLocaleDateString() : "N/A"}
+                                    </p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
