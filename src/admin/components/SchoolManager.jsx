@@ -1,65 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { Building2, Plus, RefreshCw, School } from 'lucide-react';
+import React, { useState } from 'react';
+import { Building2, Plus, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { addSchool, getAllSchools, getAllExamCentres } from '../../api';
 
 const SchoolManager = () => {
-    const [schools, setSchools] = useState([]);
-    const [centres, setCentres] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const queryClient = useQueryClient();
     const [formData, setFormData] = useState({
         schoolName: "",
         centreId: ""
     });
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    // Queries
+    const { data: schools = [], isLoading: isLoadingSchools, refetch: refetchSchools } = useQuery({
+        queryKey: ['schools'],
+        queryFn: getAllSchools,
+    });
 
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            const results = await Promise.allSettled([
-                getAllSchools(),
-                getAllExamCentres()
-            ]);
+    const { data: centres = [], isLoading: isLoadingCentres, refetch: refetchCentres } = useQuery({
+        queryKey: ['examCentres'],
+        queryFn: getAllExamCentres,
+    });
 
-            if (results[0].status === 'fulfilled') {
-                const data = results[0].value;
-                console.log("DEBUG: Final Schools JSON ->", data);
-                setSchools(Array.isArray(data) ? data : []);
-            } else {
-                setSchools([]);
-            }
-
-            if (results[1].status === 'fulfilled') {
-                const data = results[1].value;
-                setCentres(Array.isArray(data) ? data : []);
-            } else {
-                setCentres([]);
-            }
-        } catch (error) {
-            console.error("Unexpected error fetching data:", error);
-            toast.error("Failed to load data");
+    // Mutation
+    const addSchoolMutation = useMutation({
+        mutationFn: ({ centreId, schoolData }) => addSchool(centreId, schoolData),
+        onSuccess: () => {
+            toast.success("School Added!");
+            setFormData({ schoolName: "", centreId: "" });
+            queryClient.invalidateQueries({ queryKey: ['schools'] });
+        },
+        onError: (error) => {
+            console.error("Error adding school:", error);
+            toast.error("Failed to add school");
         }
-        setLoading(false);
-    };
+    });
 
-    const handleCreateSchool = async (e) => {
+    const loading = isLoadingSchools || isLoadingCentres || addSchoolMutation.isPending;
+
+    const handleCreateSchool = (e) => {
         e.preventDefault();
         if (!formData.schoolName || !formData.centreId) {
             return toast.error("Please fill all fields");
         }
+        addSchoolMutation.mutate({
+            centreId: formData.centreId,
+            schoolData: { schoolName: formData.schoolName }
+        });
+    };
 
-        try {
-            await addSchool(formData.centreId, { schoolName: formData.schoolName });
-            toast.success("School Added!");
-            setFormData({ schoolName: "", centreId: "" });
-            fetchData();
-        } catch (error) {
-            console.error("Error adding school:", error);
-            toast.error("Failed to add school");
-        }
+    const handleRefresh = () => {
+        refetchSchools();
+        refetchCentres();
     };
 
     return (
@@ -99,9 +91,11 @@ const SchoolManager = () => {
                     </div>
                     <button
                         type="submit"
-                        className="bg-indigo-600 text-white p-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
+                        disabled={addSchoolMutation.isPending}
+                        className="bg-indigo-600 text-white p-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                        <Plus size={20} /> Add School
+                        {addSchoolMutation.isPending ? <RefreshCw className="animate-spin" size={20} /> : <Plus size={20} />}
+                        Add School
                     </button>
                 </form>
             </div>
@@ -110,7 +104,7 @@ const SchoolManager = () => {
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-bold text-gray-800">Existing Schools</h3>
                     <button
-                        onClick={fetchData}
+                        onClick={handleRefresh}
                         className="text-indigo-600 hover:text-indigo-800 flex items-center gap-1 text-sm font-medium"
                     >
                         <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
@@ -128,7 +122,7 @@ const SchoolManager = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {(Array.isArray(schools) && schools.length === 0) ? (
+                            {(Array.isArray(schools) && schools.length === 0 && !isLoadingSchools) ? (
                                 <tr>
                                     <td colSpan="4" className="p-8 text-center text-gray-400 italic font-medium">
                                         No schools found. Add your first school!

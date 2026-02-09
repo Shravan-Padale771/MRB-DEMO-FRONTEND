@@ -1,76 +1,62 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Building2, Plus, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { addExamCentre, getAllExamCentres, getAllRegions } from '../../api';
 
 const ExamCentreManager = () => {
-    const [centres, setCentres] = useState([]);
-    const [regions, setRegions] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const queryClient = useQueryClient();
     const [formData, setFormData] = useState({
         centreCode: "",
         centreName: "",
         regionId: ""
     });
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    // Queries
+    const { data: centres = [], isLoading: isLoadingCentres, refetch: refetchCentres } = useQuery({
+        queryKey: ['examCentres'],
+        queryFn: getAllExamCentres,
+    });
 
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            const results = await Promise.allSettled([
-                getAllExamCentres(),
-                getAllRegions()
-            ]);
+    const { data: regions = [], isLoading: isLoadingRegions, refetch: refetchRegions } = useQuery({
+        queryKey: ['regions'],
+        queryFn: getAllRegions,
+    });
 
-            if (results[0].status === 'fulfilled') {
-                console.log("DEBUG: Fetched Exam Centres JSON:", results[0].value);
-                const data = results[0].value;
-                setCentres(Array.isArray(data) ? data : []);
-            } else {
-                console.error("Error fetching centres:", results[0].reason);
-                setCentres([]);
-            }
-
-            if (results[1].status === 'fulfilled') {
-                console.log("DEBUG: Fetched Regions JSON:", results[1].value);
-                const data = results[1].value;
-                setRegions(Array.isArray(data) ? data : []);
-            } else {
-                console.error("Error fetching regions:", results[1].reason);
-                toast.error("Failed to load regions");
-            }
-        } catch (error) {
-            console.error("Unexpected error fetching data:", error);
+    // Mutation
+    const addCentreMutation = useMutation({
+        mutationFn: ({ regionId, payload }) => addExamCentre(regionId, payload),
+        onSuccess: () => {
+            toast.success("Exam Centre added!");
+            setFormData({ centreCode: "", centreName: "", regionId: "" });
+            queryClient.invalidateQueries({ queryKey: ['examCentres'] });
+        },
+        onError: (error) => {
+            console.error("Error adding exam centre:", error);
+            toast.error("Failed to add exam centre");
         }
-        setLoading(false);
-    };
+    });
 
-    const handleAddCentre = async (e) => {
+    const loading = isLoadingCentres || isLoadingRegions || addCentreMutation.isPending;
+
+    const handleAddCentre = (e) => {
         e.preventDefault();
         if (!formData.centreCode || !formData.centreName || !formData.regionId) {
             return toast.error("Please fill all fields");
         }
 
-        try {
-            const payload = {
+        addCentreMutation.mutate({
+            regionId: formData.regionId,
+            payload: {
                 centreCode: formData.centreCode,
                 centreName: formData.centreName
-            };
-            console.log("DEBUG: Sending addExamCentre request:", {
-                regionId: formData.regionId,
-                payload
-            });
-            await addExamCentre(formData.regionId, payload);
-            toast.success("Exam Centre added!");
-            setFormData({ centreCode: "", centreName: "", regionId: "" });
-            fetchData();
-        } catch (error) {
-            console.error("Error adding exam centre:", error);
-            toast.error("Failed to add exam centre");
-        }
+            }
+        });
+    };
+
+    const handleRefresh = () => {
+        refetchCentres();
+        refetchRegions();
     };
 
     return (
@@ -119,9 +105,11 @@ const ExamCentreManager = () => {
                     </div>
                     <button
                         type="submit"
-                        className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
+                        disabled={addCentreMutation.isPending}
+                        className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                        <Plus size={20} /> Add Centre
+                        {addCentreMutation.isPending ? <RefreshCw className="animate-spin" size={20} /> : <Plus size={20} />}
+                        Add Centre
                     </button>
                 </form>
             </div>
@@ -130,7 +118,7 @@ const ExamCentreManager = () => {
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-bold text-gray-800">Existing Exam Centres</h3>
                     <button
-                        onClick={fetchData}
+                        onClick={handleRefresh}
                         className="text-indigo-600 hover:text-indigo-800 flex items-center gap-1 text-sm font-medium"
                     >
                         <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
@@ -149,7 +137,7 @@ const ExamCentreManager = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {(Array.isArray(centres) && centres.length === 0) ? (
+                            {(Array.isArray(centres) && centres.length === 0 && !isLoadingCentres) ? (
                                 <tr>
                                     <td colSpan="5" className="p-8 text-center text-gray-400 italic">No exam centres found</td>
                                 </tr>

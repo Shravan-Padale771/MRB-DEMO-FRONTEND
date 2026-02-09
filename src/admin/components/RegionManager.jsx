@@ -1,49 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { MapPin, Plus, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { addRegion, getAllRegions } from '../../api';
 
 const RegionManager = () => {
-    const [regions, setRegions] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const queryClient = useQueryClient();
     const [regionName, setRegionName] = useState("");
 
-    useEffect(() => {
-        fetchRegions();
-    }, []);
+    // Query
+    const { data: regions = [], isLoading, refetch } = useQuery({
+        queryKey: ['regions'],
+        queryFn: getAllRegions,
+    });
 
-    const fetchRegions = async () => {
-        setLoading(true);
-        try {
-            const data = await getAllRegions();
-            if (Array.isArray(data)) {
-                setRegions(data);
-            } else {
-                console.error("Received non-array data for regions:", data);
-                setRegions([]);
-            }
-        } catch (error) {
-            console.error("Error fetching regions:", error);
-            toast.error("Failed to load regions");
-        }
-        setLoading(false);
-    };
-
-    const handleAddRegion = async (e) => {
-        e.preventDefault();
-        if (!regionName.trim()) return toast.error("Please enter a region name");
-
-        try {
-            const payload = { regionName };
-            console.log("Frontend: Sending Region Payload:", payload);
-            await addRegion(payload);
+    // Mutation
+    const addRegionMutation = useMutation({
+        mutationFn: (payload) => addRegion(payload),
+        onSuccess: () => {
             toast.success("Region added successfully!");
             setRegionName("");
-            fetchRegions();
-        } catch (error) {
+            queryClient.invalidateQueries({ queryKey: ['regions'] });
+        },
+        onError: (error) => {
             console.error("Error adding region:", error);
             toast.error("Failed to add region");
         }
+    });
+
+    const handleAddRegion = (e) => {
+        e.preventDefault();
+        if (!regionName.trim()) return toast.error("Please enter a region name");
+        addRegionMutation.mutate({ regionName });
     };
 
     return (
@@ -64,9 +52,11 @@ const RegionManager = () => {
                     />
                     <button
                         type="submit"
-                        className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors flex items-center gap-2"
+                        disabled={addRegionMutation.isPending}
+                        className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors flex items-center gap-2 disabled:opacity-50"
                     >
-                        <Plus size={20} /> Add Region
+                        {addRegionMutation.isPending ? <RefreshCw className="animate-spin" size={20} /> : <Plus size={20} />}
+                        Add Region
                     </button>
                 </form>
             </div>
@@ -75,15 +65,15 @@ const RegionManager = () => {
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-bold text-gray-800">Existing Regions</h3>
                     <button
-                        onClick={fetchRegions}
+                        onClick={() => refetch()}
                         className="text-indigo-600 hover:text-indigo-800 flex items-center gap-1 text-sm font-medium"
                     >
-                        <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
+                        <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} /> Refresh
                     </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {regions.length === 0 ? (
+                    {regions.length === 0 && !isLoading ? (
                         <div className="col-span-full text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed">
                             <p className="text-gray-400">No regions found</p>
                         </div>

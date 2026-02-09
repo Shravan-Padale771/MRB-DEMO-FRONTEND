@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getAllStudents,
   getAllExams,
@@ -15,11 +16,8 @@ import MyResults from "../student/components/MyResults";
 import ApplyModal from "../student/components/ApplyModal";
 
 const StudentDashboard = () => {
+  const queryClient = useQueryClient();
   const [currentUser, setCurrentUser] = useState(null);
-  const [students, setStudents] = useState([]);
-  const [exams, setExams] = useState([]);
-  const [myResults, setMyResults] = useState([]);
-
   const [selectedExam, setSelectedExam] = useState(null);
   const [applicationForm, setApplicationForm] = useState({
     fullName: "",
@@ -28,50 +26,27 @@ const StudentDashboard = () => {
     gender: "Male",
   });
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [s, e] = await Promise.all([getAllStudents(), getAllExams()]);
-        setStudents(s || []);
-        setExams(e || []);
-      } catch (error) {
-        console.error("Failed to load data", error);
-      }
-    };
-    loadData();
-  }, []);
+  // Queries
+  const { data: students = [], isLoading: isLoadingStudents } = useQuery({
+    queryKey: ["students"],
+    queryFn: getAllStudents,
+  });
 
-  useEffect(() => {
-    if (currentUser) {
-      fetchMyResults();
-    }
-  }, [currentUser]);
+  const { data: exams = [], isLoading: isLoadingExams } = useQuery({
+    queryKey: ["exams"],
+    queryFn: getAllExams,
+  });
 
-  const fetchMyResults = async () => {
-    try {
-      const results = await getStudentResults(currentUser.studentId);
-      setMyResults(results || []);
-    } catch (error) {
-      console.error("Could not fetch results", error);
-    }
-  };
+  const { data: myResults = [], isLoading: isLoadingResults } = useQuery({
+    queryKey: ["studentResults", currentUser?.studentId],
+    queryFn: () => getStudentResults(currentUser.studentId),
+    enabled: !!currentUser,
+  });
 
-  const openApplyModal = (exam) => {
-    if (!currentUser) return toast.error("Please select a user first");
-    setSelectedExam(exam);
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    const payload = {
-      student: { studentId: currentUser.studentId },
-      exam: { examNo: selectedExam.examNo },
-      formData: JSON.stringify(applicationForm),
-      status: "APPLIED",
-    };
-
-    try {
-      await applyForExam(payload);
+  // Mutation
+  const applyMutation = useMutation({
+    mutationFn: (payload) => applyForExam(payload),
+    onSuccess: () => {
       toast.success("Application Submitted Successfully!");
       setSelectedExam(null);
       setApplicationForm({
@@ -80,13 +55,32 @@ const StudentDashboard = () => {
         address: "",
         gender: "Male",
       });
-    } catch (error) {
+      // Optional: Invalidate applications if student can see them
+      queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+    onError: () => {
       toast.error("Application Failed");
     }
+  });
+
+  const openApplyModal = (exam) => {
+    if (!currentUser) return toast.error("Please select a user first");
+    setSelectedExam(exam);
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const payload = {
+      student: { studentId: currentUser.studentId },
+      exam: { examNo: selectedExam.examNo },
+      formData: JSON.stringify(applicationForm),
+      status: "APPLIED",
+    };
+    applyMutation.mutate(payload);
   };
 
   if (!currentUser) {
-    return <StudentLogin students={students} setCurrentUser={setCurrentUser} />;
+    return <StudentLogin students={students} setCurrentUser={setCurrentUser} isLoading={isLoadingStudents} />;
   }
 
   return (
@@ -115,11 +109,11 @@ const StudentDashboard = () => {
 
       <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <ExamList exams={exams} openApplyModal={openApplyModal} />
+          <ExamList exams={exams} openApplyModal={openApplyModal} isLoading={isLoadingExams} />
         </div>
 
         <div>
-          <MyResults myResults={myResults} />
+          <MyResults myResults={myResults} isLoading={isLoadingResults} />
         </div>
       </div>
 
@@ -129,6 +123,7 @@ const StudentDashboard = () => {
         applicationForm={applicationForm}
         setApplicationForm={setApplicationForm}
         handleFormSubmit={handleFormSubmit}
+        isPending={applyMutation.isPending}
       />
     </div>
   );

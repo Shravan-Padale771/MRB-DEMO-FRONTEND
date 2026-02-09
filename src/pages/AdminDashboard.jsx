@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   RefreshCw,
   Users,
@@ -33,10 +34,12 @@ import {
 } from "../api";
 
 const AdminDashboard = () => {
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditing, setIsEditing] = useState(false);
   const [selectedExamNo, setSelectedExamNo] = useState(null);
 
+  // Forms State (kept as local state)
   const [examForm, setExamForm] = useState({
     exam_name: "राष्ट्रभाषा प्रवीण परीक्षा (सितंबर 2024)",
     exam_code: "PRAVIN_SEP_2024",
@@ -106,26 +109,43 @@ const AdminDashboard = () => {
     applicationId: "",
     score: "",
     remarks: "Pass",
-    paperMarks: {}, // { "Math": 80, "English": 70 }
+    paperMarks: {},
     oralMarks: 0,
     projectMarks: 0,
     hasOral: false,
     hasProject: false,
-    examPapers: [], // [{ name: "Math", maxMarks: 100 }, ...]
+    examPapers: [],
   });
 
-  const [students, setStudents] = useState([]);
-  const [exams, setExams] = useState([]);
-  const [applications, setApplications] = useState([]);
-  const [results, setResults] = useState([]);
-  const [schools, setSchools] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // Queries
+  const { data: students = [], isLoading: isLoadingStudents } = useQuery({
+    queryKey: ["students"],
+    queryFn: getAllStudents,
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const { data: exams = [], isLoading: isLoadingExams } = useQuery({
+    queryKey: ["exams"],
+    queryFn: getAllExams,
+  });
 
-  // Auto-calculate percentage
+  const { data: applications = [], isLoading: isLoadingApplications } = useQuery({
+    queryKey: ["applications"],
+    queryFn: getAllApplications,
+  });
+
+  const { data: results = [], isLoading: isLoadingResults } = useQuery({
+    queryKey: ["results"],
+    queryFn: getAllResults,
+  });
+
+  const { data: schools = [], isLoading: isLoadingSchools } = useQuery({
+    queryKey: ["schools"],
+    queryFn: getAllSchools,
+  });
+
+  const loading = isLoadingStudents || isLoadingExams || isLoadingApplications || isLoadingResults || isLoadingSchools;
+
+  // Auto-calculate percentage (effect remains because it's derived state from forms)
   useEffect(() => {
     if (resultForm.examPapers.length > 0) {
       let totalObtained = Object.values(resultForm.paperMarks).reduce(
@@ -137,7 +157,6 @@ const AdminDashboard = () => {
         0
       );
 
-      // Add Oral & Project if active
       if (resultForm.hasOral) {
         totalObtained += (parseFloat(resultForm.oralMarks) || 0);
         totalMax += 50;
@@ -155,34 +174,9 @@ const AdminDashboard = () => {
     }
   }, [resultForm.paperMarks, resultForm.examPapers, resultForm.oralMarks, resultForm.projectMarks, resultForm.hasOral, resultForm.hasProject]);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [s, e, a, r, sc] = await Promise.allSettled([
-        getAllStudents(),
-        getAllExams(),
-        getAllApplications(),
-        getAllResults(),
-        getAllSchools(),
-      ]);
-
-      if (s.status === "fulfilled" && Array.isArray(s.value))
-        setStudents(s.value);
-      if (e.status === "fulfilled" && Array.isArray(e.value)) setExams(e.value);
-      if (a.status === "fulfilled" && Array.isArray(a.value))
-        setApplications(a.value);
-      else setApplications([]);
-      if (r.status === "fulfilled" && Array.isArray(r.value))
-        setResults(r.value);
-      else setResults([]);
-      if (sc.status === "fulfilled" && Array.isArray(sc.value))
-        setSchools(sc.value);
-      else setSchools([]);
-    } catch (err) {
-      console.error("Error fetching data:", err);
-      toast.error("Error loading dashboard data");
-    }
-    setLoading(false);
+  const handleRefresh = () => {
+    queryClient.invalidateQueries();
+    toast.success("Refreshing data...");
   };
 
   const resetExamForm = () => {
@@ -248,49 +242,85 @@ const AdminDashboard = () => {
     setSelectedExamNo(null);
   };
 
-  const handleCreateExam = async (e) => {
-    e.preventDefault();
-    try {
-      const payload = {
-        ...examForm,
-        papers: JSON.stringify(examForm.papers),
-        exam_details: JSON.stringify(examForm.exam_details),
-      };
-      await addExam(payload);
+  // Mutations
+  const createExamMutation = useMutation({
+    mutationFn: (payload) => addExam(payload),
+    onSuccess: () => {
       toast.success("Exam Created!");
       resetExamForm();
-      fetchData();
-    } catch (error) {
-      toast.error("Failed to create exam");
-    }
-  };
+      queryClient.invalidateQueries({ queryKey: ["exams"] });
+    },
+    onError: () => toast.error("Failed to create exam"),
+  });
 
-  const handleUpdateExam = async (e) => {
-    e.preventDefault();
-    try {
-      const payload = {
-        ...examForm,
-        papers: JSON.stringify(examForm.papers),
-        exam_details: JSON.stringify(examForm.exam_details),
-      };
-      await updateExam(selectedExamNo, payload);
+  const updateExamMutation = useMutation({
+    mutationFn: ({ id, payload }) => updateExam(id, payload),
+    onSuccess: () => {
       toast.success("Exam Updated!");
       resetExamForm();
-      fetchData();
-    } catch (error) {
-      toast.error("Failed to update exam");
-    }
+      queryClient.invalidateQueries({ queryKey: ["exams"] });
+    },
+    onError: () => toast.error("Failed to update exam"),
+  });
+
+  const deleteExamMutation = useMutation({
+    mutationFn: (id) => deleteExam(id),
+    onSuccess: () => {
+      toast.success("Exam Deleted!");
+      queryClient.invalidateQueries({ queryKey: ["exams"] });
+    },
+    onError: () => toast.error("Failed to delete exam"),
+  });
+
+  const createStudentMutation = useMutation({
+    mutationFn: ({ schoolId, studentData }) => addStudent(schoolId, studentData),
+    onSuccess: () => {
+      toast.success("Student Added!");
+      setStudentForm({ username: "", password: "", schoolId: "" });
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+    },
+    onError: () => toast.error("Failed to add student"),
+  });
+
+  const publishResultMutation = useMutation({
+    mutationFn: (payload) => addExamResult(payload),
+    onSuccess: () => {
+      toast.success("Result Published!");
+      setResultForm({
+        applicationId: "",
+        score: "",
+        remarks: "Pass",
+        paperMarks: {},
+        examPapers: [],
+      });
+      queryClient.invalidateQueries({ queryKey: ["results"] });
+    },
+    onError: () => toast.error("Failed to publish result"),
+  });
+
+  const handleCreateExam = (e) => {
+    e.preventDefault();
+    const payload = {
+      ...examForm,
+      papers: JSON.stringify(examForm.papers),
+      exam_details: JSON.stringify(examForm.exam_details),
+    };
+    createExamMutation.mutate(payload);
   };
 
-  const handleDeleteExam = async (id) => {
+  const handleUpdateExam = (e) => {
+    e.preventDefault();
+    const payload = {
+      ...examForm,
+      papers: JSON.stringify(examForm.papers),
+      exam_details: JSON.stringify(examForm.exam_details),
+    };
+    updateExamMutation.mutate({ id: selectedExamNo, payload });
+  };
+
+  const handleDeleteExam = (id) => {
     if (!window.confirm("Are you sure you want to delete this exam?")) return;
-    try {
-      await deleteExam(id);
-      toast.success("Exam Deleted!");
-      fetchData();
-    } catch (error) {
-      toast.error("Failed to delete exam");
-    }
+    deleteExamMutation.mutate(id);
   };
 
   const startEditing = (exam) => {
@@ -302,30 +332,22 @@ const AdminDashboard = () => {
       });
       setIsEditing(true);
       setSelectedExamNo(exam.examNo);
-      // Scroll to top of the exam section if needed, or just let the user see it
     } catch (e) {
       console.error("Error parsing exam data for edit:", e);
       toast.error("Failed to load exam data");
     }
   };
 
-  const handleCreateStudent = async (e) => {
+  const handleCreateStudent = (e) => {
     e.preventDefault();
     if (!studentForm.schoolId) {
       return toast.error("Please select a school");
     }
-    try {
-      const { schoolId, ...studentData } = studentForm;
-      await addStudent(schoolId, studentData);
-      toast.success("Student Added!");
-      setStudentForm({ username: "", password: "", schoolId: "" });
-      fetchData();
-    } catch (error) {
-      toast.error("Failed to add student");
-    }
+    const { schoolId, ...studentData } = studentForm;
+    createStudentMutation.mutate({ schoolId, studentData });
   };
 
-  const handlePublishResult = async (e) => {
+  const handlePublishResult = (e) => {
     e.preventDefault();
     if (!resultForm.applicationId || !resultForm.score) {
       return toast.error("Please fill all fields");
@@ -340,7 +362,6 @@ const AdminDashboard = () => {
       0
     );
 
-    // Add Oral & Project if active
     if (resultForm.hasOral) {
       totalObtained += (parseFloat(resultForm.oralMarks) || 0);
       totalMax += 50;
@@ -364,22 +385,7 @@ const AdminDashboard = () => {
       publishedAt: new Date().toISOString(),
     };
 
-    console.log("Publishing Result Payload:", payload);
-
-    try {
-      await addExamResult(payload);
-      toast.success("Result Published!");
-      setResultForm({
-        applicationId: "",
-        score: "",
-        remarks: "Pass",
-        paperMarks: {},
-        examPapers: [],
-      });
-      fetchData();
-    } catch (error) {
-      toast.error("Failed to publish result");
-    }
+    publishResultMutation.mutate(payload);
   };
 
   const selectApplication = (appId) => {
@@ -429,7 +435,7 @@ const AdminDashboard = () => {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800">Admin Dashboard</h1>
           <button
-            onClick={fetchData}
+            onClick={handleRefresh}
             disabled={loading}
             className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-50 disabled:opacity-50"
           >
@@ -572,6 +578,7 @@ const AdminDashboard = () => {
             setResultForm={setResultForm}
             handlePublishResult={handlePublishResult}
             applications={applications}
+            isLoading={publishResultMutation.isPending}
           />
         )}
 
@@ -590,6 +597,7 @@ const AdminDashboard = () => {
             isEditing={isEditing}
             resetExamForm={resetExamForm}
             exams={exams}
+            isLoading={createExamMutation.isPending || updateExamMutation.isPending || deleteExamMutation.isPending}
           />
         )}
 
@@ -600,6 +608,7 @@ const AdminDashboard = () => {
             handleCreateStudent={handleCreateStudent}
             students={students}
             schools={schools}
+            isLoading={createStudentMutation.isPending}
           />
         )}
       </div>
