@@ -16,7 +16,19 @@ export const getAllStudents = async () => {
 };
 
 export const addStudent = async (schoolId, studentData) => {
-  const response = await api.post(`/addStudent?schoolId=${schoolId}`, studentData);
+  const response = await api.post(
+    `/addStudent?schoolId=${schoolId}`,
+    studentData,
+  );
+  return response.data;
+};
+
+export const registerStudent = async (studentData, schoolId = 1) => {
+  // Backend expects schoolId as query param and student data in body
+  const response = await api.post(
+    `/addStudent?schoolId=${schoolId}`,
+    studentData,
+  );
   return response.data;
 };
 
@@ -113,7 +125,10 @@ export const getAllExamCentres = async () => {
 };
 
 export const addExamCentre = async (regionId, centreData) => {
-  const response = await api.post(`/addExamCentre?regionId=${regionId}`, centreData);
+  const response = await api.post(
+    `/addExamCentre?regionId=${regionId}`,
+    centreData,
+  );
   return response.data;
 };
 
@@ -124,7 +139,10 @@ export const getAllSchools = async () => {
 };
 
 export const addSchool = async (centreId, schoolData) => {
-  const response = await api.post(`/addSchool?centreId=${centreId}`, schoolData);
+  const response = await api.post(
+    `/addSchool?centreId=${centreId}`,
+    schoolData,
+  );
   return response.data;
 };
 
