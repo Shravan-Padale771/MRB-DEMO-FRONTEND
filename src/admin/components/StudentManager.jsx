@@ -30,29 +30,43 @@ const StudentManager = ({
     // Derived states for filter options
     const availableCentres = useMemo(() => {
         if (!filterRegion) return centres;
-        return centres.filter(c => {
-            const regionId = typeof c.region === 'object' ? c.region?.regionId : null;
-            return regionId && regionId.toString() === filterRegion;
-        });
+        return centres.filter(c => c.regionId?.toString() === filterRegion);
     }, [filterRegion, centres]);
 
     const availableSchools = useMemo(() => {
         if (!filterCentre) return schools;
-        return schools.filter(s => s.examCentre?.centreId?.toString() === filterCentre);
+        return schools.filter(s => s.centreId?.toString() === filterCentre);
     }, [filterCentre, schools]);
+
+    // Process students with relation lookups
+    const processedStudents = useMemo(() => {
+        return students.map(st => {
+            const school = schools.find(s => s.schoolId === st.schoolId);
+            const centre = centres.find(c => c.centreId === school?.centreId);
+            const region = regions.find(r => r.regionId === centre?.regionId);
+
+            return {
+                ...st,
+                school,
+                schoolName: school?.schoolName || "N/A",
+                centreName: centre?.centreName || "N/A",
+                regionName: region?.regionName || "N/A",
+                regionId: region?.regionId,
+                centreId: centre?.centreId,
+                schoolId: st.schoolId
+            };
+        });
+    }, [students, schools, centres, regions]);
 
     // Final filtered list
     const filteredStudents = useMemo(() => {
-        return students.filter(st => {
-            const matchesRegion = !filterRegion ||
-                (st.school?.examCentre?.region?.regionId?.toString() === filterRegion);
-            const matchesCentre = !filterCentre ||
-                (st.school?.examCentre?.centreId?.toString() === filterCentre);
-            const matchesSchool = !filterSchool ||
-                (st.school?.schoolId?.toString() === filterSchool);
+        return processedStudents.filter(st => {
+            const matchesRegion = !filterRegion || (st.regionId?.toString() === filterRegion);
+            const matchesCentre = !filterCentre || (st.centreId?.toString() === filterCentre);
+            const matchesSchool = !filterSchool || (st.schoolId?.toString() === filterSchool);
             return matchesRegion && matchesCentre && matchesSchool;
         });
-    }, [students, filterRegion, filterCentre, filterSchool]);
+    }, [processedStudents, filterRegion, filterCentre, filterSchool]);
 
     const clearFilters = () => {
         setFilterRegion("");
@@ -120,7 +134,7 @@ const StudentManager = ({
                             <option value="">Choose a school</option>
                             {schools.map(school => (
                                 <option key={school.schoolId} value={school.schoolId}>
-                                    {school.schoolName} ({school.examCentre?.centreCode || "N/A"})
+                                    {school.schoolName}
                                 </option>
                             ))}
                         </select>
@@ -234,21 +248,17 @@ const StudentManager = ({
                                                 ID: #{st.studentId}
                                             </span>
                                             <span className="text-xs text-indigo-600 font-bold flex items-center gap-1">
-                                                🏫 {st.schoolName || st.school?.schoolName || "No School"}
+                                                🏫 {st.schoolName}
                                             </span>
                                         </div>
-                                        {(st.school?.examCentre?.region || st.regionName || st.centreName) && (
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-[10px] text-green-600 font-bold flex items-center gap-1">
-                                                    📍 {st.regionName || (typeof st.school?.examCentre?.region === 'string'
-                                                        ? st.school.examCentre.region
-                                                        : st.school?.examCentre?.region?.regionName) || "N/A"}
-                                                </span>
-                                                <span className="text-[10px] text-amber-600 font-bold flex items-center gap-1">
-                                                    🏢 {st.centreName || st.school?.examCentre?.centreName || "N/A"}
-                                                </span>
-                                            </div>
-                                        )}
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-[10px] text-green-600 font-bold flex items-center gap-1">
+                                                📍 {st.regionName}
+                                            </span>
+                                            <span className="text-[10px] text-amber-600 font-bold flex items-center gap-1">
+                                                🏢 {st.centreName}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-end gap-2">

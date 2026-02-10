@@ -444,22 +444,22 @@ const AdminDashboard = () => {
           </button>
         </div>
 
-        <div className="bg-white p-1 rounded-xl shadow-sm inline-flex mb-8 overflow-x-auto max-w-full border">
+        <div className="bg-white p-1 rounded-xl shadow-sm inline-flex mb-8 overflow-x-auto w-full border">
           {[
             "dashboard",
             "regions",
             "exam_centres",
             "schools",
+            "students",
+            "exams",
             "applications",
             "publish",
             "results",
-            "exams",
-            "students",
           ].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-6 py-3 rounded-lg capitalize font-medium transition-all whitespace-nowrap ${activeTab === tab
+              className={`flex-1 px-4 py-3 rounded-lg capitalize font-medium transition-all whitespace-nowrap text-center ${activeTab === tab
                 ? "bg-indigo-600 text-white shadow"
                 : "text-gray-600 hover:bg-gray-50"
                 }`}
