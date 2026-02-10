@@ -116,16 +116,7 @@ const RegionManager = () => {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="bg-white p-3 rounded-xl border border-indigo-50 shadow-sm flex flex-col items-center justify-center text-center">
-                                            <span className="text-xl font-black text-indigo-600">{regionCentres.length}</span>
-                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Exam Centres</span>
-                                        </div>
-                                        <div className="bg-white p-3 rounded-xl border border-emerald-50 shadow-sm flex flex-col items-center justify-center text-center">
-                                            <span className="text-xl font-black text-emerald-600">{regionSchools.length}</span>
-                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Schools</span>
-                                        </div>
-                                    </div>
+
 
                                     {regionCentres.length > 0 && (
                                         <div className="space-y-2 mt-2">

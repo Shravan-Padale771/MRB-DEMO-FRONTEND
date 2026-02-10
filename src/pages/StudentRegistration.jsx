@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { UserPlus, Eye, EyeOff, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { registerStudent } from "../api";
 
 const StudentRegistration = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -66,13 +68,13 @@ const StudentRegistration = () => {
 
       // Redirect to student dashboard after 2 seconds
       setTimeout(() => {
-        window.location.href = "/student";
+        if (navigate) navigate("/student");
       }, 2000);
     } catch (error) {
       console.error("Registration Error:", error);
       toast.error(
         error.response?.data?.message ||
-          "Registration failed! Please try again.",
+        "Registration failed! Please try again.",
       );
     }
   };

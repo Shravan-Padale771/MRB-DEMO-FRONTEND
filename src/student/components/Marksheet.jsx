@@ -140,11 +140,15 @@ const Marksheet = ({ result, onClose }) => {
             <div className="space-y-4">
               <div className="flex items-baseline">
                 <span className="font-bold min-w-[120px] text-gray-800 text-[14px] uppercase tracking-wider">Candidate</span>
-                <span className="font-black text-black border-b-2 border-dotted border-black px-2 flex-grow truncate">{resultData.fullName || student.username}</span>
+                <span className="font-black text-black border-b-2 border-dotted border-black px-2 flex-grow truncate">
+                  {resultData.fullName || (student.firstName ? `${student.firstName} ${student.middleName || ''} ${student.lastName || ''}`.trim() : student.username)}
+                </span>
               </div>
               <div className="flex items-baseline">
                 <span className="font-bold min-w-[120px] text-gray-800 text-[14px] uppercase tracking-wider">Center</span>
-                <span className="font-black text-black border-b-2 border-dotted border-black px-2 flex-grow truncate">{admin.departmentName}</span>
+                <span className="font-black text-black border-b-2 border-dotted border-black px-2 flex-grow truncate">
+                  {student.centreName || (typeof student.school?.examCentre?.centreName === 'string' ? student.school.examCentre.centreName : admin.departmentName)}
+                </span>
               </div>
             </div>
             <div className="space-y-4">

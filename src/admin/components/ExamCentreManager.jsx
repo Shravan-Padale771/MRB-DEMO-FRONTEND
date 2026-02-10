@@ -181,9 +181,9 @@ const ExamCentreManager = () => {
                                         <td className="p-4 text-sm font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">{centre.centreName}</td>
                                         <td className="p-4">
                                             <span className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[10px] font-black uppercase tracking-tighter shadow-sm">
-                                                {typeof centre.region === 'string'
+                                                {centre.regionName || (typeof centre.region === 'string'
                                                     ? centre.region
-                                                    : (centre.region?.regionName || "N/A")}
+                                                    : (centre.region?.regionName || "N/A"))}
                                             </span>
                                         </td>
                                         <td className="p-4 text-center">

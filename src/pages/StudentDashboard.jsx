@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getAllStudents,
   getAllExams,
@@ -21,6 +22,7 @@ import {
 } from "lucide-react";
 
 const StudentDashboard = () => {
+  const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
   const [students, setStudents] = useState([]);
   const [exams, setExams] = useState([]);
@@ -54,6 +56,7 @@ const StudentDashboard = () => {
   }, [currentUser]);
 
   const fetchMyResults = async () => {
+    if (!currentUser?.studentId) return;
     try {
       const results = await getStudentResults(currentUser.studentId);
       setMyResults(results || []);
@@ -68,7 +71,9 @@ const StudentDashboard = () => {
   };
 
   const handleFormSubmit = async (e) => {
-    e.preventDefault();
+    if (!currentUser?.studentId || !selectedExam?.examNo) {
+      return toast.error("Incomplete selection data");
+    }
     const payload = {
       student: { studentId: currentUser.studentId },
       exam: { examNo: selectedExam.examNo },
@@ -122,7 +127,7 @@ const StudentDashboard = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => (window.location.href = "/student/register")}
+              onClick={() => navigate("/student/register")}
               className="w-full bg-white border-2 border-indigo-600 text-indigo-600 font-bold py-4 rounded-xl hover:bg-indigo-50 transition-all duration-300 flex items-center justify-center gap-2"
             >
               <UserPlus size={20} />
@@ -148,11 +153,16 @@ const StudentDashboard = () => {
                     onClick={() => setCurrentUser(s)}
                     className="w-full flex justify-between items-center p-3 bg-gray-50 hover:bg-indigo-50 border border-transparent hover:border-indigo-200 rounded-lg transition-all duration-200 text-sm"
                   >
-                    <span className="font-semibold text-gray-700">
-                      {s.username}
-                    </span>
-                    <span className="text-xs bg-white border px-2 py-1 rounded text-gray-400">
-                      ID: {s.studentId}
+                    <div className="flex flex-col items-start text-left">
+                      <span className="font-bold text-gray-700">
+                        {s.firstName ? `${s.firstName} ${s.middleName || ''} ${s.lastName || ''}`.trim() : s.username}
+                      </span>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">
+                        {s.schoolName || s.school?.schoolName || "No School"}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-black bg-white border px-2 py-1 rounded text-indigo-600 shadow-sm">
+                      ID: #{s.studentId}
                     </span>
                   </motion.button>
                 ))
@@ -169,14 +179,14 @@ const StudentDashboard = () => {
       <header className="flex justify-between items-center mb-10 max-w-7xl mx-auto bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div className="flex items-center gap-4">
           <div className="h-14 w-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md">
-            {currentUser.username.charAt(0).toUpperCase()}
+            {currentUser?.firstName ? currentUser.firstName.charAt(0).toUpperCase() : (currentUser?.username?.charAt(0).toUpperCase() || "?")}
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-800">
-              Welcome, {currentUser.username}
+              Welcome, {currentUser?.firstName ? `${currentUser.firstName} ${currentUser.lastName || ''}` : (currentUser?.username || "Student")}
             </h1>
-            <p className="text-sm text-gray-500">
-              Student ID: #{currentUser.studentId}
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">
+              Student ID: #{currentUser?.studentId || "N/A"} • {currentUser?.schoolName || currentUser?.school?.schoolName || "No School"}
             </p>
           </div>
         </div>

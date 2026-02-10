@@ -1,0 +1,38 @@
+[
+    {
+        "studentId": 1,
+        "firstName": "Rahul",
+        "middleName": "Kumar",
+        "lastName": "Sharma",
+        "contact": null,
+        "email": null,
+        "age": 15,
+        "motherTongue": "Hindi",
+        "schoolId": 1,
+        "schoolName": "New Modern School"
+    },
+    {
+        "studentId": 2,
+        "firstName": "vyankatesh",
+        "middleName": "milind",
+        "lastName": "pandit",
+        "contact": "7397963819",
+        "email": "vyankateshpandit1511@gmail.com",
+        "age": 20,
+        "motherTongue": "Marathi",
+        "schoolId": 1,
+        "schoolName": "New Modern School"
+    },
+    {
+        "studentId": 3,
+        "firstName": "vyankatesh",
+        "middleName": "milind",
+        "lastName": "pandit",
+        "contact": "7397963819",
+        "email": "vyankateshpandit1511@gmail.com",
+        "age": 21,
+        "motherTongue": "Marathi",
+        "schoolId": 1,
+        "schoolName": "New Modern School"
+    }
+]

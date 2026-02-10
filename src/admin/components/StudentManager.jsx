@@ -225,25 +225,27 @@ const StudentManager = ({
                                 className="p-4 border border-gray-100 rounded-xl hover:bg-indigo-50/50 hover:border-indigo-100 transition-all flex justify-between items-center bg-white shadow-sm group"
                             >
                                 <div className="space-y-1">
-                                    <p className="font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">{st.username}</p>
+                                    <p className="font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">
+                                        {st.firstName ? `${st.firstName} ${st.middleName || ''} ${st.lastName || ''}`.trim() : st.username}
+                                    </p>
                                     <div className="flex flex-col gap-1">
                                         <div className="flex items-center gap-2">
                                             <span className="text-[10px] font-black px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded uppercase tracking-tighter">
                                                 ID: #{st.studentId}
                                             </span>
                                             <span className="text-xs text-indigo-600 font-bold flex items-center gap-1">
-                                                🏫 {st.school?.schoolName || "No School"}
+                                                🏫 {st.schoolName || st.school?.schoolName || "No School"}
                                             </span>
                                         </div>
-                                        {st.school?.examCentre?.region && (
+                                        {(st.school?.examCentre?.region || st.regionName || st.centreName) && (
                                             <div className="flex items-center gap-3">
                                                 <span className="text-[10px] text-green-600 font-bold flex items-center gap-1">
-                                                    📍 {typeof st.school.examCentre.region === 'string'
+                                                    📍 {st.regionName || (typeof st.school?.examCentre?.region === 'string'
                                                         ? st.school.examCentre.region
-                                                        : st.school.examCentre.region.regionName}
+                                                        : st.school?.examCentre?.region?.regionName) || "N/A"}
                                                 </span>
                                                 <span className="text-[10px] text-amber-600 font-bold flex items-center gap-1">
-                                                    🏢 {st.school.examCentre.centreName}
+                                                    🏢 {st.centreName || st.school?.examCentre?.centreName || "N/A"}
                                                 </span>
                                             </div>
                                         )}

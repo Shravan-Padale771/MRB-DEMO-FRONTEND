@@ -211,7 +211,7 @@ const SchoolManager = () => {
                                         <td className="p-4 align-middle">
                                             <div className="space-y-1">
                                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-blue-100 text-blue-700 shadow-sm">
-                                                    {school.examCentre?.centreName || "N/A"}
+                                                    {school.centreName || school.examCentre?.centreName || "N/A"}
                                                 </span>
                                                 <p className="text-[10px] font-mono text-gray-400 font-bold">
                                                     {school.examCentre?.centreCode || ""}
@@ -220,9 +220,9 @@ const SchoolManager = () => {
                                         </td>
                                         <td className="p-4 align-middle">
                                             <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-purple-100 text-purple-700 shadow-sm">
-                                                {typeof school.examCentre?.region === 'string'
+                                                {school.regionName || (typeof school.examCentre?.region === 'string'
                                                     ? school.examCentre.region
-                                                    : (school.examCentre?.region?.regionName || "City Area")}
+                                                    : (school.examCentre?.region?.regionName || "City Area")) || "City Area"}
                                             </span>
                                         </td>
                                         <td className="p-4 align-middle text-right">
