@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Award, CheckCircle, Trophy, Filter, XCircle, Search, TrendingUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { getAllRegions, getAllExamCentres, getAllSchools } from '../../api';
+import { getAllRegions, getAllExamCentres, getAllSchools, getAllStudents, getAllApplications } from '../../api';
 
 const ResultViewer = ({ results = [] }) => {
     // Filter State
@@ -15,6 +15,8 @@ const ResultViewer = ({ results = [] }) => {
     const { data: regions = [] } = useQuery({ queryKey: ['regions'], queryFn: getAllRegions });
     const { data: centres = [] } = useQuery({ queryKey: ['examCentres'], queryFn: getAllExamCentres });
     const { data: schools = [] } = useQuery({ queryKey: ['schools'], queryFn: getAllSchools });
+    const { data: students = [] } = useQuery({ queryKey: ['students'], queryFn: getAllStudents });
+    const { data: applications = [] } = useQuery({ queryKey: ['applications'], queryFn: getAllApplications });
 
     // Cascading Filter Options
     const availableCentres = useMemo(() => {
@@ -40,27 +42,46 @@ const ResultViewer = ({ results = [] }) => {
                 console.error("Error parsing resultData:", e);
             }
 
-            const student = res.application?.student;
-            const school = student?.school;
-            const centre = school?.examCentre;
-            const region = centre?.region;
+            let student = null;
+            let school = null;
+            let centre = null;
+            let region = null;
+            let application = null;
+
+            // Find application first
+            if (res.application && res.application.applicationId) {
+                application = applications.find(a => a.applicationId === res.application.applicationId);
+            } else if (res.applicationId) {
+                application = applications.find(a => a.applicationId === res.applicationId);
+            }
+
+            if (application) {
+                student = students.find(s => s.studentId === application.studentId);
+                school = schools.find(s => s.schoolId === student?.schoolId);
+                centre = centres.find(c => c.centreId === school?.centreId);
+                region = regions.find(r => r.regionId === centre?.regionId);
+            }
 
             return {
                 ...res,
                 numericScore: score,
                 remarks,
-                student,
-                school,
-                centre,
-                region
+                studentName: application ? application.studentName : "Unknown",
+                applicationId: application ? application.applicationId : (res.applicationId || "N/A"),
+                schoolName: school ? school.schoolName : "N/A",
+                centreName: centre ? centre.centreName : "N/A",
+                regionName: region ? region.regionName : "N/A",
+                regionId: region ? region.regionId : null,
+                centreId: centre ? centre.centreId : null,
+                schoolId: school ? school.schoolId : null
             };
         });
 
         // Filter
         let filtered = parsed.filter(res => {
-            const matchesRegion = !filterRegion || res.region?.regionId?.toString() === filterRegion;
-            const matchesCentre = !filterCentre || res.centre?.centreId?.toString() === filterCentre;
-            const matchesSchool = !filterSchool || res.school?.schoolId?.toString() === filterSchool;
+            const matchesRegion = !filterRegion || (res.regionId && res.regionId.toString() === filterRegion);
+            const matchesCentre = !filterCentre || (res.centreId && res.centreId.toString() === filterCentre);
+            const matchesSchool = !filterSchool || (res.schoolId && res.schoolId.toString() === filterSchool);
             return matchesRegion && matchesCentre && matchesSchool;
         });
 
@@ -208,10 +229,10 @@ const ResultViewer = ({ results = [] }) => {
                                         </div>
                                         <div>
                                             <p className="font-black text-gray-900 group-hover:text-indigo-700 transition-colors truncate max-w-[150px]">
-                                                {res.student?.username || "Unknown Student"}
+                                                {res.studentName}
                                             </p>
                                             <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">
-                                                App ID: #{res.application?.applicationId}
+                                                App ID: #{res.applicationId}
                                             </p>
                                         </div>
                                     </div>
@@ -221,11 +242,11 @@ const ResultViewer = ({ results = [] }) => {
                                 <div className="space-y-3 relative z-10">
                                     <div className="flex flex-col gap-1.5 p-3 bg-gray-50/50 rounded-xl border border-gray-100">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-tighter">🏫 {res.school?.schoolName || "N/A"}</span>
+                                            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-tighter">🏫 {res.schoolName}</span>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">📍 {res.region?.regionName || "N/A"}</span>
-                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">🏢 {res.centre?.centreName || "N/A"}</span>
+                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">📍 {res.regionName}</span>
+                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">🏢 {res.centreName}</span>
                                         </div>
                                     </div>
 

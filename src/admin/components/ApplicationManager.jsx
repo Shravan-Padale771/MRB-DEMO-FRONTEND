@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { FileText, AlertTriangle, Filter, XCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { getAllRegions, getAllExamCentres, getAllSchools } from '../../api';
+import { getAllRegions, getAllExamCentres, getAllSchools, getAllStudents } from '../../api';
 
 const ApplicationManager = ({
     applications = [],
@@ -16,6 +16,7 @@ const ApplicationManager = ({
     const { data: regions = [] } = useQuery({ queryKey: ['regions'], queryFn: getAllRegions });
     const { data: centres = [] } = useQuery({ queryKey: ['examCentres'], queryFn: getAllExamCentres });
     const { data: schools = [] } = useQuery({ queryKey: ['schools'], queryFn: getAllSchools });
+    const { data: students = [] } = useQuery({ queryKey: ['students'], queryFn: getAllStudents });
 
     // Cascading Filter Options
     const availableCentres = useMemo(() => {
@@ -31,10 +32,11 @@ const ApplicationManager = ({
     // Filtered Applications
     const filteredApplications = useMemo(() => {
         return applications.filter(app => {
-            const student = app.student;
-            const school = student?.school;
-            const centre = school?.examCentre;
-            const region = centre?.region;
+            // Reconstruct hierarchy from studentId
+            const student = students.find(s => s.studentId === app.studentId);
+            const school = schools.find(s => s.schoolId === student?.schoolId);
+            const centre = centres.find(c => c.centreId === school?.centreId);
+            const region = regions.find(r => r.regionId === centre?.regionId);
 
             const matchesRegion = !filterRegion || region?.regionId?.toString() === filterRegion;
             const matchesCentre = !filterCentre || centre?.centreId?.toString() === filterCentre;
@@ -42,7 +44,7 @@ const ApplicationManager = ({
 
             return matchesRegion && matchesCentre && matchesSchool;
         });
-    }, [applications, filterRegion, filterCentre, filterSchool]);
+    }, [applications, filterRegion, filterCentre, filterSchool, students, schools, centres, regions]);
 
     const clearFilters = () => {
         setFilterRegion("");
@@ -147,60 +149,87 @@ const ApplicationManager = ({
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {filteredApplications.map((app) => (
-                                <tr
-                                    key={app.applicationId}
-                                    className="hover:bg-indigo-50/30 transition-colors group"
-                                >
-                                    <td className="p-4 font-black text-indigo-600 text-sm">
-                                        #{app.applicationId}
-                                    </td>
-                                    <td className="p-4">
-                                        <div className="flex flex-col">
-                                            <span className="font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">
-                                                {app.student?.username || "N/A"}
-                                            </span>
-                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
-                                                Roll: {app.student?.studentId}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td className="p-4">
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-xs font-bold text-gray-700">🏫 {app.student?.school?.schoolName || "N/A"}</span>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-[10px] bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter">
-                                                    📍 {app.student?.school?.examCentre?.region?.regionName || "City"}
+                            {filteredApplications.map((app) => {
+                                // Helper to get related data for display
+                                const student = students.find(s => s.studentId === app.studentId);
+                                const school = schools.find(s => s.schoolId === student?.schoolId);
+                                const centre = centres.find(c => c.centreId === school?.centreId);
+                                const region = regions.find(r => r.regionId === centre?.regionId);
+
+                                let formData = {};
+                                try {
+                                    formData = typeof app.formData === 'string' ? JSON.parse(app.formData) : app.formData;
+                                } catch (e) {
+                                    console.error("Error parsing formData", e);
+                                }
+
+                                return (
+                                    <tr
+                                        key={app.applicationId}
+                                        className="hover:bg-indigo-50/30 transition-colors group"
+                                    >
+                                        <td className="p-4 font-black text-indigo-600 text-sm">
+                                            #{app.applicationId}
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">
+                                                    {app.studentName || "N/A"}
                                                 </span>
-                                                <span className="text-[10px] bg-green-100 text-green-600 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter">
-                                                    🏢 {app.student?.school?.examCentre?.centreCode || "EC"}
-                                                </span>
+                                                <div className="flex gap-2 mt-1">
+                                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
+                                                        Roll: {app.studentId}
+                                                    </span>
+                                                    {formData.phone && (
+                                                        <span className="text-[10px] text-gray-500 font-bold tracking-tighter">
+                                                            📞 {formData.phone}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {formData.gender && (
+                                                    <span className="text-[9px] text-gray-400 font-medium uppercase tracking-widest">
+                                                        {formData.gender}
+                                                    </span>
+                                                )}
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td className="p-4">
-                                        <span className="text-xs font-black text-indigo-900 uppercase">{app.exam?.exam_name || "N/A"}</span>
-                                    </td>
-                                    <td className="p-4">
-                                        <span
-                                            className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest shadow-sm border ${app.status === "APPLIED"
-                                                ? "bg-blue-50 text-blue-700 border-blue-100"
-                                                : "bg-emerald-50 text-emerald-700 border-emerald-100"
-                                                }`}
-                                        >
-                                            {app.status}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-center">
-                                        <button
-                                            onClick={() => selectApplication(app.applicationId)}
-                                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-[10px] font-black uppercase tracking-widest transition shadow-md hover:shadow-lg"
-                                        >
-                                            Publish Result
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-xs font-bold text-gray-700">🏫 {school?.schoolName || "N/A"}</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[10px] bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter">
+                                                        📍 {region?.regionName || "City"}
+                                                    </span>
+                                                    <span className="text-[10px] bg-green-100 text-green-600 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter">
+                                                        🏢 {centre?.centreCode || "EC"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="p-4">
+                                            <span className="text-xs font-black text-indigo-900 uppercase">{app.examName || "N/A"}</span>
+                                        </td>
+                                        <td className="p-4">
+                                            <span
+                                                className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest shadow-sm border ${app.status === "APPLIED"
+                                                    ? "bg-blue-50 text-blue-700 border-blue-100"
+                                                    : "bg-emerald-50 text-emerald-700 border-emerald-100"
+                                                    }`}
+                                            >
+                                                {app.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 text-center">
+                                            <button
+                                                onClick={() => selectApplication(app.applicationId)}
+                                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-[10px] font-black uppercase tracking-widest transition shadow-md hover:shadow-lg"
+                                            >
+                                                Publish Result
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
                         </tbody>
                     </table>
                 </div>

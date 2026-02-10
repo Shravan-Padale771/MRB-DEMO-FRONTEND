@@ -49,7 +49,7 @@ const SchoolManager = () => {
     const availableCentresForFilter = useMemo(() => {
         if (!filterRegion) return centres;
         return centres.filter(c => {
-            const regionId = typeof c.region === 'object' ? c.region?.regionId : null;
+            const regionId = c.regionId;
             return regionId && regionId.toString() === filterRegion;
         });
     }, [filterRegion, centres]);
@@ -57,13 +57,15 @@ const SchoolManager = () => {
     // Final filtered schools
     const filteredSchools = useMemo(() => {
         return schools.filter(s => {
-            const matchesRegion = !filterRegion ||
-                (s.examCentre?.region?.regionId?.toString() === filterRegion ||
-                    (typeof s.examCentre?.region === 'string' && s.examCentre?.region === filterRegion));
-            const matchesCentre = !filterCentre || s.examCentre?.centreId?.toString() === filterCentre;
+            // Find related centre and region
+            const centre = centres.find(c => c.centreId === s.centreId);
+            const regionId = centre?.regionId;
+
+            const matchesRegion = !filterRegion || (regionId && regionId.toString() === filterRegion);
+            const matchesCentre = !filterCentre || s.centreId?.toString() === filterCentre;
             return matchesRegion && matchesCentre;
         });
-    }, [schools, filterRegion, filterCentre]);
+    }, [schools, filterRegion, filterCentre, centres]);
 
     const handleCreateSchool = (e) => {
         e.preventDefault();
@@ -210,20 +212,32 @@ const SchoolManager = () => {
                                         </td>
                                         <td className="p-4 align-middle">
                                             <div className="space-y-1">
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-blue-100 text-blue-700 shadow-sm">
-                                                    {school.centreName || school.examCentre?.centreName || "N/A"}
-                                                </span>
-                                                <p className="text-[10px] font-mono text-gray-400 font-bold">
-                                                    {school.examCentre?.centreCode || ""}
-                                                </p>
+                                                {(() => {
+                                                    const centre = centres.find(c => c.centreId === school.centreId);
+                                                    return (
+                                                        <>
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-blue-100 text-blue-700 shadow-sm">
+                                                                {centre?.centreName || "N/A"}
+                                                            </span>
+                                                            <p className="text-[10px] font-mono text-gray-400 font-bold">
+                                                                {centre?.centreCode || ""}
+                                                            </p>
+                                                        </>
+                                                    );
+                                                })()}
                                             </div>
                                         </td>
                                         <td className="p-4 align-middle">
-                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-purple-100 text-purple-700 shadow-sm">
-                                                {school.regionName || (typeof school.examCentre?.region === 'string'
-                                                    ? school.examCentre.region
-                                                    : (school.examCentre?.region?.regionName || "City Area")) || "City Area"}
-                                            </span>
+                                            {(() => {
+                                                const centre = centres.find(c => c.centreId === school.centreId);
+                                                const region = regions.find(r => r.regionId === centre?.regionId);
+
+                                                return (
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-purple-100 text-purple-700 shadow-sm">
+                                                        {region?.regionName || "City Area"}
+                                                    </span>
+                                                );
+                                            })()}
                                         </td>
                                         <td className="p-4 align-middle text-right">
                                             <button className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-indigo-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-indigo-50 border border-transparent hover:border-indigo-100">

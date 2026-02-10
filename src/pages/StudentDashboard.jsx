@@ -20,6 +20,7 @@ import {
   Calendar,
   DollarSign,
 } from "lucide-react";
+import MyResults from "../student/components/MyResults";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -257,56 +258,7 @@ const StudentDashboard = () => {
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold mb-8 text-gray-800 border-l-4 border-green-500 pl-4 flex items-center gap-2">
-            <Award size={24} /> My Results
-          </h2>
-
-          <div className="space-y-4">
-            {myResults.length === 0 ? (
-              <div className="bg-white p-8 rounded-xl shadow-sm text-center border border-dashed border-gray-300">
-                <Award className="mx-auto text-gray-300 mb-3" size={40} />
-                <p className="text-gray-500 font-medium">No results yet</p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Your exam results will appear here
-                </p>
-              </div>
-            ) : (
-              myResults.map((result) => (
-                <motion.div
-                  key={result.id || Math.random()}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="bg-gradient-to-br from-green-50 to-white p-6 rounded-xl shadow-md border-l-4 border-green-500 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="font-bold text-gray-800 text-lg">
-                        {result.application?.exam?.exam_name || "Exam Result"}
-                      </h3>
-                      <p className="text-xs text-gray-600 mt-1">
-                        App ID: #{result.application?.applicationId}
-                      </p>
-                    </div>
-                    <CheckCircle
-                      className="text-green-500 flex-shrink-0"
-                      size={28}
-                    />
-                  </div>
-
-                  <div className="bg-white p-4 rounded-lg border-2 border-green-200 mb-4">
-                    <p className="text-sm font-mono text-gray-800 break-words font-semibold">
-                      {result.resultData}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <Calendar size={14} />
-                    {new Date(result.publishedAt).toLocaleDateString()}
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </div>
+          <MyResults myResults={myResults} student={currentUser} />
         </div>
       </div>
 

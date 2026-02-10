@@ -3,8 +3,40 @@ import { motion } from 'framer-motion';
 import { Award, CheckCircle, Calendar, FileText } from 'lucide-react';
 import Marksheet from './Marksheet';
 
-const MyResults = ({ myResults }) => {
+import { getAllExams, getAllApplications } from '../../api';
+import { useQuery } from '@tanstack/react-query';
+
+const MyResults = ({ myResults, student }) => {
     const [selectedResult, setSelectedResult] = useState(null);
+
+    const { data: exams = [] } = useQuery({ queryKey: ['exams'], queryFn: getAllExams });
+    const { data: applications = [] } = useQuery({ queryKey: ['applications'], queryFn: getAllApplications });
+
+    // Process results to include full exam/application details for Marksheet
+    const processedResults = myResults.map(result => {
+        let application = null;
+        let exam = null;
+
+        if (result.application && result.application.applicationId) {
+            application = applications.find(a => a.applicationId === result.application.applicationId);
+        } else if (result.applicationId) {
+            application = applications.find(a => a.applicationId === result.applicationId);
+        }
+
+        if (application) {
+            exam = exams.find(e => e.examNo === application.examNo);
+        }
+
+        // Reconstruct the nested structure Marksheet expects
+        return {
+            ...result,
+            application: {
+                ...application,
+                student: student, // Pass the full student object
+                exam: exam
+            }
+        };
+    });
 
     return (
         <div>
@@ -22,7 +54,7 @@ const MyResults = ({ myResults }) => {
                         </p>
                     </div>
                 ) : (
-                    myResults.map((result) => (
+                    processedResults.map((result) => (
                         <motion.div
                             key={result.id || Math.random()}
                             initial={{ opacity: 0, x: 20 }}

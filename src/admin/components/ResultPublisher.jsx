@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Award, Filter, XCircle, Search, Keyboard, FastForward } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useQuery } from '@tanstack/react-query';
-import { getAllRegions, getAllExamCentres, getAllSchools } from '../../api';
+import { getAllRegions, getAllExamCentres, getAllSchools, getAllStudents, getAllExams } from '../../api';
 
 const ResultPublisher = ({
     resultForm,
@@ -19,6 +19,8 @@ const ResultPublisher = ({
     const { data: regions = [] } = useQuery({ queryKey: ['regions'], queryFn: getAllRegions });
     const { data: centres = [] } = useQuery({ queryKey: ['examCentres'], queryFn: getAllExamCentres });
     const { data: schools = [] } = useQuery({ queryKey: ['schools'], queryFn: getAllSchools });
+    const { data: students = [] } = useQuery({ queryKey: ['students'], queryFn: getAllStudents });
+    const { data: exams = [] } = useQuery({ queryKey: ['exams'], queryFn: getAllExams });
 
     // Cascading Filter Options
     const availableCentres = useMemo(() => {
@@ -34,10 +36,10 @@ const ResultPublisher = ({
     // Filtered Applications for Selection
     const filteredAppsForSelect = useMemo(() => {
         return applications.filter(app => {
-            const student = app.student;
-            const school = student?.school;
-            const centre = school?.examCentre;
-            const region = centre?.region;
+            const student = students.find(s => s.studentId === app.studentId);
+            const school = schools.find(s => s.schoolId === student?.schoolId);
+            const centre = centres.find(c => c.centreId === school?.centreId);
+            const region = regions.find(r => r.regionId === centre?.regionId);
 
             const matchesRegion = !filterRegion || region?.regionId?.toString() === filterRegion;
             const matchesCentre = !filterCentre || centre?.centreId?.toString() === filterCentre;
@@ -45,7 +47,7 @@ const ResultPublisher = ({
 
             return matchesRegion && matchesCentre && matchesSchool;
         });
-    }, [applications, filterRegion, filterCentre, filterSchool]);
+    }, [applications, filterRegion, filterCentre, filterSchool, students, schools, centres, regions]);
 
     const handleIdChange = (e) => {
         const appId = e.target.value;
@@ -61,24 +63,29 @@ const ResultPublisher = ({
         // Try to find matching application
         const app = applications.find((a) => a.applicationId === numericId);
 
-        if (app && app.exam && app.exam.papers) {
-            let papers = [];
-            try {
-                papers = typeof app.exam.papers === 'string' ? JSON.parse(app.exam.papers) : app.exam.papers;
-            } catch (err) {
-                console.error("Error parsing papers:", err);
-            }
+        if (app) {
+            // Find the exam details using examNo from the application
+            const exam = exams.find(e => e.examNo === app.examNo);
 
-            setResultForm(prev => ({
-                ...prev,
-                applicationId: appId,
-                examPapers: papers,
-                paperMarks: papers.reduce((acc, p) => ({ ...acc, [p.name]: 0 }), {}),
-                oralMarks: 0,
-                projectMarks: 0,
-                score: "",
-            }));
-            // toast.success(`Loaded App #${appId}`); // Silent load for better UX during typing
+            if (exam) {
+                let papers = [];
+                try {
+                    papers = typeof exam.papers === 'string' ? JSON.parse(exam.papers) : exam.papers;
+                } catch (err) {
+                    console.error("Error parsing papers:", err);
+                }
+
+                setResultForm(prev => ({
+                    ...prev,
+                    applicationId: appId,
+                    examPapers: papers,
+                    paperMarks: papers.reduce((acc, p) => ({ ...acc, [p.name]: 0 }), {}),
+                    oralMarks: 0,
+                    projectMarks: 0,
+                    score: "",
+                }));
+                // toast.success(`Loaded App #${appId}`); // Silent load for better UX during typing
+            }
         } else {
             // Clear papers if ID is entered but not found
             setResultForm(prev => ({
@@ -174,7 +181,7 @@ const ResultPublisher = ({
                         <option value="">Select Candidate</option>
                         {filteredAppsForSelect.map(app => (
                             <option key={app.applicationId} value={app.applicationId}>
-                                #{app.applicationId} - {app.student?.username}
+                                #{app.applicationId} - {app.studentName || "Student"}
                             </option>
                         ))}
                     </select>
@@ -195,7 +202,7 @@ const ResultPublisher = ({
                             />
                             {currentApp && (
                                 <div className="mt-2 text-[10px] font-medium text-gray-400 flex items-center gap-1">
-                                    <FastForward size={10} /> Candidate: <span className="text-gray-900 font-bold">{currentApp.student?.username}</span> | Exam: <span className="text-gray-900 font-bold uppercase">{currentApp.exam?.exam_name}</span>
+                                    <FastForward size={10} /> Candidate: <span className="text-gray-900 font-bold">{currentApp.studentName}</span> | Exam: <span className="text-gray-900 font-bold uppercase">{currentApp.examName}</span>
                                 </div>
                             )}
                         </div>
@@ -259,9 +266,13 @@ const ResultPublisher = ({
 
                         <div className="space-y-4">
                             {(() => {
-                                if (!currentApp || !currentApp.exam) return null;
+                                if (!currentApp) return null;
+                                const exam = exams.find(e => e.examNo === currentApp.examNo);
+
+                                if (!exam) return null;
+
                                 let details = {};
-                                try { details = typeof currentApp.exam.exam_details === 'string' ? JSON.parse(currentApp.exam.exam_details) : (currentApp.exam.exam_details || {}); }
+                                try { details = typeof exam.exam_details === 'string' ? JSON.parse(exam.exam_details) : (exam.exam_details || {}); }
                                 catch (e) { console.error("Error parsing details:", e); }
                                 const hasOral = details.structure?.hasOral;
                                 const hasProject = details.structure?.hasProject;

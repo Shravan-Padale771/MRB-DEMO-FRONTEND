@@ -44,7 +44,7 @@ const ExamCentreManager = () => {
     const filteredCentres = useMemo(() => {
         if (!filterRegion) return centres;
         return centres.filter(c => {
-            const regionId = typeof c.region === 'object' ? c.region?.regionId : null;
+            const regionId = c.regionId;
             return regionId && regionId.toString() === filterRegion;
         });
     }, [centres, filterRegion]);
@@ -174,25 +174,26 @@ const ExamCentreManager = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredCentres.map((centre, idx) => (
-                                    <tr key={centre.centreId || `centre-${idx}`} className="border-b hover:bg-indigo-50/30 transition-colors group">
-                                        <td className="p-4 text-xs font-bold text-gray-400">#{centre.centreId}</td>
-                                        <td className="p-4 text-sm font-mono font-bold text-indigo-600 uppercase">{centre.centreCode}</td>
-                                        <td className="p-4 text-sm font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">{centre.centreName}</td>
-                                        <td className="p-4">
-                                            <span className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[10px] font-black uppercase tracking-tighter shadow-sm">
-                                                {centre.regionName || (typeof centre.region === 'string'
-                                                    ? centre.region
-                                                    : (centre.region?.regionName || "N/A"))}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 text-center">
-                                            <span className="bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full text-[10px] font-black border border-emerald-100">
-                                                {(Array.isArray(centre.schools) ? centre.schools.length : 0)} Schools
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))
+                                filteredCentres.map((centre, idx) => {
+                                    const region = regions.find(r => r.regionId === centre.regionId);
+                                    return (
+                                        <tr key={centre.centreId || `centre-${idx}`} className="border-b hover:bg-indigo-50/30 transition-colors group">
+                                            <td className="p-4 text-xs font-bold text-gray-400">#{centre.centreId}</td>
+                                            <td className="p-4 text-sm font-mono font-bold text-indigo-600 uppercase">{centre.centreCode}</td>
+                                            <td className="p-4 text-sm font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">{centre.centreName}</td>
+                                            <td className="p-4">
+                                                <span className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[10px] font-black uppercase tracking-tighter shadow-sm">
+                                                    {region?.regionName || "City Area"}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 text-center">
+                                                <span className="bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full text-[10px] font-black border border-emerald-100">
+                                                    {(Array.isArray(centre.schools) ? centre.schools.length : 0)} Schools
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    )
+                                })
                             )}
                         </tbody>
                     </table>
