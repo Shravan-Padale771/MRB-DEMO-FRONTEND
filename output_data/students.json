@@ -9,7 +9,8 @@
         "age": 15,
         "motherTongue": "Hindi",
         "schoolId": 1,
-        "schoolName": "New Modern School"
+        "schoolName": "New Modern School",
+        "examApplications": null
     },
     {
         "studentId": 2,
@@ -21,7 +22,8 @@
         "age": 20,
         "motherTongue": "Marathi",
         "schoolId": 1,
-        "schoolName": "New Modern School"
+        "schoolName": "New Modern School",
+        "examApplications": null
     },
     {
         "studentId": 3,
@@ -33,6 +35,33 @@
         "age": 21,
         "motherTongue": "Marathi",
         "schoolId": 1,
-        "schoolName": "New Modern School"
+        "schoolName": "New Modern School",
+        "examApplications": null
+    },
+    {
+        "studentId": 4,
+        "firstName": "Sumit",
+        "middleName": "Sanjay",
+        "lastName": "Hatekar",
+        "contact": "1234567890",
+        "email": "test@gmail.com",
+        "age": 22,
+        "motherTongue": "Marathi",
+        "schoolId": 1,
+        "schoolName": "New Modern School",
+        "examApplications": null
+    },
+    {
+        "studentId": 5,
+        "firstName": "Vinit",
+        "middleName": "Pramod",
+        "lastName": "Deshmukh",
+        "contact": "1234567890",
+        "email": "test@gmail.com",
+        "age": 16,
+        "motherTongue": "Marathi",
+        "schoolId": 1,
+        "schoolName": "New Modern School",
+        "examApplications": null
     }
 ]

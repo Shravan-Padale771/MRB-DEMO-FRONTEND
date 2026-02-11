@@ -1,6 +1,7 @@
 [
     {
         "regionId": 1,
-        "regionName": "Pune"
+        "regionName": "Pune",
+        "no_exam_centres": 0
     }
 ]

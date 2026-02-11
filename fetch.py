@@ -42,7 +42,7 @@ if __name__ == "__main__":
         ("getAllExamCentres", "exam_centres.json"),
         ("getAllSchools", "schools.json"),
         ("getAllApplications", "applications.json"),
-        ("getAllExam", "exam.json")
+        ("getAllResults", "results.json")
     ]
     
     for endpoint, filename in endpoints:

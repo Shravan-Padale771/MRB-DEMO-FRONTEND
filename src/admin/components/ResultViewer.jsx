@@ -2,13 +2,14 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Award, CheckCircle, Trophy, Filter, XCircle, Search, TrendingUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { getAllRegions, getAllExamCentres, getAllSchools, getAllStudents, getAllApplications } from '../../api';
+import { getAllRegions, getAllExamCentres, getAllSchools, getAllStudents, getAllApplications, getAllExams } from '../../api';
 
 const ResultViewer = ({ results = [] }) => {
     // Filter State
     const [filterRegion, setFilterRegion] = useState("");
     const [filterCentre, setFilterCentre] = useState("");
     const [filterSchool, setFilterSchool] = useState("");
+    const [filterExam, setFilterExam] = useState("");
     const [isRankingsMode, setIsRankingsMode] = useState(false);
 
     // Metadata Queries
@@ -17,6 +18,7 @@ const ResultViewer = ({ results = [] }) => {
     const { data: schools = [] } = useQuery({ queryKey: ['schools'], queryFn: getAllSchools });
     const { data: students = [] } = useQuery({ queryKey: ['students'], queryFn: getAllStudents });
     const { data: applications = [] } = useQuery({ queryKey: ['applications'], queryFn: getAllApplications });
+    const { data: exams = [] } = useQuery({ queryKey: ['exams'], queryFn: getAllExams });
 
     // Cascading Filter Options
     const availableCentres = useMemo(() => {
@@ -73,7 +75,9 @@ const ResultViewer = ({ results = [] }) => {
                 regionName: region ? region.regionName : "N/A",
                 regionId: region ? region.regionId : null,
                 centreId: centre ? centre.centreId : null,
-                schoolId: school ? school.schoolId : null
+                schoolId: school ? school.schoolId : null,
+                examNo: application ? application.examNo : (res.examNo || null),
+                examName: res.examName || application?.examName || "Unknown Exam"
             };
         });
 
@@ -82,7 +86,8 @@ const ResultViewer = ({ results = [] }) => {
             const matchesRegion = !filterRegion || (res.regionId && res.regionId.toString() === filterRegion);
             const matchesCentre = !filterCentre || (res.centreId && res.centreId.toString() === filterCentre);
             const matchesSchool = !filterSchool || (res.schoolId && res.schoolId.toString() === filterSchool);
-            return matchesRegion && matchesCentre && matchesSchool;
+            const matchesExam = !filterExam || (res.examNo && res.examNo.toString() === filterExam);
+            return matchesRegion && matchesCentre && matchesSchool && matchesExam;
         });
 
         // Sort if Rankings Mode
@@ -94,12 +99,13 @@ const ResultViewer = ({ results = [] }) => {
         }
 
         return filtered;
-    }, [results, filterRegion, filterCentre, filterSchool, isRankingsMode]);
+    }, [results, filterRegion, filterCentre, filterSchool, filterExam, isRankingsMode, applications, schools, centres, regions, students]);
 
     const clearFilters = () => {
         setFilterRegion("");
         setFilterCentre("");
         setFilterSchool("");
+        setFilterExam("");
     };
 
     const getRankBadge = (index) => {
@@ -140,16 +146,28 @@ const ResultViewer = ({ results = [] }) => {
                 </div>
 
                 {/* Filter Controls */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
                     <div className="col-span-full flex justify-between items-center mb-2">
                         <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-2">
                             <Filter size={12} /> Filter Results to find Toppers
                         </h4>
-                        {(filterRegion || filterCentre || filterSchool) && (
+                        {(filterRegion || filterCentre || filterSchool || filterExam) && (
                             <button onClick={clearFilters} className="text-[10px] font-black text-red-500 uppercase flex items-center gap-1 hover:underline">
                                 <XCircle size={12} /> Reset
                             </button>
                         )}
+                    </div>
+                    <div>
+                        <select
+                            className="w-full text-xs p-2.5 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-indigo-900 shadow-sm"
+                            value={filterExam}
+                            onChange={(e) => setFilterExam(e.target.value)}
+                        >
+                            <option value="">All Exams</option>
+                            {exams.map(ex => (
+                                <option key={ex.examNo} value={ex.examNo}>{ex.exam_name}</option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <select
@@ -225,18 +243,23 @@ const ResultViewer = ({ results = [] }) => {
                                 <div className="flex justify-between items-start mb-4 relative z-10">
                                     <div className="flex items-center gap-3">
                                         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg shadow-inner ${isRankingsMode && index === 0 ? "bg-amber-100 text-amber-600" : isRankingsMode && index === 1 ? "bg-slate-100 text-slate-500" : isRankingsMode && index === 2 ? "bg-amber-50 text-amber-800" : "bg-indigo-50 text-indigo-600"}`}>
-                                            {getRankBadge(index) || (res.student?.username?.charAt(0) || "?")}
+                                            {getRankBadge(index) || (res.studentName?.charAt(0) || "?")}
                                         </div>
-                                        <div>
-                                            <p className="font-black text-gray-900 group-hover:text-indigo-700 transition-colors truncate max-w-[150px]">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-black text-gray-900 group-hover:text-indigo-700 transition-colors truncate">
                                                 {res.studentName}
                                             </p>
-                                            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">
-                                                App ID: #{res.applicationId}
-                                            </p>
+                                            <div className="flex flex-wrap gap-2 items-center">
+                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">
+                                                    #{res.applicationId}
+                                                </p>
+                                                <span className="text-[9px] bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter truncate max-w-[120px]">
+                                                    {res.examName}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <CheckCircle className="text-emerald-500" size={20} />
+                                    <CheckCircle className="text-emerald-500 shrink-0" size={20} />
                                 </div>
 
                                 <div className="space-y-3 relative z-10">
