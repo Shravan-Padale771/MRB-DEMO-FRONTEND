@@ -60,6 +60,8 @@ export const deleteExam = async (id) => {
 
 // --- APPLICATION ENDPOINTS ---
 export const applyForExam = async (applicationData) => {
+
+  
   // applicationData should look like:
   // { student: { studentId: 1 }, exam: { examNo: 1 }, formData: "...", status: "PENDING" }
   const response = await api.post("/fill-form", applicationData);

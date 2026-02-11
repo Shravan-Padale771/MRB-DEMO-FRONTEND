@@ -180,17 +180,16 @@ const ApplicationManager = ({
                                                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
                                                         Roll: {app.studentId}
                                                     </span>
-                                                    {formData.phone && (
-                                                        <span className="text-[10px] text-gray-500 font-bold tracking-tighter">
-                                                            📞 {formData.phone}
-                                                        </span>
-                                                    )}
+
+                                                    {student?.contact && (
+                                                     <span className="text-[10px] text-gray-500 font-bold">
+                                                       📞 {student.contact}
+                                                     </span>
+                                                   )}
+
+                                                    
                                                 </div>
-                                                {formData.gender && (
-                                                    <span className="text-[9px] text-gray-400 font-medium uppercase tracking-widest">
-                                                        {formData.gender}
-                                                    </span>
-                                                )}
+                                                
                                             </div>
                                         </td>
                                         <td className="p-4">

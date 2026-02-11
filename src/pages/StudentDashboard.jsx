@@ -21,6 +21,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import MyResults from "../student/components/MyResults";
+import ApplyModal from "../student/components/ApplyModal";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -37,12 +38,21 @@ const StudentDashboard = () => {
     gender: "Male",
   });
 
+
+
+
   useEffect(() => {
     const loadData = async () => {
       try {
         const [s, e] = await Promise.all([getAllStudents(), getAllExams()]);
         setStudents(s || []);
         setExams(e || []);
+        console.log("This is fetched data of students and exams");
+
+        console.log(s);
+        console.log(e);
+
+
       } catch (error) {
         console.error("Failed to load data", error);
       }
@@ -243,6 +253,7 @@ const StudentDashboard = () => {
                       </div>
                     </div>
                   </div>
+                  {/* Apply field which opens exam form  */}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -285,86 +296,22 @@ const StudentDashboard = () => {
                 </motion.button>
               </div>
               <div className="p-8">
-                <form onSubmit={handleFormSubmit} className="space-y-5">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Full Name
-                    </label>
-                    <input
-                      required
-                      placeholder="Enter your full name"
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                      value={applicationForm.fullName}
-                      onChange={(e) =>
-                        setApplicationForm({
-                          ...applicationForm,
-                          fullName: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Phone Number
-                    </label>
-                    <input
-                      required
-                      placeholder="Enter your phone number"
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                      value={applicationForm.phone}
-                      onChange={(e) =>
-                        setApplicationForm({
-                          ...applicationForm,
-                          phone: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Address
-                    </label>
-                    <textarea
-                      required
-                      placeholder="Enter your address"
-                      rows="3"
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition resize-none"
-                      value={applicationForm.address}
-                      onChange={(e) =>
-                        setApplicationForm({
-                          ...applicationForm,
-                          address: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Gender
-                    </label>
-                    <select
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                      value={applicationForm.gender}
-                      onChange={(e) =>
-                        setApplicationForm({
-                          ...applicationForm,
-                          gender: e.target.value,
-                        })
-                      }
-                    >
-                      <option>Male</option>
-                      <option>Female</option>
-                      <option>Other</option>
-                    </select>
-                  </div>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-bold hover:shadow-lg transition-all duration-300 mt-6"
-                  >
-                    Submit Application
-                  </motion.button>
-                </form>
+
+
+
+
+
+                {/* this is exam form containing student and exam details used ApplyModal.jsx  */}
+                <ApplyModal
+                  exam={selectedExam}
+                  student={currentUser}
+                  onClose={() => setSelectedExam(null)}
+                  onSuccess={fetchMyResults}
+                />
+
+
+
+
               </div>
             </motion.div>
           </div>
