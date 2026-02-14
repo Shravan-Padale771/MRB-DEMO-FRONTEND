@@ -7,10 +7,12 @@ import {
   BookOpen,
   FileText,
   Award,
+  ArrowUpRight,
+  MoreVertical,
+  Download
 } from "lucide-react";
 
 // Sub-components
-import StatCard from "../common/components/StatCard";
 import ExamManager from "../admin/components/ExamManager";
 import StudentManager from "../admin/components/StudentManager";
 import ApplicationManager from "../admin/components/ApplicationManager";
@@ -19,6 +21,8 @@ import ResultViewer from "../admin/components/ResultViewer";
 import RegionManager from "../admin/components/RegionManager";
 import ExamCentreManager from "../admin/components/ExamCentreManager";
 import SchoolManager from "../admin/components/SchoolManager";
+import DashboardLayout from "../admin/components/DashboardLayout";
+import MetricCard from "../admin/components/MetricCard";
 
 import {
   addExam,
@@ -31,7 +35,9 @@ import {
   getAllApplications,
   getAllResults,
   getAllSchools,
+  getAllRegions,
 } from "../api";
+
 
 const AdminDashboard = () => {
   const queryClient = useQueryClient();
@@ -143,9 +149,14 @@ const AdminDashboard = () => {
     queryFn: getAllSchools,
   });
 
-  const loading = isLoadingStudents || isLoadingExams || isLoadingApplications || isLoadingResults || isLoadingSchools;
+  const { data: regions = [], isLoading: isLoadingRegions } = useQuery({
+    queryKey: ["regions"],
+    queryFn: getAllRegions,
+  });
 
-  // Auto-calculate percentage (effect remains because it's derived state from forms)
+  const loading = isLoadingStudents || isLoadingExams || isLoadingApplications || isLoadingResults || isLoadingSchools || isLoadingRegions;
+
+  // Auto-calculate percentage
   useEffect(() => {
     if (resultForm.examPapers.length > 0) {
       let totalObtained = Object.values(resultForm.paperMarks).reduce(
@@ -430,148 +441,61 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800">Admin Dashboard</h1>
-          <button
-            onClick={handleRefresh}
-            disabled={loading}
-            className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-50 disabled:opacity-50"
-          >
-            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />{" "}
-            Refresh
-          </button>
-        </div>
+    <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+      {activeTab === "dashboard" && (
+        <div className="space-y-8">
+          {/* Metric Cards Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <MetricCard
+              label="Total Students"
+              value={students.length.toLocaleString()}
+              color="#4c84ff"
+            />
+            <MetricCard
+              label="Total Exams"
+              value={exams.length.toLocaleString()}
+              color="#fbc02d"
+            />
+            <MetricCard
+              label="Active Applications"
+              value={applications.length.toLocaleString()}
+              color="#4c84ff"
+            />
+            <MetricCard
+              label="Total Results"
+              value={results.length.toLocaleString()}
+              color="#4c84ff"
+            />
+          </div>
 
-        <div className="bg-white p-1 rounded-xl shadow-sm inline-flex mb-8 overflow-x-auto w-full border">
-          {[
-            "dashboard",
-            "regions",
-            "exam_centres",
-            "schools",
-            "students",
-            "exams",
-            "applications",
-            "publish",
-            "results",
-          ].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 px-4 py-3 rounded-lg capitalize font-medium transition-all whitespace-nowrap text-center ${activeTab === tab
-                ? "bg-indigo-600 text-white shadow"
-                : "text-gray-600 hover:bg-gray-50"
-                }`}
-            >
-              {tab.replace("_", " ")}
-            </button>
-          ))}
-        </div>
-
-        {activeTab === "dashboard" && (
           <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatCard
-                icon={Users}
-                label="Total Students"
-                value={students.length}
-                color="border-blue-500"
-              />
-              <StatCard
-                icon={BookOpen}
-                label="Total Exams"
-                value={exams.length}
-                color="border-green-500"
-              />
-              <StatCard
-                icon={FileText}
-                label="Applications"
-                value={applications.length}
-                color="border-yellow-500"
-              />
-              <StatCard
-                icon={Award}
-                label="Results Published"
-                value={results.length}
-                color="border-purple-500"
-              />
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-800">Recent Applications</h3>
+                <button onClick={() => setActiveTab('applications')} className="text-sm font-semibold text-blue-600 hover:text-blue-700">View All</button>
+              </div>
+              <ApplicationManager applications={applications.slice(0, 5)} selectApplication={selectApplication} />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-xl shadow-md">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">
-                  Recent Applications
-                </h3>
-                <div className="space-y-3 max-h-80 overflow-y-auto">
-                  {applications.length === 0 ? (
-                    <p className="text-gray-400 text-sm">No applications yet</p>
-                  ) : (
-                    applications.slice(0, 5).map((app) => (
-                      <div
-                        key={app.applicationId}
-                        className="p-3 bg-gray-50 rounded-lg border flex justify-between items-center"
-                      >
-                        <div className="flex-1">
-                          <p className="font-semibold text-gray-800">
-                            #{app.applicationId}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {app.student?.username}
-                          </p>
-                        </div>
-                        <span
-                          className={`text-xs font-bold px-2 py-1 rounded ${app.status === "APPLIED" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"}`}
-                        >
-                          {app.status}
-                        </span>
-                      </div>
-                    ))
-                  )}
-                </div>
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-800">Recent Results</h3>
+                <button onClick={() => setActiveTab('results')} className="text-sm font-semibold text-blue-600 hover:text-blue-700">View All</button>
               </div>
-
-              <div className="bg-white p-6 rounded-xl shadow-md">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">
-                  Recent Results
-                </h3>
-                <div className="space-y-3 max-h-80 overflow-y-auto">
-                  {results.length === 0 ? (
-                    <p className="text-gray-400 text-sm">
-                      No results published
-                    </p>
-                  ) : (
-                    results.slice(0, 5).map((res) => (
-                      <div
-                        key={res.id || Math.random()}
-                        className="p-3 bg-gray-50 rounded-lg border"
-                      >
-                        <p className="font-semibold text-gray-800">
-                          App #{res.application?.applicationId}
-                        </p>
-                        <p className="text-xs text-gray-600 font-mono truncate">
-                          {res.resultData}
-                        </p>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
+              <ResultViewer results={results.slice(0, 5)} />
             </div>
           </div>
-        )}
+        </div>
+      )}
 
+      {/* Render Sub-managers based on activeTab */}
+      <div className={activeTab === 'dashboard' ? 'hidden' : 'block'}>
         {activeTab === "regions" && <RegionManager />}
         {activeTab === "exam_centres" && <ExamCentreManager />}
         {activeTab === "schools" && <SchoolManager />}
-
         {activeTab === "applications" && (
-          <ApplicationManager
-            applications={applications}
-            selectApplication={selectApplication}
-          />
+          <ApplicationManager applications={applications} selectApplication={selectApplication} />
         )}
-
         {activeTab === "publish" && (
           <ResultPublisher
             resultForm={resultForm}
@@ -581,11 +505,7 @@ const AdminDashboard = () => {
             isLoading={publishResultMutation.isPending}
           />
         )}
-
-        {activeTab === "results" && (
-          <ResultViewer results={results} />
-        )}
-
+        {activeTab === "results" && <ResultViewer results={results} />}
         {activeTab === "exams" && (
           <ExamManager
             examForm={examForm}
@@ -600,7 +520,6 @@ const AdminDashboard = () => {
             isLoading={createExamMutation.isPending || updateExamMutation.isPending || deleteExamMutation.isPending}
           />
         )}
-
         {activeTab === "students" && (
           <StudentManager
             studentForm={studentForm}
@@ -612,7 +531,7 @@ const AdminDashboard = () => {
           />
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

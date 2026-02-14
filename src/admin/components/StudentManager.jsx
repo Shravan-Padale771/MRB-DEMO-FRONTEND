@@ -76,7 +76,7 @@ const StudentManager = ({
 
     return (
         <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-md border-t-4 border-green-600 h-fit">
+            <div className="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-600 h-fit">
                 <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
                     <Plus size={24} /> Add Student
                 </h2>
@@ -139,7 +139,7 @@ const StudentManager = ({
                             ))}
                         </select>
                     </div>
-                    <button className="w-full bg-green-600 text-white font-bold p-3 rounded-lg hover:bg-green-700 transition-colors shadow-lg">
+                    <button className="w-full bg-indigo-600 text-white font-bold p-3 rounded-lg hover:bg-indigo-700 transition-colors shadow-lg">
                         Add Student
                     </button>
                 </form>
@@ -252,7 +252,7 @@ const StudentManager = ({
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-[10px] text-green-600 font-bold flex items-center gap-1">
+                                            <span className="text-[10px] text-indigo-600 font-bold flex items-center gap-1">
                                                 📍 {st.regionName}
                                             </span>
                                             <span className="text-[10px] text-amber-600 font-bold flex items-center gap-1">
@@ -262,7 +262,7 @@ const StudentManager = ({
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
-                                    <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
+                                    <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
                                         Active
                                     </span>
                                 </div>

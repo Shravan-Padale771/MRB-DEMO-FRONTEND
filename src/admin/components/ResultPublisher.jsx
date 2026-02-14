@@ -84,7 +84,6 @@ const ResultPublisher = ({
                     projectMarks: 0,
                     score: "",
                 }));
-                // toast.success(`Loaded App #${appId}`); // Silent load for better UX during typing
             }
         } else {
             // Clear papers if ID is entered but not found
@@ -110,205 +109,215 @@ const ResultPublisher = ({
     }, [applications, resultForm.applicationId]);
 
     return (
-        <div className="max-w-3xl mx-auto">
-            <div className="bg-white p-5 rounded-2xl shadow-lg border border-gray-100 overflow-hidden relative">
-                {/* Accent line */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-gray-200"></div>
+        <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-indigo-600">
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <Award size={28} className="text-indigo-600" /> Result Publication
+                </h2>
+                {(filterRegion || filterCentre || filterSchool) && (
+                    <button
+                        onClick={clearFilters}
+                        className="text-xs font-black text-red-500 uppercase flex items-center gap-1 hover:underline"
+                    >
+                        <XCircle size={14} /> Clear Selection
+                    </button>
+                )}
+            </div>
 
-                <div className="flex justify-between items-center mb-5 mt-2">
-                    <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 tracking-tight">
-                        <Award size={20} className="text-indigo-600" /> Publish Result
-                    </h2>
-                    {(filterRegion || filterCentre || filterSchool) && (
-                        <button
-                            onClick={clearFilters}
-                            className="text-[9px] font-black text-gray-400 uppercase tracking-[0.1em] flex items-center gap-1 hover:text-red-500 px-2 py-1 rounded-full transition-all"
-                        >
-                            <XCircle size={10} /> Reset Filters
-                        </button>
-                    )}
+            {/* Filterable App Selection */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+                <div className="col-span-full mb-2">
+                    <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <Search size={12} /> Step 1: Browse Candidates
+                    </h4>
                 </div>
+                <select
+                    className="text-xs p-3 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-bold shadow-sm"
+                    value={filterRegion}
+                    onChange={(e) => {
+                        setFilterRegion(e.target.value);
+                        setFilterCentre("");
+                        setFilterSchool("");
+                    }}
+                >
+                    <option value="">All Regions</option>
+                    {regions.map(r => (
+                        <option key={r.regionId} value={r.regionId}>{r.regionName}</option>
+                    ))}
+                </select>
+                <select
+                    className="text-xs p-3 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-bold shadow-sm"
+                    value={filterCentre}
+                    onChange={(e) => {
+                        setFilterCentre(e.target.value);
+                        setFilterSchool("");
+                    }}
+                >
+                    <option value="">All Centres</option>
+                    {availableCentres.map(c => (
+                        <option key={c.centreId} value={c.centreId}>{c.centreName}</option>
+                    ))}
+                </select>
+                <select
+                    className="text-xs p-3 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-bold shadow-sm"
+                    value={filterSchool}
+                    onChange={(e) => setFilterSchool(e.target.value)}
+                >
+                    <option value="">All Schools</option>
+                    {availableSchools.map(s => (
+                        <option key={s.schoolId} value={s.schoolId}>{s.schoolName}</option>
+                    ))}
+                </select>
+                <select
+                    className="text-xs p-3 border border-indigo-200 rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 font-black text-indigo-600 shadow-sm cursor-pointer"
+                    value={resultForm.applicationId}
+                    onChange={handleIdChange}
+                >
+                    <option value="">Select Candidate...</option>
+                    {filteredAppsForSelect.map(app => (
+                        <option key={app.applicationId} value={app.applicationId}>
+                            #{app.applicationId} - {app.studentName || "Student"}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
-                {/* Filterable App Selection */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-6 p-4 bg-gray-50/50 rounded-xl border border-gray-100">
-                    <div className="col-span-full mb-1">
-                        <h4 className="text-[9px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                            <Search size={10} /> Step 1: Find Application
-                        </h4>
-                    </div>
-                    <select
-                        className="text-[11px] p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-medium"
-                        value={filterRegion}
-                        onChange={(e) => {
-                            setFilterRegion(e.target.value);
-                            setFilterCentre("");
-                            setFilterSchool("");
-                        }}
-                    >
-                        <option value="">Region</option>
-                        {regions.map(r => (
-                            <option key={r.regionId} value={r.regionId}>{r.regionName}</option>
-                        ))}
-                    </select>
-                    <select
-                        className="text-[11px] p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-medium"
-                        value={filterCentre}
-                        onChange={(e) => {
-                            setFilterCentre(e.target.value);
-                            setFilterSchool("");
-                        }}
-                    >
-                        <option value="">Centre</option>
-                        {availableCentres.map(c => (
-                            <option key={c.centreId} value={c.centreId}>{c.centreName}</option>
-                        ))}
-                    </select>
-                    <select
-                        className="text-[11px] p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700 font-medium"
-                        value={filterSchool}
-                        onChange={(e) => setFilterSchool(e.target.value)}
-                    >
-                        <option value="">School</option>
-                        {availableSchools.map(s => (
-                            <option key={s.schoolId} value={s.schoolId}>{s.schoolName}</option>
-                        ))}
-                    </select>
-                    <select
-                        className="text-[11px] p-2 border border-gray-200 rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-indigo-600 shadow-sm cursor-pointer"
-                        value={resultForm.applicationId}
-                        onChange={handleIdChange}
-                    >
-                        <option value="">Select Candidate</option>
-                        {filteredAppsForSelect.map(app => (
-                            <option key={app.applicationId} value={app.applicationId}>
-                                #{app.applicationId} - {app.studentName || "Student"}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <form onSubmit={handlePublishResult} className="space-y-5">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1 bg-white p-4 rounded-xl border border-gray-200 group transition-all hover:border-indigo-400">
-                            <label className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest group-hover:text-indigo-600 transition-colors">
-                                <Keyboard size={12} /> Step 2: Application ID (Direct)
-                            </label>
-                            <input
-                                type="number"
-                                className="w-full p-2.5 text-xl font-bold text-gray-800 bg-transparent outline-none placeholder-gray-200"
-                                value={resultForm.applicationId}
-                                onChange={handleIdChange}
-                                placeholder="Enter ID..."
-                            />
-                            {currentApp && (
-                                <div className="mt-2 text-[10px] font-medium text-gray-400 flex items-center gap-1">
-                                    <FastForward size={10} /> Candidate: <span className="text-gray-900 font-bold">{currentApp.studentName}</span> | Exam: <span className="text-gray-900 font-bold uppercase">{currentApp.examName}</span>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="w-full md:w-1/3 bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col justify-center">
-                            <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1 tracking-widest">
-                                Status
-                            </label>
-                            <select
-                                required
-                                className="w-full p-2 text-sm border rounded-lg bg-white font-bold text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500"
-                                value={resultForm.remarks}
-                                onChange={(e) => setResultForm({ ...resultForm, remarks: e.target.value })}
-                            >
-                                <option>Pass</option>
-                                <option>Fail</option>
-                                <option>Withheld</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
-                            <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 pb-2">
-                                Paper Breakdown
-                            </h3>
-                            {resultForm.examPapers.length === 0 ? (
-                                <div className="text-center py-6">
-                                    <p className="text-[10px] text-gray-300 font-medium italic">
-                                        No papers loaded. Enter ID above.
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    {resultForm.examPapers.map((paper, idx) => (
-                                        <div key={idx} className="flex items-center justify-between gap-3 group">
-                                            <div className="flex flex-col">
-                                                <span className="text-[11px] font-medium text-gray-600 group-hover:text-indigo-600 transition-colors">{paper.name}</span>
-                                                <span className="text-[9px] font-bold text-gray-300 uppercase tracking-tighter">Max: {paper.maxMarks}</span>
-                                            </div>
-                                            <input
-                                                type="number"
-                                                required
-                                                max={paper.maxMarks}
-                                                min="0"
-                                                className="w-16 p-1.5 text-center text-sm font-bold border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-gray-50 text-gray-700"
-                                                value={resultForm.paperMarks[paper.name] || 0}
-                                                onChange={(e) => {
-                                                    const val = parseFloat(e.target.value) || 0;
-                                                    setResultForm({
-                                                        ...resultForm,
-                                                        paperMarks: { ...resultForm.paperMarks, [paper.name]: val },
-                                                    });
-                                                }}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="space-y-4">
-                            {(() => {
-                                if (!currentApp) return null;
-                                const exam = exams.find(e => e.examNo === currentApp.examNo);
-
-                                if (!exam) return null;
-
-                                let details = {};
-                                try { details = typeof exam.exam_details === 'string' ? JSON.parse(exam.exam_details) : (exam.exam_details || {}); }
-                                catch (e) { console.error("Error parsing details:", e); }
-                                const hasOral = details.structure?.hasOral;
-                                const hasProject = details.structure?.hasProject;
-                                if (!hasOral && !hasProject) return null;
-                                return (
-                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
-                                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-200/50 pb-2">Special Components</h4>
-                                        {hasOral && (
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[11px] font-medium text-gray-700">Oral Marks (50)</span>
-                                                <input type="number" max="50" min="0" className="w-14 p-1 text-center text-sm font-bold border border-gray-200 rounded-lg bg-white text-gray-900 outline-none" value={resultForm.oralMarks} onChange={(e) => setResultForm({ ...resultForm, oralMarks: parseFloat(e.target.value) || 0 })} />
-                                            </div>
-                                        )}
-                                        {hasProject && (
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[11px] font-medium text-gray-700">Project Marks (50)</span>
-                                                <input type="number" max="50" min="0" className="w-14 p-1 text-center text-sm font-bold border border-gray-200 rounded-lg bg-white text-gray-900 outline-none" value={resultForm.projectMarks} onChange={(e) => setResultForm({ ...resultForm, projectMarks: parseFloat(e.target.value) || 0 })} />
-                                            </div>
-                                        )}
+            <form onSubmit={handlePublishResult} className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm group transition-all hover:border-indigo-400">
+                        <label className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase mb-4 tracking-widest group-hover:text-indigo-600 transition-colors">
+                            <Keyboard size={14} /> Step 2: Confirmation & Status
+                        </label>
+                        <div className="flex items-end gap-6">
+                            <div className="flex-1">
+                                <span className="block text-[9px] font-black text-gray-400 uppercase mb-1">Application ID</span>
+                                <input
+                                    type="number"
+                                    className="w-full p-0 text-3xl font-black text-gray-900 bg-transparent outline-none placeholder-gray-100"
+                                    value={resultForm.applicationId}
+                                    onChange={handleIdChange}
+                                    placeholder="000"
+                                />
+                            </div>
+                            <div className="flex-[2]">
+                                {currentApp ? (
+                                    <div className="space-y-1">
+                                        <span className="block text-[9px] font-black text-indigo-400 uppercase">Verified Candidate</span>
+                                        <p className="text-lg font-black text-indigo-900 leading-tight">{currentApp.studentName}</p>
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">{currentApp.examName}</p>
                                     </div>
-                                )
-                            })()}
-
-                            <div className="bg-white p-5 rounded-xl border border-dashed border-gray-300 flex flex-col items-center justify-center">
-                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-1">Calculation</span>
-                                <div className="text-3xl font-bold text-indigo-600">{resultForm.score}</div>
-                                <span className="text-[9px] font-medium text-gray-400 uppercase tracking-tighter mt-1 italic">Total Percentage</span>
+                                ) : (
+                                    <div className="h-12 flex items-center">
+                                        <p className="text-xs font-bold text-gray-300 italic">No candidate selected yet...</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    <button className="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-indigo-700 transition-all shadow-md uppercase tracking-widest text-xs">
-                        Publish Final Result
-                    </button>
-                </form>
-            </div>
+                    <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 flex flex-col justify-center">
+                        <label className="block text-[10px] font-black text-gray-400 uppercase mb-4 tracking-widest">
+                            Final Remark
+                        </label>
+                        <select
+                            required
+                            className="w-full p-3 text-sm border rounded-xl bg-white font-black text-indigo-900 outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+                            value={resultForm.remarks}
+                            onChange={(e) => setResultForm({ ...resultForm, remarks: e.target.value })}
+                        >
+                            <option>Pass</option>
+                            <option>Fail</option>
+                            <option>Withheld</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
+                        <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] border-b border-gray-50 pb-4">
+                            Paper Breakdown
+                        </h3>
+                        {resultForm.examPapers.length === 0 ? (
+                            <div className="text-center py-8">
+                                <p className="text-[11px] text-gray-300 font-bold italic">
+                                    Waiting for application selection...
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {resultForm.examPapers.map((paper, idx) => (
+                                    <div key={idx} className="flex items-center justify-between gap-6 group hover:bg-gray-50/50 p-2 rounded-xl transition-all">
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">{paper.name}</span>
+                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Maximum: {paper.maxMarks}</span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            required
+                                            max={paper.maxMarks}
+                                            min="0"
+                                            className="w-20 p-2 text-center text-lg font-black border-2 border-gray-100 rounded-xl focus:border-indigo-500 focus:ring-0 outline-none bg-white text-indigo-600 transition-all font-mono"
+                                            value={resultForm.paperMarks[paper.name] || 0}
+                                            onChange={(e) => {
+                                                const val = parseFloat(e.target.value) || 0;
+                                                setResultForm({
+                                                    ...resultForm,
+                                                    paperMarks: { ...resultForm.paperMarks, [paper.name]: val },
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="space-y-6">
+                        {(() => {
+                            if (!currentApp) return null;
+                            const exam = exams.find(e => e.examNo === currentApp.examNo);
+
+                            if (!exam) return null;
+
+                            let details = {};
+                            try { details = typeof exam.exam_details === 'string' ? JSON.parse(exam.exam_details) : (exam.exam_details || {}); }
+                            catch (e) { console.error("Error parsing details:", e); }
+                            const hasOral = details.structure?.hasOral;
+                            const hasProject = details.structure?.hasProject;
+                            if (!hasOral && !hasProject) return null;
+                            return (
+                                <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100 space-y-4">
+                                    <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] border-b border-indigo-100/50 pb-4">Special Components</h4>
+                                    {hasOral && (
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm font-bold text-indigo-900">Oral (50)</span>
+                                            <input type="number" max="50" min="0" className="w-16 p-1.5 text-center text-lg font-black border-2 border-indigo-100 rounded-xl bg-white text-indigo-600 outline-none font-mono" value={resultForm.oralMarks} onChange={(e) => setResultForm({ ...resultForm, oralMarks: parseFloat(e.target.value) || 0 })} />
+                                        </div>
+                                    )}
+                                    {hasProject && (
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm font-bold text-indigo-900">Project (50)</span>
+                                            <input type="number" max="50" min="0" className="w-16 p-1.5 text-center text-lg font-black border-2 border-indigo-100 rounded-xl bg-white text-indigo-600 outline-none font-mono" value={resultForm.projectMarks} onChange={(e) => setResultForm({ ...resultForm, projectMarks: parseFloat(e.target.value) || 0 })} />
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        })()}
+
+                        <div className="bg-white p-6 rounded-2xl border-2 border-dashed border-indigo-100 flex flex-col items-center justify-center shadow-sm">
+                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-indigo-300 mb-1">Final Performance</span>
+                            <div className="text-5xl font-black text-indigo-600 leading-none font-mono">{resultForm.score || "0"}</div>
+                            <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mt-3 flex items-center gap-2">
+                                <div className="w-1 h-1 rounded-full bg-indigo-500 animate-pulse"></div> Total Score Percentage
+                            </span>
+                        </div>
+
+                        <button className="w-full bg-indigo-600 text-white font-black py-4 px-6 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-100 uppercase tracking-widest text-xs flex items-center justify-center gap-3">
+                            <Award size={18} /> Publish Result
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     );
 };
