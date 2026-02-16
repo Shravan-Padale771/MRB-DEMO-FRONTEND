@@ -474,7 +474,7 @@ const AdminDashboard = () => {
                 <h3 className="text-xl font-bold text-gray-800">Recent Applications</h3>
                 <button onClick={() => setActiveTab('applications')} className="text-sm font-semibold text-blue-600 hover:text-blue-700">View All</button>
               </div>
-              <ApplicationManager applications={applications.slice(0, 5)} selectApplication={selectApplication} />
+              <ApplicationManager isDashboard={true} selectApplication={selectApplication} />
             </div>
 
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
@@ -482,7 +482,7 @@ const AdminDashboard = () => {
                 <h3 className="text-xl font-bold text-gray-800">Recent Results</h3>
                 <button onClick={() => setActiveTab('results')} className="text-sm font-semibold text-blue-600 hover:text-blue-700">View All</button>
               </div>
-              <ResultViewer results={results.slice(0, 5)} />
+              <ResultViewer isDashboard={true} />
             </div>
           </div>
         </div>
@@ -494,7 +494,7 @@ const AdminDashboard = () => {
         {activeTab === "exam_centres" && <ExamCentreManager />}
         {activeTab === "schools" && <SchoolManager />}
         {activeTab === "applications" && (
-          <ApplicationManager applications={applications} selectApplication={selectApplication} />
+          <ApplicationManager selectApplication={selectApplication} />
         )}
         {activeTab === "publish" && (
           <ResultPublisher
@@ -505,7 +505,7 @@ const AdminDashboard = () => {
             isLoading={publishResultMutation.isPending}
           />
         )}
-        {activeTab === "results" && <ResultViewer results={results} />}
+        {activeTab === "results" && <ResultViewer />}
         {activeTab === "exams" && (
           <ExamManager
             examForm={examForm}
@@ -516,7 +516,6 @@ const AdminDashboard = () => {
             startEditing={startEditing}
             isEditing={isEditing}
             resetExamForm={resetExamForm}
-            exams={exams}
             isLoading={createExamMutation.isPending || updateExamMutation.isPending || deleteExamMutation.isPending}
           />
         )}
@@ -525,8 +524,6 @@ const AdminDashboard = () => {
             studentForm={studentForm}
             setStudentForm={setStudentForm}
             handleCreateStudent={handleCreateStudent}
-            students={students}
-            schools={schools}
             isLoading={createStudentMutation.isPending}
           />
         )}

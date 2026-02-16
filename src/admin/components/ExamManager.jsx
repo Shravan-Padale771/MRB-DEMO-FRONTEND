@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, BookOpen, ChevronRight, ChevronLeft, Check, Edit, Trash2, X } from 'lucide-react';
+import { Plus, BookOpen, ChevronRight, ChevronLeft, Check, Edit, Trash2, X, Filter, RefreshCw } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { getExams } from '../../api';
 
 const ExamManager = ({
     examForm,
@@ -10,10 +12,27 @@ const ExamManager = ({
     handleDeleteExam,
     startEditing,
     isEditing,
-    resetExamForm,
-    exams
+    resetExamForm
 }) => {
     const [activeStep, setActiveStep] = useState(0);
+    const [page, setPage] = useState(0);
+    const [size] = useState(10);
+    const [filterName, setFilterName] = useState("");
+
+    // API Query for Exams
+    const { data: examsData, isLoading, refetch } = useQuery({
+        queryKey: ['exams', filterName, page, size],
+        queryFn: () => getExams({
+            examName: filterName || undefined,
+            page,
+            size,
+            sort: 'examNo,desc'
+        }),
+        keepPreviousData: true
+    });
+
+    const exams = examsData?.content || [];
+    const totalPages = examsData?.totalPages || 0;
 
     const steps = [
         { id: 'basic', title: 'Basic Info' },
@@ -499,67 +518,110 @@ const ExamManager = ({
                 </form>
             </div>
 
-            {/* List Section - Reduced height and simplified */}
+            {/* List Section */}
             <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-                <h2 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2 border-b pb-4">
-                    <BookOpen size={22} className="text-indigo-600" /> Existing Exams
-                </h2>
+                <div className="flex justify-between items-center mb-6 border-b pb-4">
+                    <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <BookOpen size={22} className="text-indigo-600" /> Existing Exams
+                    </h2>
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
+                            <Filter size={12} className="text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                className="bg-transparent border-none outline-none text-[10px] font-bold text-gray-600 w-24"
+                                value={filterName}
+                                onChange={(e) => { setFilterName(e.target.value); setPage(0); }}
+                            />
+                        </div>
+                        <button onClick={() => refetch()} className="p-1.5 text-gray-400 hover:text-indigo-600">
+                            <RefreshCw size={16} className={isLoading ? "animate-spin" : ""} />
+                        </button>
+                    </div>
+                </div>
 
-                {exams.length === 0 ? (
+                {exams.length === 0 && !isLoading ? (
                     <div className="py-12 text-center">
                         <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                             <BookOpen size={24} className="text-gray-300" />
                         </div>
-                        <p className="text-gray-400 font-medium italic">No exams created yet</p>
+                        <p className="text-gray-400 font-medium italic">No exams found</p>
                     </div>
                 ) : (
-                    <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                        {exams.map((ex) => (
-                            <motion.div
-                                key={ex.examNo}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="p-4 border border-gray-100 rounded-xl hover:bg-indigo-50/50 hover:border-indigo-100 transition-all group"
-                            >
-                                <div className="flex justify-between items-start">
-                                    <div className="max-w-[70%]">
-                                        <p className="font-bold text-gray-800 leading-tight group-hover:text-indigo-700 transition-colors">
-                                            {ex.exam_name}
-                                        </p>
-                                        <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-wider">
-                                            {ex.exam_code}
-                                        </p>
-                                    </div>
-                                    <div className="flex flex-col items-end gap-2">
-                                        <span className={`text-[9px] font-bold px-2 py-1 rounded-full border ${ex.status === 'PUBLISHED'
-                                            ? 'bg-green-50 text-green-700 border-green-100'
-                                            : ex.status === 'DRAFT'
-                                                ? 'bg-yellow-50 text-yellow-700 border-yellow-100'
-                                                : 'bg-gray-50 text-gray-700 border-gray-100'
-                                            }`}>
-                                            {ex.status}
-                                        </span>
-                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button
-                                                onClick={() => startEditing(ex)}
-                                                className="p-1.5 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-600 hover:text-white transition-all border border-amber-100"
-                                                title="Edit Exam"
-                                            >
-                                                <Edit size={14} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteExam(ex.examNo)}
-                                                className="p-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all border border-red-100"
-                                                title="Delete Exam"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
+                    <>
+                        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                            {exams.map((ex) => (
+                                <motion.div
+                                    key={ex.examNo}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="p-4 border border-gray-100 rounded-xl hover:bg-indigo-50/50 hover:border-indigo-100 transition-all group"
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <div className="max-w-[70%]">
+                                            <p className="font-bold text-gray-800 leading-tight group-hover:text-indigo-700 transition-colors">
+                                                {ex.exam_name}
+                                            </p>
+                                            <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-wider">
+                                                {ex.exam_code}
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-col items-end gap-2">
+                                            <span className={`text-[9px] font-bold px-2 py-1 rounded-full border ${ex.status === 'PUBLISHED'
+                                                ? 'bg-green-50 text-green-700 border-green-100'
+                                                : ex.status === 'DRAFT'
+                                                    ? 'bg-yellow-50 text-yellow-700 border-yellow-100'
+                                                    : 'bg-gray-50 text-gray-700 border-gray-100'
+                                                }`}>
+                                                {ex.status}
+                                            </span>
+                                            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={() => startEditing(ex)}
+                                                    className="p-1.5 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-600 hover:text-white transition-all border border-amber-100"
+                                                    title="Edit Exam"
+                                                >
+                                                    <Edit size={14} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteExam(ex.examNo)}
+                                                    className="p-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all border border-red-100"
+                                                    title="Delete Exam"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
+                                </motion.div>
+                            ))}
+                        </div>
+
+                        {totalPages > 1 && (
+                            <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-6">
+                                <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                                    Page {page + 1} of {totalPages}
+                                </span>
+                                <div className="flex gap-2">
+                                    <button
+                                        disabled={page === 0}
+                                        onClick={() => setPage(p => p - 1)}
+                                        className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
+                                    >
+                                        <ChevronLeft size={16} />
+                                    </button>
+                                    <button
+                                        disabled={page >= totalPages - 1}
+                                        onClick={() => setPage(p => p + 1)}
+                                        className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
+                                    >
+                                        <ChevronRight size={16} />
+                                    </button>
                                 </div>
-                            </motion.div>
-                        ))}
-                    </div>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

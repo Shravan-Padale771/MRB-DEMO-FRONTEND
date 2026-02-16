@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Building2, Plus, RefreshCw } from 'lucide-react';
+import { Building2, Plus, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { addSchool, getAllSchools, getAllExamCentres, getAllRegions } from '../../api';
+import { addSchool, getSchools, getAllExamCentres, getAllRegions } from '../../api';
 
 const SchoolManager = () => {
     const queryClient = useQueryClient();
@@ -12,22 +12,35 @@ const SchoolManager = () => {
     });
     const [filterRegion, setFilterRegion] = useState("");
     const [filterCentre, setFilterCentre] = useState("");
+    const [page, setPage] = useState(0);
+    const [size] = useState(10);
 
-    // Queries
-    const { data: schools = [], isLoading: isLoadingSchools, refetch: refetchSchools } = useQuery({
-        queryKey: ['schools'],
-        queryFn: getAllSchools,
-    });
-
-    const { data: centres = [], isLoading: isLoadingCentres, refetch: refetchCentres } = useQuery({
-        queryKey: ['examCentres'],
-        queryFn: getAllExamCentres,
-    });
-
+    // Metadata Queries
     const { data: regions = [] } = useQuery({
         queryKey: ['regions'],
         queryFn: getAllRegions,
     });
+
+    const { data: centres = [] } = useQuery({
+        queryKey: ['examCentres'],
+        queryFn: getAllExamCentres,
+    });
+
+    // API Query for Schools
+    const { data: schoolsData, isLoading: isLoadingSchools, refetch: refetchSchools } = useQuery({
+        queryKey: ['schools', filterRegion, filterCentre, page, size],
+        queryFn: () => getSchools({
+            regionId: filterRegion || undefined,
+            examCentreId: filterCentre || undefined,
+            page,
+            size,
+            sort: 'schoolName,asc'
+        }),
+        keepPreviousData: true
+    });
+
+    const schools = schoolsData?.content || [];
+    const totalPages = schoolsData?.totalPages || 0;
 
     // Mutation
     const addSchoolMutation = useMutation({
@@ -43,29 +56,13 @@ const SchoolManager = () => {
         }
     });
 
-    const loading = isLoadingSchools || isLoadingCentres || addSchoolMutation.isPending;
+    const loading = isLoadingSchools || addSchoolMutation.isPending;
 
-    // Derived filter options
+    // Derived filter options for cascading
     const availableCentresForFilter = useMemo(() => {
         if (!filterRegion) return centres;
-        return centres.filter(c => {
-            const regionId = c.regionId;
-            return regionId && regionId.toString() === filterRegion;
-        });
+        return centres.filter(c => c.regionId?.toString() === filterRegion);
     }, [filterRegion, centres]);
-
-    // Final filtered schools
-    const filteredSchools = useMemo(() => {
-        return schools.filter(s => {
-            // Find related centre and region
-            const centre = centres.find(c => c.centreId === s.centreId);
-            const regionId = centre?.regionId;
-
-            const matchesRegion = !filterRegion || (regionId && regionId.toString() === filterRegion);
-            const matchesCentre = !filterCentre || s.centreId?.toString() === filterCentre;
-            return matchesRegion && matchesCentre;
-        });
-    }, [schools, filterRegion, filterCentre, centres]);
 
     const handleCreateSchool = (e) => {
         e.preventDefault();
@@ -80,7 +77,6 @@ const SchoolManager = () => {
 
     const handleRefresh = () => {
         refetchSchools();
-        refetchCentres();
     };
 
     return (
@@ -133,7 +129,7 @@ const SchoolManager = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
                         <h3 className="text-lg font-bold text-gray-800">Existing Schools</h3>
-                        <p className="text-xs text-gray-500 mt-1 uppercase font-bold tracking-widest">Listing {filteredSchools.length} Schools</p>
+                        <p className="text-xs text-gray-500 mt-1 uppercase font-bold tracking-widest">Listing {schoolsData?.totalElements || 0} Schools</p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
@@ -145,6 +141,7 @@ const SchoolManager = () => {
                                 onChange={(e) => {
                                     setFilterRegion(e.target.value);
                                     setFilterCentre("");
+                                    setPage(0);
                                 }}
                             >
                                 <option value="">All Regions</option>
@@ -159,7 +156,7 @@ const SchoolManager = () => {
                             <select
                                 className="text-xs bg-transparent outline-none font-bold text-indigo-600"
                                 value={filterCentre}
-                                onChange={(e) => setFilterCentre(e.target.value)}
+                                onChange={(e) => { setFilterCentre(e.target.value); setPage(0); }}
                             >
                                 <option value="">All Centres</option>
                                 {availableCentresForFilter.map(c => (
@@ -185,19 +182,18 @@ const SchoolManager = () => {
                                 <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">School Name</th>
                                 <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Exam Centre</th>
                                 <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Region</th>
-                                <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {(filteredSchools.length === 0 && !isLoadingSchools) ? (
+                            {(schools.length === 0 && !isLoadingSchools) ? (
                                 <tr>
-                                    <td colSpan="4" className="p-12 text-center">
+                                    <td colSpan="3" className="p-12 text-center">
                                         <Building2 size={48} className="mx-auto text-gray-100 mb-4" />
                                         <p className="text-gray-400 italic font-medium">No schools match your filter</p>
                                     </td>
                                 </tr>
                             ) : (
-                                filteredSchools.map((school, idx) => (
+                                schools.map((school, idx) => (
                                     <tr key={school.schoolId || `school-${idx}`} className="border-b transition-colors hover:bg-indigo-50/30 group">
                                         <td className="p-4 align-middle">
                                             <div className="flex items-center gap-3">
@@ -212,37 +208,18 @@ const SchoolManager = () => {
                                         </td>
                                         <td className="p-4 align-middle">
                                             <div className="space-y-1">
-                                                {(() => {
-                                                    const centre = centres.find(c => c.centreId === school.centreId);
-                                                    return (
-                                                        <>
-                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-blue-100 text-blue-700 shadow-sm">
-                                                                {centre?.centreName || "N/A"}
-                                                            </span>
-                                                            <p className="text-[10px] font-mono text-gray-400 font-bold">
-                                                                {centre?.centreCode || ""}
-                                                            </p>
-                                                        </>
-                                                    );
-                                                })()}
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-blue-100 text-blue-700 shadow-sm">
+                                                    {school.centreName || "N/A"}
+                                                </span>
+                                                <p className="text-[10px] font-mono text-gray-400 font-bold">
+                                                    {school.centreCode || ""}
+                                                </p>
                                             </div>
                                         </td>
                                         <td className="p-4 align-middle">
-                                            {(() => {
-                                                const centre = centres.find(c => c.centreId === school.centreId);
-                                                const region = regions.find(r => r.regionId === centre?.regionId);
-
-                                                return (
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-purple-100 text-purple-700 shadow-sm">
-                                                        {region?.regionName || "City Area"}
-                                                    </span>
-                                                );
-                                            })()}
-                                        </td>
-                                        <td className="p-4 align-middle text-right">
-                                            <button className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-indigo-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-indigo-50 border border-transparent hover:border-indigo-100">
-                                                Manage
-                                            </button>
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-purple-100 text-purple-700 shadow-sm">
+                                                {school.regionName || "City Area"}
+                                            </span>
                                         </td>
                                     </tr>
                                 ))
@@ -250,6 +227,30 @@ const SchoolManager = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {totalPages > 1 && (
+                    <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-6">
+                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                            Page {page + 1} of {totalPages}
+                        </span>
+                        <div className="flex gap-2">
+                            <button
+                                disabled={page === 0}
+                                onClick={() => setPage(p => p - 1)}
+                                className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
+                            >
+                                <ChevronLeft size={18} />
+                            </button>
+                            <button
+                                disabled={page >= totalPages - 1}
+                                onClick={() => setPage(p => p + 1)}
+                                className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
+                            >
+                                <ChevronRight size={18} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

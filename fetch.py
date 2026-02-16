@@ -36,13 +36,13 @@ if __name__ == "__main__":
     base_url = "http://localhost:8080"
     
     endpoints = [
-        ("getAllStudents", "students.json"),
-        ("getRegions", "regions.json"),
-        ("getAllExams", "exams.json"),
-        ("getAllExamCentres", "exam_centres.json"),
-        ("getAllSchools", "schools.json"),
-        ("getAllApplications", "applications.json"),
-        ("getAllResults", "results.json")
+        ("students", "students.json"),
+        ("regions", "regions.json"),
+        ("exams", "exams.json"),
+        ("exam-centres", "exam_centres.json"),
+        ("schools", "schools.json"),
+        ("exam-applications", "applications.json"),
+        ("exam-results", "results.json")
     ]
     
     for endpoint, filename in endpoints:

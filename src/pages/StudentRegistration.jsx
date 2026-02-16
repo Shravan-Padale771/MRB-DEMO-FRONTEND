@@ -3,12 +3,26 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { UserPlus, Eye, EyeOff, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
-import { registerStudent } from "../api";
+import { registerStudent, getAllSchools } from "../api";
+import { useEffect } from "react";
 
 const StudentRegistration = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [schools, setSchools] = useState([]);
+
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        const data = await getAllSchools();
+        setSchools(data || []);
+      } catch (err) {
+        console.error("Failed to fetch schools", err);
+      }
+    };
+    fetchSchools();
+  }, []);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -20,6 +34,7 @@ const StudentRegistration = () => {
     motherTongue: "",
     password: "",
     confirmPassword: "",
+    schoolId: "",
   });
 
   const handleChange = (e) => {
@@ -44,11 +59,16 @@ const StudentRegistration = () => {
     }
 
     try {
-      // Prepare data for backend (exclude confirmPassword)
-      const { confirmPassword, ...studentData } = formData;
+      // Prepare data for backend (exclude confirmPassword and schoolId from main object)
+      const { confirmPassword, schoolId, ...studentData } = formData;
+
+      if (!schoolId) {
+        toast.error("Please select a school!");
+        return;
+      }
 
       // Call backend API
-      const response = await registerStudent(studentData, 1); // schoolId = 1 (default)
+      const response = await registerStudent(studentData, schoolId);
 
       toast.success("Registration Successful! Redirecting to login...");
       console.log("Registered Student:", response);
@@ -64,6 +84,7 @@ const StudentRegistration = () => {
         motherTongue: "",
         password: "",
         confirmPassword: "",
+        schoolId: "",
       });
 
       // Redirect to student dashboard after 2 seconds
@@ -220,6 +241,30 @@ const StudentRegistration = () => {
                 </div>
               </div>
 
+              {/* School Selection */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Select Registered School <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="schoolId"
+                  required
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition bg-white font-medium"
+                  value={formData.schoolId}
+                  onChange={handleChange}
+                >
+                  <option value="">Choose your school</option>
+                  {schools.map((s) => (
+                    <option key={s.schoolId} value={s.schoolId}>
+                      {s.schoolName}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 ml-1">
+                  Registration is tied to your specific school
+                </p>
+              </div>
+
               {/* Password Fields */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -313,7 +358,7 @@ const StudentRegistration = () => {
           </ul>
         </motion.div>
       </div>
-    </div>
+    </div >
   );
 };
 

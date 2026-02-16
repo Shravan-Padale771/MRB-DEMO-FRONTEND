@@ -1,31 +1,41 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Users, Filter, XCircle } from 'lucide-react';
+import { Plus, Users, Filter, XCircle, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { getAllRegions, getAllExamCentres } from '../../api';
+import { getAllRegions, getAllExamCentres, getStudents, getAllSchools } from '../../api';
 
 const StudentManager = ({
     studentForm,
     setStudentForm,
     handleCreateStudent,
-    students = [],
     schools = []
 }) => {
     // Filter State
     const [filterRegion, setFilterRegion] = useState("");
     const [filterCentre, setFilterCentre] = useState("");
     const [filterSchool, setFilterSchool] = useState("");
+    const [page, setPage] = useState(0);
+    const [size] = useState(10);
 
-    // Additional data for filters
-    const { data: regions = [] } = useQuery({
-        queryKey: ['regions'],
-        queryFn: getAllRegions,
+    // Metadata Queries
+    const { data: regions = [] } = useQuery({ queryKey: ['regions'], queryFn: getAllRegions });
+    const { data: centres = [] } = useQuery({ queryKey: ['examCentres'], queryFn: getAllExamCentres });
+    const { data: allSchools = [] } = useQuery({ queryKey: ['schools'], queryFn: getAllSchools });
+
+    // API Query for Students
+    const { data: studentsData, isLoading: isLoadingStudents, refetch: refetchStudents } = useQuery({
+        queryKey: ['students', filterSchool, page, size],
+        queryFn: () => getStudents({
+            schoolId: filterSchool || undefined,
+            page,
+            size,
+            sort: 'studentId,desc'
+        }),
+        keepPreviousData: true
     });
 
-    const { data: centres = [] } = useQuery({
-        queryKey: ['examCentres'],
-        queryFn: getAllExamCentres,
-    });
+    const students = studentsData?.content || [];
+    const totalPages = studentsData?.totalPages || 0;
 
     // Derived states for filter options
     const availableCentres = useMemo(() => {
@@ -34,44 +44,15 @@ const StudentManager = ({
     }, [filterRegion, centres]);
 
     const availableSchools = useMemo(() => {
-        if (!filterCentre) return schools;
-        return schools.filter(s => s.centreId?.toString() === filterCentre);
-    }, [filterCentre, schools]);
-
-    // Process students with relation lookups
-    const processedStudents = useMemo(() => {
-        return students.map(st => {
-            const school = schools.find(s => s.schoolId === st.schoolId);
-            const centre = centres.find(c => c.centreId === school?.centreId);
-            const region = regions.find(r => r.regionId === centre?.regionId);
-
-            return {
-                ...st,
-                school,
-                schoolName: school?.schoolName || "N/A",
-                centreName: centre?.centreName || "N/A",
-                regionName: region?.regionName || "N/A",
-                regionId: region?.regionId,
-                centreId: centre?.centreId,
-                schoolId: st.schoolId
-            };
-        });
-    }, [students, schools, centres, regions]);
-
-    // Final filtered list
-    const filteredStudents = useMemo(() => {
-        return processedStudents.filter(st => {
-            const matchesRegion = !filterRegion || (st.regionId?.toString() === filterRegion);
-            const matchesCentre = !filterCentre || (st.centreId?.toString() === filterCentre);
-            const matchesSchool = !filterSchool || (st.schoolId?.toString() === filterSchool);
-            return matchesRegion && matchesCentre && matchesSchool;
-        });
-    }, [processedStudents, filterRegion, filterCentre, filterSchool]);
+        if (!filterCentre) return allSchools;
+        return allSchools.filter(s => s.centreId?.toString() === filterCentre);
+    }, [filterCentre, allSchools]);
 
     const clearFilters = () => {
         setFilterRegion("");
         setFilterCentre("");
         setFilterSchool("");
+        setPage(0);
     };
 
     return (
@@ -132,7 +113,7 @@ const StudentManager = ({
                             }
                         >
                             <option value="">Choose a school</option>
-                            {schools.map(school => (
+                            {allSchools.map(school => (
                                 <option key={school.schoolId} value={school.schoolId}>
                                     {school.schoolName}
                                 </option>
@@ -150,14 +131,19 @@ const StudentManager = ({
                     <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                         <Users size={24} /> All Students
                     </h2>
-                    {(filterRegion || filterCentre || filterSchool) && (
-                        <button
-                            onClick={clearFilters}
-                            className="text-xs text-red-500 font-bold flex items-center gap-1 hover:text-red-700"
-                        >
-                            <XCircle size={14} /> Clear Filters
+                    <div className="flex items-center gap-2">
+                        {(filterRegion || filterCentre || filterSchool) && (
+                            <button
+                                onClick={clearFilters}
+                                className="text-xs text-red-500 font-bold flex items-center gap-1 hover:text-red-700"
+                            >
+                                <XCircle size={14} /> Clear
+                            </button>
+                        )}
+                        <button onClick={() => refetchStudents()} className="p-1.5 text-gray-400 hover:text-indigo-600 transition-colors">
+                            <RefreshCw size={18} className={isLoadingStudents ? "animate-spin" : ""} />
                         </button>
-                    )}
+                    </div>
                 </div>
 
                 {/* Filter Controls */}
@@ -173,6 +159,7 @@ const StudentManager = ({
                                 setFilterRegion(e.target.value);
                                 setFilterCentre("");
                                 setFilterSchool("");
+                                setPage(0);
                             }}
                         >
                             <option value="">All Regions</option>
@@ -191,11 +178,12 @@ const StudentManager = ({
                             onChange={(e) => {
                                 setFilterCentre(e.target.value);
                                 setFilterSchool("");
+                                setPage(0);
                             }}
                         >
                             <option value="">All Centres</option>
                             {availableCentres.map(c => (
-                                <option key={c.centreId} value={c.centreId}>{c.centreName} ({c.centreCode})</option>
+                                <option key={c.centreId} value={c.centreId}>{c.centreName}</option>
                             ))}
                         </select>
                     </div>
@@ -206,7 +194,7 @@ const StudentManager = ({
                         <select
                             className="w-full text-xs p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500"
                             value={filterSchool}
-                            onChange={(e) => setFilterSchool(e.target.value)}
+                            onChange={(e) => { setFilterSchool(e.target.value); setPage(0); }}
                         >
                             <option value="">All Schools</option>
                             {availableSchools.map(s => (
@@ -216,59 +204,74 @@ const StudentManager = ({
                     </div>
                 </div>
 
-                {filteredStudents.length === 0 ? (
+                {students.length === 0 && !isLoadingStudents ? (
                     <div className="text-center py-12 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-100">
                         <Users size={48} className="mx-auto text-gray-200 mb-4" />
                         <p className="text-gray-400 font-medium italic">No students match your filters</p>
-                        {(filterRegion || filterCentre || filterSchool) && (
-                            <button
-                                onClick={clearFilters}
-                                className="mt-4 text-indigo-600 font-bold text-sm underline"
-                            >
-                                Reset Filters
-                            </button>
-                        )}
                     </div>
                 ) : (
-                    <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                        {filteredStudents.map((st) => (
-                            <motion.div
-                                key={st.studentId}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="p-4 border border-gray-100 rounded-xl hover:bg-indigo-50/50 hover:border-indigo-100 transition-all flex justify-between items-center bg-white shadow-sm group"
-                            >
-                                <div className="space-y-1">
-                                    <p className="font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">
-                                        {st.firstName ? `${st.firstName} ${st.middleName || ''} ${st.lastName || ''}`.trim() : st.username}
-                                    </p>
-                                    <div className="flex flex-col gap-1">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[10px] font-black px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded uppercase tracking-tighter">
-                                                ID: #{st.studentId}
-                                            </span>
-                                            <span className="text-xs text-indigo-600 font-bold flex items-center gap-1">
-                                                🏫 {st.schoolName}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-[10px] text-indigo-600 font-bold flex items-center gap-1">
-                                                📍 {st.regionName}
-                                            </span>
-                                            <span className="text-[10px] text-amber-600 font-bold flex items-center gap-1">
-                                                🏢 {st.centreName}
-                                            </span>
+                    <>
+                        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                            {students.map((st) => (
+                                <motion.div
+                                    key={st.studentId}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="p-4 border border-gray-100 rounded-xl hover:bg-indigo-50/50 hover:border-indigo-100 transition-all flex justify-between items-center bg-white shadow-sm group"
+                                >
+                                    <div className="space-y-1">
+                                        <p className="font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">
+                                            {st.firstName ? `${st.firstName} ${st.lastName || ''}`.trim() : st.username}
+                                        </p>
+                                        <div className="flex flex-col gap-1">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[10px] font-black px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded uppercase tracking-tighter">
+                                                    ID: #{st.studentId}
+                                                </span>
+                                                <span className="text-xs text-indigo-600 font-bold flex items-center gap-1">
+                                                    🏫 {st.schoolName || "N/A"}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-[10px] text-indigo-600 font-bold flex items-center gap-1 text-opacity-70">
+                                                    📍 {st.centreName || "Registered Centre"}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
+                                            Active
+                                        </span>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+
+                        {totalPages > 1 && (
+                            <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-6">
+                                <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                                    Page {page + 1} of {totalPages}
+                                </span>
+                                <div className="flex gap-2">
+                                    <button
+                                        disabled={page === 0}
+                                        onClick={() => setPage(p => p - 1)}
+                                        className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
+                                    >
+                                        <ChevronLeft size={16} />
+                                    </button>
+                                    <button
+                                        disabled={page >= totalPages - 1}
+                                        onClick={() => setPage(p => p + 1)}
+                                        className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
+                                    >
+                                        <ChevronRight size={16} />
+                                    </button>
                                 </div>
-                                <div className="flex flex-col items-end gap-2">
-                                    <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
-                                        Active
-                                    </span>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

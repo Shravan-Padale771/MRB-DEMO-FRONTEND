@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Building2, Plus, RefreshCw } from 'lucide-react';
+import { Building2, Plus, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { addExamCentre, getAllExamCentres, getAllRegions } from '../../api';
+import { addExamCentre, getExamCentres, getAllRegions } from '../../api';
 
 const ExamCentreManager = () => {
     const queryClient = useQueryClient();
@@ -12,17 +12,29 @@ const ExamCentreManager = () => {
         regionId: ""
     });
     const [filterRegion, setFilterRegion] = useState("");
+    const [page, setPage] = useState(0);
+    const [size] = useState(10);
 
-    // Queries
-    const { data: centres = [], isLoading: isLoadingCentres, refetch: refetchCentres } = useQuery({
-        queryKey: ['examCentres'],
-        queryFn: getAllExamCentres,
-    });
-
-    const { data: regions = [], isLoading: isLoadingRegions, refetch: refetchRegions } = useQuery({
+    // Metadata Queries
+    const { data: regions = [], isLoading: isLoadingRegions } = useQuery({
         queryKey: ['regions'],
         queryFn: getAllRegions,
     });
+
+    // API Query for Exam Centres
+    const { data: centresData, isLoading: isLoadingCentres, refetch: refetchCentres } = useQuery({
+        queryKey: ['examCentres', filterRegion, page, size],
+        queryFn: () => getExamCentres({
+            regionId: filterRegion || undefined,
+            page,
+            size,
+            sort: 'centreName,asc'
+        }),
+        keepPreviousData: true
+    });
+
+    const centres = centresData?.content || [];
+    const totalPages = centresData?.totalPages || 0;
 
     // Mutation
     const addCentreMutation = useMutation({
@@ -39,15 +51,6 @@ const ExamCentreManager = () => {
     });
 
     const loading = isLoadingCentres || isLoadingRegions || addCentreMutation.isPending;
-
-    // Filtered centres
-    const filteredCentres = useMemo(() => {
-        if (!filterRegion) return centres;
-        return centres.filter(c => {
-            const regionId = c.regionId;
-            return regionId && regionId.toString() === filterRegion;
-        });
-    }, [centres, filterRegion]);
 
     const handleAddCentre = (e) => {
         e.preventDefault();
@@ -66,7 +69,6 @@ const ExamCentreManager = () => {
 
     const handleRefresh = () => {
         refetchCentres();
-        refetchRegions();
     };
 
     return (
@@ -128,7 +130,7 @@ const ExamCentreManager = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
                         <h3 className="text-lg font-bold text-gray-800">Existing Exam Centres</h3>
-                        <p className="text-xs text-gray-500 mt-1 uppercase font-bold tracking-widest">Listing {filteredCentres.length} Centres</p>
+                        <p className="text-xs text-gray-500 mt-1 uppercase font-bold tracking-widest">Listing {centresData?.totalElements || 0} Centres</p>
                     </div>
 
                     <div className="flex items-center gap-4 w-full md:w-auto">
@@ -137,7 +139,7 @@ const ExamCentreManager = () => {
                             <select
                                 className="text-xs bg-transparent outline-none font-bold text-indigo-600"
                                 value={filterRegion}
-                                onChange={(e) => setFilterRegion(e.target.value)}
+                                onChange={(e) => { setFilterRegion(e.target.value); setPage(0); }}
                             >
                                 <option value="">All Regions</option>
                                 {regions.map(r => (
@@ -162,20 +164,18 @@ const ExamCentreManager = () => {
                                 <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Code</th>
                                 <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Centre Name</th>
                                 <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Region</th>
-                                <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider text-center">Schools</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {(filteredCentres.length === 0 && !isLoadingCentres) ? (
+                            {(centres.length === 0 && !isLoadingCentres) ? (
                                 <tr>
-                                    <td colSpan="5" className="p-12 text-center">
+                                    <td colSpan="4" className="p-12 text-center">
                                         <Building2 size={48} className="mx-auto text-gray-100 mb-4" />
                                         <p className="text-gray-400 italic font-medium">No centres match your filter</p>
                                     </td>
                                 </tr>
                             ) : (
-                                filteredCentres.map((centre, idx) => {
-                                    const region = regions.find(r => r.regionId === centre.regionId);
+                                centres.map((centre, idx) => {
                                     return (
                                         <tr key={centre.centreId || `centre-${idx}`} className="border-b hover:bg-indigo-50/30 transition-colors group">
                                             <td className="p-4 text-xs font-bold text-gray-400">#{centre.centreId}</td>
@@ -183,12 +183,7 @@ const ExamCentreManager = () => {
                                             <td className="p-4 text-sm font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">{centre.centreName}</td>
                                             <td className="p-4">
                                                 <span className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[10px] font-black uppercase tracking-tighter shadow-sm">
-                                                    {region?.regionName || "City Area"}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 text-center">
-                                                <span className="bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full text-[10px] font-black border border-emerald-100">
-                                                    {(Array.isArray(centre.schools) ? centre.schools.length : 0)} Schools
+                                                    {centre.regionName || "City Area"}
                                                 </span>
                                             </td>
                                         </tr>
@@ -198,6 +193,30 @@ const ExamCentreManager = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {totalPages > 1 && (
+                    <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-6">
+                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                            Page {page + 1} of {totalPages}
+                        </span>
+                        <div className="flex gap-2">
+                            <button
+                                disabled={page === 0}
+                                onClick={() => setPage(p => p - 1)}
+                                className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
+                            >
+                                <ChevronLeft size={18} />
+                            </button>
+                            <button
+                                disabled={page >= totalPages - 1}
+                                onClick={() => setPage(p => p + 1)}
+                                className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
+                            >
+                                <ChevronRight size={18} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

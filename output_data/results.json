@@ -1,42 +1,69 @@
-[
-    {
-        "id": 1,
-        "applicationId": 1,
-        "studentName": null,
-        "examName": "\u0930\u093e\u0937\u094d\u091f\u094d\u0930\u092d\u093e\u0937\u093e \u092a\u094d\u0930\u0935\u0940\u0923 \u092a\u0930\u0940\u0915\u094d\u0937\u093e (\u0938\u093f\u0924\u0902\u092c\u0930 2024)",
-        "resultData": "{\"score\": \"47.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"\u092a\u094d\u0930\u0925\u092e \u092a\u094d\u0930\u0936\u094d\u0928\u092a\u0924\u094d\u0930\": 50, \"\u0926\u094d\u0935\u093f\u0924\u0940\u092f \u092a\u094d\u0930\u0936\u094d\u0928\u092a\u0924\u094d\u0930\": 44}, \"oralMarks\": 0, \"projectMarks\": 0, \"totalObtained\": 94}",
-        "publishedAt": "2026-02-10T13:58:54.776",
-        "totalMarks": null,
-        "percentage": null
+{
+    "content": [
+        {
+            "id": 1,
+            "applicationId": 1,
+            "studentName": null,
+            "examName": "\u0930\u093e\u0937\u094d\u091f\u094d\u0930\u092d\u093e\u0937\u093e \u092a\u094d\u0930\u0935\u0940\u0923 \u092a\u0930\u0940\u0915\u094d\u0937\u093e (\u0938\u093f\u0924\u0902\u092c\u0930 2024)",
+            "resultData": "{\"score\": \"47.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"\u092a\u094d\u0930\u0925\u092e \u092a\u094d\u0930\u0936\u094d\u0928\u092a\u0924\u094d\u0930\": 50, \"\u0926\u094d\u0935\u093f\u0924\u0940\u092f \u092a\u094d\u0930\u0936\u094d\u0928\u092a\u0924\u094d\u0930\": 44}, \"oralMarks\": 0, \"projectMarks\": 0, \"totalObtained\": 94}",
+            "publishedAt": "2026-02-10T13:58:54.776",
+            "totalMarks": null,
+            "percentage": null
+        },
+        {
+            "id": 2,
+            "applicationId": 2,
+            "studentName": null,
+            "examName": "Rasthrabhasha Prabodth exam",
+            "resultData": "{\"score\": \"78.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"\u092a\u094d\u0930\u0925\u092e \u092a\u094d\u0930\u0936\u094d\u0928\u092a\u0924\u094d\u0930\": 79, \"\u0926\u094d\u0935\u093f\u0924\u0940\u092f \u092a\u094d\u0930\u0936\u094d\u0928\u092a\u0924\u094d\u0930\": 78}, \"oralMarks\": 0, \"projectMarks\": 0, \"totalObtained\": 157}",
+            "publishedAt": "2026-02-11T15:06:38.101",
+            "totalMarks": null,
+            "percentage": null
+        },
+        {
+            "id": 5,
+            "applicationId": 3,
+            "studentName": null,
+            "examName": "International English Exam 2026",
+            "resultData": "{\"score\": \"79.33%\", \"remarks\": \"Pass\", \"totalMax\": 300, \"breakdown\": {\"Paper I\": 90, \"Paper II\": 70, \"Paper III\": 78}, \"oralMarks\": 0, \"projectMarks\": 0, \"totalObtained\": 238}",
+            "publishedAt": "2026-02-11T17:41:31.778",
+            "totalMarks": null,
+            "percentage": null
+        },
+        {
+            "id": 7,
+            "applicationId": 4,
+            "studentName": null,
+            "examName": "\u0930\u093e\u0937\u094d\u091f\u094d\u0930\u092d\u093e\u0937\u093e \u092a\u094d\u0930\u0935\u0940\u0923 \u092a\u0930\u0940\u0915\u094d\u0937\u093e (\u0938\u093f\u0924\u0902\u092c\u0930 2024)",
+            "resultData": "{\"score\": \"94.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"\u092a\u094d\u0930\u0925\u092e \u092a\u094d\u0930\u0936\u094d\u0928\u092a\u0924\u094d\u0930\": 90, \"\u0926\u094d\u0935\u093f\u0924\u0940\u092f \u092a\u094d\u0930\u0936\u094d\u0928\u092a\u0924\u094d\u0930\": 98}, \"oralMarks\": 0, \"projectMarks\": 0, \"totalObtained\": 188}",
+            "publishedAt": "2026-02-11T18:10:35.54",
+            "totalMarks": null,
+            "percentage": null
+        }
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 20,
+        "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+        },
+        "offset": 0,
+        "unpaged": false,
+        "paged": true
     },
-    {
-        "id": 2,
-        "applicationId": 2,
-        "studentName": null,
-        "examName": "Rasthrabhasha Prabodth exam",
-        "resultData": "{\"score\": \"78.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"\u092a\u094d\u0930\u0925\u092e \u092a\u094d\u0930\u0936\u094d\u0928\u092a\u0924\u094d\u0930\": 79, \"\u0926\u094d\u0935\u093f\u0924\u0940\u092f \u092a\u094d\u0930\u0936\u094d\u0928\u092a\u0924\u094d\u0930\": 78}, \"oralMarks\": 0, \"projectMarks\": 0, \"totalObtained\": 157}",
-        "publishedAt": "2026-02-11T15:06:38.101",
-        "totalMarks": null,
-        "percentage": null
+    "last": true,
+    "totalElements": 4,
+    "totalPages": 1,
+    "first": true,
+    "numberOfElements": 4,
+    "size": 20,
+    "number": 0,
+    "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
     },
-    {
-        "id": 5,
-        "applicationId": 3,
-        "studentName": null,
-        "examName": "International English Exam 2026",
-        "resultData": "{\"score\": \"79.33%\", \"remarks\": \"Pass\", \"totalMax\": 300, \"breakdown\": {\"Paper I\": 90, \"Paper II\": 70, \"Paper III\": 78}, \"oralMarks\": 0, \"projectMarks\": 0, \"totalObtained\": 238}",
-        "publishedAt": "2026-02-11T17:41:31.778",
-        "totalMarks": null,
-        "percentage": null
-    },
-    {
-        "id": 7,
-        "applicationId": 4,
-        "studentName": null,
-        "examName": "\u0930\u093e\u0937\u094d\u091f\u094d\u0930\u092d\u093e\u0937\u093e \u092a\u094d\u0930\u0935\u0940\u0923 \u092a\u0930\u0940\u0915\u094d\u0937\u093e (\u0938\u093f\u0924\u0902\u092c\u0930 2024)",
-        "resultData": "{\"score\": \"94.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"\u092a\u094d\u0930\u0925\u092e \u092a\u094d\u0930\u0936\u094d\u0928\u092a\u0924\u094d\u0930\": 90, \"\u0926\u094d\u0935\u093f\u0924\u0940\u092f \u092a\u094d\u0930\u0936\u094d\u0928\u092a\u0924\u094d\u0930\": 98}, \"oralMarks\": 0, \"projectMarks\": 0, \"totalObtained\": 188}",
-        "publishedAt": "2026-02-11T18:10:35.54",
-        "totalMarks": null,
-        "percentage": null
-    }
-]
+    "empty": false
+}

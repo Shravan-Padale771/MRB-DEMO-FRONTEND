@@ -1,67 +1,94 @@
-[
-    {
-        "studentId": 1,
-        "firstName": "Rahul",
-        "middleName": "Kumar",
-        "lastName": "Sharma",
-        "contact": null,
-        "email": null,
-        "age": 15,
-        "motherTongue": "Hindi",
-        "schoolId": 1,
-        "schoolName": "New Modern School",
-        "examApplications": null
+{
+    "content": [
+        {
+            "studentId": 1,
+            "firstName": "Rahul",
+            "middleName": "Kumar",
+            "lastName": "Sharma",
+            "contact": null,
+            "email": null,
+            "age": 15,
+            "motherTongue": "Hindi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 2,
+            "firstName": "vyankatesh",
+            "middleName": "milind",
+            "lastName": "pandit",
+            "contact": "7397963819",
+            "email": "vyankateshpandit1511@gmail.com",
+            "age": 20,
+            "motherTongue": "Marathi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 3,
+            "firstName": "vyankatesh",
+            "middleName": "milind",
+            "lastName": "pandit",
+            "contact": "7397963819",
+            "email": "vyankateshpandit1511@gmail.com",
+            "age": 21,
+            "motherTongue": "Marathi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 4,
+            "firstName": "Sumit",
+            "middleName": "Sanjay",
+            "lastName": "Hatekar",
+            "contact": "1234567890",
+            "email": "test@gmail.com",
+            "age": 22,
+            "motherTongue": "Marathi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 5,
+            "firstName": "Vinit",
+            "middleName": "Pramod",
+            "lastName": "Deshmukh",
+            "contact": "1234567890",
+            "email": "test@gmail.com",
+            "age": 16,
+            "motherTongue": "Marathi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        }
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 20,
+        "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+        },
+        "offset": 0,
+        "unpaged": false,
+        "paged": true
     },
-    {
-        "studentId": 2,
-        "firstName": "vyankatesh",
-        "middleName": "milind",
-        "lastName": "pandit",
-        "contact": "7397963819",
-        "email": "vyankateshpandit1511@gmail.com",
-        "age": 20,
-        "motherTongue": "Marathi",
-        "schoolId": 1,
-        "schoolName": "New Modern School",
-        "examApplications": null
+    "last": true,
+    "totalElements": 5,
+    "totalPages": 1,
+    "first": true,
+    "numberOfElements": 5,
+    "size": 20,
+    "number": 0,
+    "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
     },
-    {
-        "studentId": 3,
-        "firstName": "vyankatesh",
-        "middleName": "milind",
-        "lastName": "pandit",
-        "contact": "7397963819",
-        "email": "vyankateshpandit1511@gmail.com",
-        "age": 21,
-        "motherTongue": "Marathi",
-        "schoolId": 1,
-        "schoolName": "New Modern School",
-        "examApplications": null
-    },
-    {
-        "studentId": 4,
-        "firstName": "Sumit",
-        "middleName": "Sanjay",
-        "lastName": "Hatekar",
-        "contact": "1234567890",
-        "email": "test@gmail.com",
-        "age": 22,
-        "motherTongue": "Marathi",
-        "schoolId": 1,
-        "schoolName": "New Modern School",
-        "examApplications": null
-    },
-    {
-        "studentId": 5,
-        "firstName": "Vinit",
-        "middleName": "Pramod",
-        "lastName": "Deshmukh",
-        "contact": "1234567890",
-        "email": "test@gmail.com",
-        "age": 16,
-        "motherTongue": "Marathi",
-        "schoolId": 1,
-        "schoolName": "New Modern School",
-        "examApplications": null
-    }
-]
+    "empty": false
+}
