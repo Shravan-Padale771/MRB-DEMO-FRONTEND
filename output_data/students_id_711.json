@@ -1,0 +1,42 @@
+{
+    "content": [
+        {
+            "studentId": 711,
+            "firstName": "Ishaan",
+            "middleName": null,
+            "lastName": "Chauhan",
+            "contact": "7859094527",
+            "email": "ishaan.chauhan6@student.edu",
+            "age": 17,
+            "motherTongue": "Hindi",
+            "schoolId": 71,
+            "schoolName": "Modern Exam Centre Convent 5",
+            "examApplications": null
+        }
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 20,
+        "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+        },
+        "offset": 0,
+        "paged": true,
+        "unpaged": false
+    },
+    "last": true,
+    "totalPages": 1,
+    "totalElements": 1,
+    "size": 20,
+    "number": 0,
+    "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
+    },
+    "first": true,
+    "numberOfElements": 1,
+    "empty": false
+}

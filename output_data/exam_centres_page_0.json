@@ -1,0 +1,99 @@
+{
+    "content": [
+        {
+            "centreId": 1,
+            "centreCode": "WC2",
+            "centreName": "Modern Exam Centre",
+            "regionId": 1,
+            "regionName": "Pune"
+        },
+        {
+            "centreId": 2,
+            "centreCode": "C_PUNE_CENTR",
+            "centreName": "Pune Central",
+            "regionId": 1,
+            "regionName": "Pune"
+        },
+        {
+            "centreId": 3,
+            "centreCode": "C_KOTHRUD_AC",
+            "centreName": "Kothrud Academy",
+            "regionId": 1,
+            "regionName": "Pune"
+        },
+        {
+            "centreId": 4,
+            "centreCode": "C_HADINAGAR_",
+            "centreName": "Hadinagar School of Excellence",
+            "regionId": 1,
+            "regionName": "Pune"
+        },
+        {
+            "centreId": 5,
+            "centreCode": "C_BANER_GLOB",
+            "centreName": "Baner Global Centre",
+            "regionId": 1,
+            "regionName": "Pune"
+        },
+        {
+            "centreId": 6,
+            "centreCode": "C_SOUTH_MUMB",
+            "centreName": "South Mumbai High",
+            "regionId": 2,
+            "regionName": "Mumbai"
+        },
+        {
+            "centreId": 7,
+            "centreCode": "C_ANDHERI_TE",
+            "centreName": "Andheri Technical Institute",
+            "regionId": 2,
+            "regionName": "Mumbai"
+        },
+        {
+            "centreId": 8,
+            "centreCode": "C_BORIVALI_S",
+            "centreName": "Borivali Science Centre",
+            "regionId": 2,
+            "regionName": "Mumbai"
+        },
+        {
+            "centreId": 9,
+            "centreCode": "C_NAVI_MUMBA",
+            "centreName": "Navi Mumbai Hub",
+            "regionId": 2,
+            "regionName": "Mumbai"
+        },
+        {
+            "centreId": 10,
+            "centreCode": "C_NASHIK_ROA",
+            "centreName": "Nashik Road High",
+            "regionId": 3,
+            "regionName": "Nashik"
+        }
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 10,
+        "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+        },
+        "offset": 0,
+        "paged": true,
+        "unpaged": false
+    },
+    "last": false,
+    "totalPages": 2,
+    "totalElements": 13,
+    "size": 10,
+    "number": 0,
+    "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
+    },
+    "first": true,
+    "numberOfElements": 10,
+    "empty": false
+}

@@ -1,0 +1,159 @@
+{
+    "content": [
+        {
+            "studentId": 1,
+            "firstName": "Rahul",
+            "middleName": "Kumar",
+            "lastName": "Sharma",
+            "contact": null,
+            "email": null,
+            "age": 15,
+            "motherTongue": "Hindi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 2,
+            "firstName": "vyankatesh",
+            "middleName": "milind",
+            "lastName": "pandit",
+            "contact": "7397963819",
+            "email": "vyankateshpandit1511@gmail.com",
+            "age": 20,
+            "motherTongue": "Marathi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 3,
+            "firstName": "vyankatesh",
+            "middleName": "milind",
+            "lastName": "pandit",
+            "contact": "7397963819",
+            "email": "vyankateshpandit1511@gmail.com",
+            "age": 21,
+            "motherTongue": "Marathi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 4,
+            "firstName": "Sumit",
+            "middleName": "Sanjay",
+            "lastName": "Hatekar",
+            "contact": "1234567890",
+            "email": "test@gmail.com",
+            "age": 22,
+            "motherTongue": "Marathi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 5,
+            "firstName": "Vinit",
+            "middleName": "Pramod",
+            "lastName": "Deshmukh",
+            "contact": "1234567890",
+            "email": "test@gmail.com",
+            "age": 16,
+            "motherTongue": "Marathi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 6,
+            "firstName": "Navya",
+            "middleName": null,
+            "lastName": "Mehta",
+            "contact": "7640151674",
+            "email": "navya.mehta1@student.edu",
+            "age": 17,
+            "motherTongue": "Hindi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 7,
+            "firstName": "Rohan",
+            "middleName": null,
+            "lastName": "Yadav",
+            "contact": "8711130818",
+            "email": "rohan.yadav2@student.edu",
+            "age": 18,
+            "motherTongue": "Marathi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 8,
+            "firstName": "Ira",
+            "middleName": null,
+            "lastName": "Agarwal",
+            "contact": "7637605713",
+            "email": "ira.agarwal3@student.edu",
+            "age": 15,
+            "motherTongue": "Hindi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 9,
+            "firstName": "Harsh",
+            "middleName": null,
+            "lastName": "Shukla",
+            "contact": "7244589812",
+            "email": "harsh.shukla4@student.edu",
+            "age": 14,
+            "motherTongue": "Hindi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        },
+        {
+            "studentId": 10,
+            "firstName": "Ishaan",
+            "middleName": null,
+            "lastName": "Nair",
+            "contact": "7323466125",
+            "email": "ishaan.nair5@student.edu",
+            "age": 18,
+            "motherTongue": "Hindi",
+            "schoolId": 1,
+            "schoolName": "New Modern School",
+            "examApplications": null
+        }
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 10,
+        "sort": {
+            "empty": true,
+            "sorted": false,
+            "unsorted": true
+        },
+        "offset": 0,
+        "paged": true,
+        "unpaged": false
+    },
+    "last": false,
+    "totalPages": 72,
+    "totalElements": 711,
+    "size": 10,
+    "number": 0,
+    "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
+    },
+    "first": true,
+    "numberOfElements": 10,
+    "empty": false
+}

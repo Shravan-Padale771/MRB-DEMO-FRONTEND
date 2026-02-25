@@ -14,6 +14,9 @@ const StudentManager = ({
     const [filterRegion, setFilterRegion] = useState("");
     const [filterCentre, setFilterCentre] = useState("");
     const [filterSchool, setFilterSchool] = useState("");
+    const [filterFirstName, setFilterFirstName] = useState("");
+    const [filterLastName, setFilterLastName] = useState("");
+    const [filterStudentId, setFilterStudentId] = useState("");
     const [page, setPage] = useState(0);
     const [size] = useState(10);
 
@@ -24,9 +27,12 @@ const StudentManager = ({
 
     // API Query for Students
     const { data: studentsData, isLoading: isLoadingStudents, refetch: refetchStudents } = useQuery({
-        queryKey: ['students', filterSchool, page, size],
+        queryKey: ['students', filterSchool, filterFirstName, filterLastName, filterStudentId, page, size],
         queryFn: () => getStudents({
             schoolId: filterSchool || undefined,
+            firstName: filterFirstName || undefined,
+            lastName: filterLastName || undefined,
+            studentId: filterStudentId || undefined,
             page,
             size,
             sort: 'studentId,desc'
@@ -52,6 +58,9 @@ const StudentManager = ({
         setFilterRegion("");
         setFilterCentre("");
         setFilterSchool("");
+        setFilterFirstName("");
+        setFilterLastName("");
+        setFilterStudentId("");
         setPage(0);
     };
 
@@ -132,7 +141,7 @@ const StudentManager = ({
                         <Users size={24} /> All Students
                     </h2>
                     <div className="flex items-center gap-2">
-                        {(filterRegion || filterCentre || filterSchool) && (
+                        {(filterRegion || filterCentre || filterSchool || filterFirstName || filterLastName || filterStudentId) && (
                             <button
                                 onClick={clearFilters}
                                 className="text-xs text-red-500 font-bold flex items-center gap-1 hover:text-red-700"
@@ -147,60 +156,103 @@ const StudentManager = ({
                 </div>
 
                 {/* Filter Controls */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 flex items-center gap-1">
-                            <Filter size={10} /> Region
-                        </label>
-                        <select
-                            className="w-full text-xs p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500"
-                            value={filterRegion}
-                            onChange={(e) => {
-                                setFilterRegion(e.target.value);
-                                setFilterCentre("");
-                                setFilterSchool("");
-                                setPage(0);
-                            }}
-                        >
-                            <option value="">All Regions</option>
-                            {regions.map(r => (
-                                <option key={r.regionId} value={r.regionId}>{r.regionName}</option>
-                            ))}
-                        </select>
+                <div className="space-y-3 mb-6">
+                    {/* Dropdown Filters */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 flex items-center gap-1">
+                                <Filter size={10} /> Region
+                            </label>
+                            <select
+                                className="w-full text-xs p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                value={filterRegion}
+                                onChange={(e) => {
+                                    setFilterRegion(e.target.value);
+                                    setFilterCentre("");
+                                    setFilterSchool("");
+                                    setPage(0);
+                                }}
+                            >
+                                <option value="">All Regions</option>
+                                {regions.map(r => (
+                                    <option key={r.regionId} value={r.regionId}>{r.regionName}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 flex items-center gap-1">
+                                <Filter size={10} /> Centre
+                            </label>
+                            <select
+                                className="w-full text-xs p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                value={filterCentre}
+                                onChange={(e) => {
+                                    setFilterCentre(e.target.value);
+                                    setFilterSchool("");
+                                    setPage(0);
+                                }}
+                            >
+                                <option value="">All Centres</option>
+                                {availableCentres.map(c => (
+                                    <option key={c.centreId} value={c.centreId}>{c.centreName}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase mb-1 flex items-center gap-1">
+                                <Filter size={10} /> School
+                            </label>
+                            <select
+                                className="w-full text-xs p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                value={filterSchool}
+                                onChange={(e) => { setFilterSchool(e.target.value); setPage(0); }}
+                            >
+                                <option value="">All Schools</option>
+                                {availableSchools.map(s => (
+                                    <option key={s.schoolId} value={s.schoolId}>{s.schoolName}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 flex items-center gap-1">
-                            <Filter size={10} /> Centre
-                        </label>
-                        <select
-                            className="w-full text-xs p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500"
-                            value={filterCentre}
-                            onChange={(e) => {
-                                setFilterCentre(e.target.value);
-                                setFilterSchool("");
-                                setPage(0);
-                            }}
-                        >
-                            <option value="">All Centres</option>
-                            {availableCentres.map(c => (
-                                <option key={c.centreId} value={c.centreId}>{c.centreName}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="text-[10px] font-black text-gray-400 uppercase mb-1 flex items-center gap-1">
-                            <Filter size={10} /> School
-                        </label>
-                        <select
-                            className="w-full text-xs p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500"
-                            value={filterSchool}
-                            onChange={(e) => { setFilterSchool(e.target.value); setPage(0); }}
-                        >
-                            <option value="">All Schools</option>
-                            {availableSchools.map(s => (
-                                <option key={s.schoolId} value={s.schoolId}>{s.schoolName}</option>
-                            ))}
-                        </select>
+
+                    {/* Text Input Filters */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                        <div>
+                            <label className="text-[10px] font-black text-indigo-600 uppercase mb-1 flex items-center gap-1">
+                                <Filter size={10} /> First Name
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Search by first name..."
+                                className="w-full text-xs p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                value={filterFirstName}
+                                onChange={(e) => { setFilterFirstName(e.target.value); setPage(0); }}
+                            />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-indigo-600 uppercase mb-1 flex items-center gap-1">
+                                <Filter size={10} /> Last Name
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Search by last name..."
+                                className="w-full text-xs p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                value={filterLastName}
+                                onChange={(e) => { setFilterLastName(e.target.value); setPage(0); }}
+                            />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-indigo-600 uppercase mb-1 flex items-center gap-1">
+                                <Filter size={10} /> Student ID
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Search by student ID..."
+                                className="w-full text-xs p-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                value={filterStudentId}
+                                onChange={(e) => { setFilterStudentId(e.target.value); setPage(0); }}
+                            />
+                        </div>
                     </div>
                 </div>
 

@@ -1,0 +1,17 @@
+[
+    {
+        "regionId": 2,
+        "regionName": "Mumbai",
+        "no_exam_centres": 0
+    },
+    {
+        "regionId": 3,
+        "regionName": "Nashik",
+        "no_exam_centres": 0
+    },
+    {
+        "regionId": 1,
+        "regionName": "Pune",
+        "no_exam_centres": 0
+    }
+]

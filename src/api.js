@@ -20,6 +20,7 @@ export const getStudents = async ({
   size = 20,
   firstName,
   lastName,
+  studentId,
   schoolId,
   email,
   sort,
@@ -27,6 +28,7 @@ export const getStudents = async ({
   const params = new URLSearchParams({ page, size });
   if (firstName) params.append("firstName", firstName);
   if (lastName) params.append("lastName", lastName);
+  if (studentId) params.append("studentId", studentId);
   if (schoolId) params.append("schoolId", schoolId);
   if (email) params.append("email", email);
   if (sort) params.append("sort", sort);

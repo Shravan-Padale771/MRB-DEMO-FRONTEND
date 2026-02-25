@@ -11,7 +11,7 @@ const MetricCard = ({ label, value, color = "#4c84ff" }) => {
         >
             <div className="flex items-center gap-4">
                 <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-white"
+                    className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold"
                     style={{ backgroundColor: color }}
                 >
                     <BookOpen size={24} />
@@ -24,5 +24,6 @@ const MetricCard = ({ label, value, color = "#4c84ff" }) => {
         </motion.div>
     );
 };
+
 
 export default MetricCard;

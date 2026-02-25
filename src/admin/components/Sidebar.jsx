@@ -11,8 +11,10 @@ import {
     Award,
     ChevronDown,
     Monitor,
-    Database
+    Database,
+    Search
 } from 'lucide-react';
+
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
     const menuItems = [
@@ -37,7 +39,21 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                 <span className="font-bold text-lg tracking-tight">MRB Admin</span>
             </div>
 
+            {/* Search Hint */}
+            <div className="px-4 mt-6">
+                <button
+                    onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
+                    className="w-full flex items-center gap-3 px-3 py-2 bg-black/20 border border-white/5 rounded-lg text-gray-300 text-sm hover:bg-black/30 transition-colors group"
+                >
+                    <Search size={16} className="group-hover:text-white transition-colors" />
+                    <span className="flex-1 text-left">Search...</span>
+                    <kbd className="text-[10px] font-mono bg-white/10 px-1.5 py-0.5 rounded text-gray-400">CTRL K</kbd>
+                </button>
+            </div>
+
+
             {/* Navigation */}
+
             <nav className="flex-1 mt-6 px-4 space-y-1 overflow-y-auto custom-scrollbar pb-6">
                 {menuItems.map((item) => (
                     <div key={item.id}>
