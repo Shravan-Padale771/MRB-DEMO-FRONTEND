@@ -2,63 +2,15 @@
     "content": [
         {
             "schoolId": 1,
-            "schoolName": "New Modern School",
+            "schoolName": "The Modern School of Science",
             "centreId": 1,
             "centreName": "Modern Exam Centre"
         },
         {
             "schoolId": 2,
-            "schoolName": "Modern Exam Centre Public School 1",
-            "centreId": 1,
-            "centreName": "Modern Exam Centre"
-        },
-        {
-            "schoolId": 3,
-            "schoolName": "Modern Exam Centre Academy 2",
-            "centreId": 1,
-            "centreName": "Modern Exam Centre"
-        },
-        {
-            "schoolId": 4,
-            "schoolName": "Modern Exam Centre International School 3",
-            "centreId": 1,
-            "centreName": "Modern Exam Centre"
-        },
-        {
-            "schoolId": 5,
-            "schoolName": "Modern Exam Centre High School 4",
-            "centreId": 1,
-            "centreName": "Modern Exam Centre"
-        },
-        {
-            "schoolId": 6,
-            "schoolName": "Modern Exam Centre Convent 5",
-            "centreId": 1,
-            "centreName": "Modern Exam Centre"
-        },
-        {
-            "schoolId": 7,
-            "schoolName": "Pune Central Public School 1",
+            "schoolName": "SOP School of Varada",
             "centreId": 2,
-            "centreName": "Pune Central"
-        },
-        {
-            "schoolId": 8,
-            "schoolName": "Pune Central Academy 2",
-            "centreId": 2,
-            "centreName": "Pune Central"
-        },
-        {
-            "schoolId": 9,
-            "schoolName": "Pune Central International School 3",
-            "centreId": 2,
-            "centreName": "Pune Central"
-        },
-        {
-            "schoolId": 10,
-            "schoolName": "Pune Central High School 4",
-            "centreId": 2,
-            "centreName": "Pune Central"
+            "centreName": "SPPA Exam Centre Shivajinagar"
         }
     ],
     "pageable": {
@@ -70,12 +22,12 @@
             "unsorted": true
         },
         "offset": 0,
-        "paged": true,
-        "unpaged": false
+        "unpaged": false,
+        "paged": true
     },
-    "last": false,
-    "totalPages": 14,
-    "totalElements": 131,
+    "last": true,
+    "totalPages": 1,
+    "totalElements": 2,
     "size": 10,
     "number": 0,
     "sort": {
@@ -84,6 +36,6 @@
         "unsorted": true
     },
     "first": true,
-    "numberOfElements": 10,
+    "numberOfElements": 2,
     "empty": false
 }

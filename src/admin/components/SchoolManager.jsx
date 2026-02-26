@@ -1,11 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { Building2, Plus, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Building2, Plus, RefreshCw, ChevronLeft, ChevronRight, Settings2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { addSchool, getSchools, getAllExamCentres, getAllRegions } from '../../api';
 
 const SchoolManager = () => {
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         schoolName: "",
         centreId: ""
@@ -181,7 +183,7 @@ const SchoolManager = () => {
                             <tr className="bg-gray-50 border-b">
                                 <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">School Name</th>
                                 <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Exam Centre</th>
-                                <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Region</th>
+                                <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -216,10 +218,14 @@ const SchoolManager = () => {
                                                 </p>
                                             </div>
                                         </td>
-                                        <td className="p-4 align-middle">
-                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter bg-purple-100 text-purple-700 shadow-sm">
-                                                {school.regionName || "City Area"}
-                                            </span>
+                                        <td className="p-4 align-middle text-right">
+                                            <button
+                                                onClick={() => navigate(`/admin/manage/school/${school.schoolId}`)}
+                                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all shadow-sm border border-indigo-100"
+                                            >
+                                                <Settings2 size={14} />
+                                                Manage
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -252,7 +258,7 @@ const SchoolManager = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 };
 

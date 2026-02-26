@@ -130,6 +130,13 @@ const AdminDashboard = () => {
     examPapers: [],
   });
 
+  const [activeFilters, setActiveFilters] = useState({
+    region: "",
+    centre: "",
+    school: "",
+    status: ""
+  });
+
   // Queries
   const { data: students = [], isLoading: isLoadingStudents } = useQuery({
     queryKey: ["students"],
@@ -365,8 +372,14 @@ const AdminDashboard = () => {
     createStudentMutation.mutate({ schoolId, studentData });
   };
 
-  const handlePublishResult = (e) => {
-    e.preventDefault();
+  const handlePublishResult = (e, directPayload = null) => {
+    if (e) e.preventDefault();
+
+    if (directPayload) {
+      publishResultMutation.mutate(directPayload);
+      return;
+    }
+
     if (!resultForm.applicationId || !resultForm.score) {
       return toast.error("Please fill all fields");
     }
@@ -389,8 +402,12 @@ const AdminDashboard = () => {
       totalMax += 50;
     }
 
+    const percentageNumeric = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
+
     const payload = {
       application: { applicationId: parseInt(resultForm.applicationId) },
+      totalMarks: parseFloat(totalMax.toFixed(2)),
+      percentage: parseFloat(percentageNumeric.toFixed(2)),
       resultData: JSON.stringify({
         score: resultForm.score,
         remarks: resultForm.remarks,
@@ -446,6 +463,13 @@ const AdminDashboard = () => {
     setActiveTab("publish");
     toast("Selected Application #" + appId);
   };
+
+  const handlePublishWithFilters = (filters) => {
+    setActiveFilters(filters);
+    setActiveTab("publish");
+    toast.success("Navigating to Publisher with selected filters");
+  };
+
   // Process Application Trends (mocking actual dates if missing, or using real ones if structured)
   const applicationTrends = useMemo(() => {
     // Group applications by date (last 7 days or any structured data)
@@ -620,7 +644,11 @@ const AdminDashboard = () => {
         {activeTab === "exam_centres" && <ExamCentreManager />}
         {activeTab === "schools" && <SchoolManager />}
         {activeTab === "applications" && (
-          <ApplicationManager selectApplication={selectApplication} />
+          <ApplicationManager
+            selectApplication={selectApplication}
+            onPublishWithFilters={handlePublishWithFilters}
+            activeFilters={activeFilters}
+          />
         )}
         {activeTab === "publish" && (
           <ResultPublisher
@@ -629,6 +657,7 @@ const AdminDashboard = () => {
             handlePublishResult={handlePublishResult}
             applications={applications}
             isLoading={publishResultMutation.isPending}
+            initialFilters={activeFilters}
           />
         )}
         {activeTab === "results" && <ResultViewer />}

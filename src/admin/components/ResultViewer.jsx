@@ -13,6 +13,10 @@ const ResultViewer = ({ isDashboard = false }) => {
     const [isRankingsMode, setIsRankingsMode] = useState(false);
     const [page, setPage] = useState(0);
     const [size] = useState(isDashboard ? 4 : 12);
+    const [minPercent, setMinPercent] = useState("");
+    const [maxPercent, setMaxPercent] = useState("");
+    const [tempMin, setTempMin] = useState("");
+    const [tempMax, setTempMax] = useState("");
 
     // Metadata Queries
     const { data: regions = [] } = useQuery({ queryKey: ['regions'], queryFn: getAllRegions });
@@ -20,15 +24,25 @@ const ResultViewer = ({ isDashboard = false }) => {
     const { data: schools = [] } = useQuery({ queryKey: ['schools'], queryFn: getAllSchools });
     const { data: exams = [] } = useQuery({ queryKey: ['exams'], queryFn: getAllExams });
 
+    // Set default exam filter to first available exam
+    React.useEffect(() => {
+        if (!filterExam && exams.length > 0) {
+            setFilterExam(exams[0].examNo.toString());
+        }
+    }, [exams, filterExam]);
+
     // API Query for Results
     const { data: resultsData, isLoading } = useQuery({
-        queryKey: ['examResults', filterRegion, filterCentre, filterSchool, filterExam, isRankingsMode, page, size],
+        queryKey: ['examResults', filterRegion, filterCentre, filterSchool, filterExam, isRankingsMode, page, size, minPercent, maxPercent],
         queryFn: () => getExamResults({
             regionId: filterRegion || undefined,
+            centreId: filterCentre || undefined,
             schoolId: filterSchool || undefined,
             examId: filterExam || undefined,
+            minPercentage: minPercent || undefined,
+            maxPercentage: maxPercent || undefined,
             page,
-            size,
+            size: isRankingsMode ? 100 : size, // Fetch more in ranking mode to allow accurate client-side fallback sorting
             sort: isRankingsMode ? 'percentage,desc' : 'publishedAt,desc'
         }),
         keepPreviousData: true
@@ -36,6 +50,40 @@ const ResultViewer = ({ isDashboard = false }) => {
 
     const results = resultsData?.content || [];
     const totalPages = resultsData?.totalPages || 0;
+
+    // Process results for fallback calculation and display
+    const processedResults = useMemo(() => {
+        return results.map(res => {
+            let scoreData = {};
+            try {
+                scoreData = typeof res.resultData === 'string' ? JSON.parse(res.resultData) : (res.resultData || {});
+            } catch (e) {
+                console.error("Error parsing resultData:", e);
+            }
+
+            // Extract numeric percentage from resultData if top-level is null
+            let percentage = res.percentage;
+            if (percentage === null || percentage === undefined) {
+                if (scoreData.score) {
+                    percentage = parseFloat(scoreData.score.replace('%', ''));
+                } else if (scoreData.totalMax > 0) {
+                    percentage = (scoreData.totalObtained / scoreData.totalMax) * 100;
+                }
+            }
+
+            return {
+                ...res,
+                processedPercentage: percentage || 0,
+                scoreData
+            };
+        });
+    }, [results]);
+
+    // Client-side ranking sort if needed (backend might fail to sort nulls correctly)
+    const sortedResults = useMemo(() => {
+        if (!isRankingsMode) return processedResults;
+        return [...processedResults].sort((a, b) => b.processedPercentage - a.processedPercentage);
+    }, [processedResults, isRankingsMode]);
 
     // Cascading Filter Options
     const availableCentres = useMemo(() => {
@@ -53,6 +101,10 @@ const ResultViewer = ({ isDashboard = false }) => {
         setFilterCentre("");
         setFilterSchool("");
         setFilterExam("");
+        setMinPercent("");
+        setMaxPercent("");
+        setTempMin("");
+        setTempMax("");
         setPage(0);
     };
 
@@ -172,10 +224,83 @@ const ResultViewer = ({ isDashboard = false }) => {
                         <div className="flex items-center justify-center px-4 py-2.5 bg-indigo-600 rounded-lg text-white font-black text-[10px] uppercase tracking-widest shadow-md">
                             <Search size={12} className="mr-2" /> {resultsData?.totalElements || 0} Found
                         </div>
+
+                        {/* Insight Filters */}
+                        <div className="col-span-full mt-2 pt-4 border-t border-gray-200">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Quick Insights:</span>
+
+                                <button
+                                    onClick={() => {
+                                        setMinPercent("35"); setMaxPercent("39.9");
+                                        setTempMin("35"); setTempMax("39.9");
+                                        setPage(0);
+                                    }}
+                                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold transition-all border ${minPercent === "35" && maxPercent === "39.9" ? "bg-amber-100 text-amber-700 border-amber-200 shadow-sm" : "bg-white text-gray-600 border-gray-200 hover:border-amber-400 hover:text-amber-600"}`}
+                                >
+                                    Show Borderline (35-39%)
+                                </button>
+
+                                <div className="h-4 w-[1px] bg-gray-200 mx-1"></div>
+
+                                <button
+                                    onClick={() => {
+                                        setMinPercent("60"); setMaxPercent("74.9");
+                                        setTempMin("60"); setTempMax("74.9");
+                                        setPage(0);
+                                    }}
+                                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold transition-all border ${minPercent === "60" && maxPercent === "74.9" ? "bg-indigo-100 text-indigo-700 border-indigo-200 shadow-sm" : "bg-white text-gray-600 border-gray-200 hover:border-indigo-400 hover:text-indigo-600"}`}
+                                >
+                                    First Class (60-74%)
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        setMinPercent("75"); setMaxPercent("100");
+                                        setTempMin("75"); setTempMax("100");
+                                        setPage(0);
+                                    }}
+                                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold transition-all border ${minPercent === "75" ? "bg-emerald-100 text-emerald-700 border-emerald-200 shadow-sm" : "bg-white text-gray-600 border-gray-200 hover:border-emerald-400 hover:text-emerald-600"}`}
+                                >
+                                    Distinction (75%+)
+                                </button>
+
+                                <div className="flex items-center gap-2 ml-auto">
+                                    <span className="text-[10px] font-bold text-gray-400">Custom Range:</span>
+                                    <div className="flex items-center gap-1">
+                                        <input
+                                            type="number"
+                                            placeholder="Min"
+                                            className="w-12 p-1 text-[10px] border rounded bg-white font-bold outline-none focus:ring-1 focus:ring-indigo-500"
+                                            value={tempMin}
+                                            onChange={(e) => setTempMin(e.target.value)}
+                                        />
+                                        <span className="text-gray-400 text-[10px]">-</span>
+                                        <input
+                                            type="number"
+                                            placeholder="Max"
+                                            className="w-12 p-1 text-[10px] border rounded bg-white font-bold outline-none focus:ring-1 focus:ring-indigo-500"
+                                            value={tempMax}
+                                            onChange={(e) => setTempMax(e.target.value)}
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                setMinPercent(tempMin);
+                                                setMaxPercent(tempMax);
+                                                setPage(0);
+                                            }}
+                                            className="bg-indigo-600 text-white text-[10px] font-black px-2 py-1 rounded hover:bg-indigo-700 transition-colors"
+                                        >
+                                            Apply
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 
-                {results.length === 0 ? (
+                {sortedResults.length === 0 ? (
                     <div className="text-center p-16 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
                         <Award className="mx-auto text-gray-200 mb-4" size={64} />
                         <p className="text-gray-400 font-bold italic text-lg">No results match your filters</p>
@@ -188,13 +313,8 @@ const ResultViewer = ({ isDashboard = false }) => {
                 ) : (
                     <>
                         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                            {results.map((res, index) => {
-                                let scoreData = {};
-                                try {
-                                    scoreData = typeof res.resultData === 'string' ? JSON.parse(res.resultData) : res.resultData;
-                                } catch (e) {
-                                    console.error("Error parsing resultData:", e);
-                                }
+                            {sortedResults.map((res, index) => {
+                                const scoreData = res.scoreData;
 
                                 return (
                                     <motion.div
@@ -231,10 +351,17 @@ const ResultViewer = ({ isDashboard = false }) => {
 
                                         <div className="space-y-3 relative z-10">
                                             <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                                                <span className="text-2xl font-black text-indigo-600 italic">
-                                                    {res.percentage ? `${res.percentage.toFixed(2)}%` : (scoreData.score || "N/A")}
-                                                </span>
-                                                <span className={`ml-2 text-[10px] font-black px-4 py-1.5 rounded-full border shadow-sm uppercase tracking-widest ${scoreData.remarks === "Pass" ? "bg-indigo-50 text-indigo-600 border-indigo-100" : "bg-red-50 text-red-600 border-red-100"}`}>
+                                                <div className="flex items-baseline justify-between mb-1">
+                                                    <span className="text-2xl font-black text-indigo-600 italic">
+                                                        {res.processedPercentage ? `${res.processedPercentage.toFixed(2)}%` : "N/A"}
+                                                    </span>
+                                                    {scoreData.totalObtained !== undefined && (
+                                                        <span className="text-[10px] font-black text-gray-400">
+                                                            {scoreData.totalObtained}/{scoreData.totalMax}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <span className={`text-[10px] font-black px-4 py-1.5 rounded-full border shadow-sm uppercase tracking-widest inline-block ${scoreData.remarks === "Pass" ? "bg-indigo-50 text-indigo-600 border-indigo-100" : "bg-red-50 text-red-600 border-red-100"}`}>
                                                     {scoreData.remarks || "N/A"}
                                                 </span>
                                             </div>

@@ -27,6 +27,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/manage/:type/:id" element={<AdminDashboard />} /> { /* We can handle it inside AdminDashboard or as a separate page */}
             <Route path="/student" element={<StudentDashboard />} />
             <Route path="/student/register" element={<StudentRegistration />} />
           </Routes>

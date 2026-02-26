@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Users, Filter, XCircle, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { Plus, Users, Filter, XCircle, ChevronLeft, ChevronRight, RefreshCw, Settings2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getAllRegions, getAllExamCentres, getStudents, getAllSchools } from '../../api';
 
@@ -10,6 +11,7 @@ const StudentManager = ({
     handleCreateStudent,
     schools = []
 }) => {
+    const navigate = useNavigate();
     // Filter State
     const [filterRegion, setFilterRegion] = useState("");
     const [filterCentre, setFilterCentre] = useState("");
@@ -295,6 +297,13 @@ const StudentManager = ({
                                         <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
                                             Active
                                         </span>
+                                        <button
+                                            onClick={() => navigate(`/admin/manage/student/${st.studentId}`)}
+                                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-white text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all shadow-sm border border-indigo-50 opacity-0 group-hover:opacity-100"
+                                        >
+                                            <Settings2 size={12} />
+                                            Manage
+                                        </button>
                                     </div>
                                 </motion.div>
                             ))}

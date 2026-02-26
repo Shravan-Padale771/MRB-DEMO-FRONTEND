@@ -182,6 +182,7 @@ export const getExamResults = async ({
   examId,
   schoolId,
   regionId,
+  centreId,
   minPercentage,
   maxPercentage,
   sort,
@@ -191,6 +192,7 @@ export const getExamResults = async ({
   if (examId) params.append("examId", examId);
   if (schoolId) params.append("schoolId", schoolId);
   if (regionId) params.append("regionId", regionId);
+  if (centreId) params.append("centreId", centreId);
   if (minPercentage) params.append("minPercentage", minPercentage);
   if (maxPercentage) params.append("maxPercentage", maxPercentage);
   if (sort) params.append("sort", sort);
