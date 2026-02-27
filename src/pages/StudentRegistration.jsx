@@ -101,7 +101,11 @@ const StudentRegistration = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8">
+    <div className="min-h-screen bg-[#f8f9fe] py-12 px-4 md:px-8 relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] rounded-full bg-blue-500/5 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-5%] left-[10%] w-[30%] h-[30%] rounded-full bg-indigo-500/5 blur-[90px] pointer-events-none" />
+
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -109,15 +113,18 @@ const StudentRegistration = () => {
           className="bg-white rounded-2xl shadow-xl overflow-hidden"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white">
-            <div className="flex items-center gap-4">
-              <div className="h-16 w-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <UserPlus size={32} />
+          <div className="bg-[#4c84ff] p-10 text-white relative">
+            <div className="absolute top-0 right-0 p-8 opacity-10">
+              <UserPlus size={120} />
+            </div>
+            <div className="flex items-center gap-6 relative z-10">
+              <div className="h-20 w-20 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md shadow-inner border border-white/20">
+                <UserPlus size={36} />
               </div>
               <div>
-                <h1 className="text-3xl font-bold">Student Registration</h1>
-                <p className="text-indigo-100 text-sm mt-1">
-                  Create your account to get started
+                <h1 className="text-3xl font-black tracking-tight uppercase">Student Registration</h1>
+                <p className="text-blue-50 text-sm mt-1 font-medium opacity-90">
+                  Create your account to get started with the MRB Portal
                 </p>
               </div>
             </div>
@@ -137,7 +144,7 @@ const StudentRegistration = () => {
                     name="firstName"
                     required
                     placeholder="Enter first name"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
                     value={formData.firstName}
                     onChange={handleChange}
                   />
@@ -150,7 +157,7 @@ const StudentRegistration = () => {
                     type="text"
                     name="middleName"
                     placeholder="Enter middle name"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
                     value={formData.middleName}
                     onChange={handleChange}
                   />
@@ -164,7 +171,7 @@ const StudentRegistration = () => {
                     name="lastName"
                     required
                     placeholder="Enter last name"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
                     value={formData.lastName}
                     onChange={handleChange}
                   />
@@ -183,7 +190,7 @@ const StudentRegistration = () => {
                     required
                     placeholder="Enter contact number"
                     pattern="[0-9]{10}"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
                     value={formData.contact}
                     onChange={handleChange}
                   />
@@ -198,7 +205,7 @@ const StudentRegistration = () => {
                     name="email"
                     required
                     placeholder="Enter email address"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
                     value={formData.email}
                     onChange={handleChange}
                   />
@@ -218,7 +225,7 @@ const StudentRegistration = () => {
                     min="5"
                     max="100"
                     placeholder="Enter age"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
                     value={formData.age}
                     onChange={handleChange}
                   />
@@ -230,7 +237,7 @@ const StudentRegistration = () => {
                   <select
                     name="motherTongue"
                     required
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition bg-white"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition bg-white"
                     value={formData.motherTongue}
                     onChange={handleChange}
                   >
@@ -249,7 +256,7 @@ const StudentRegistration = () => {
                 <select
                   name="schoolId"
                   required
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition bg-white font-medium"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition bg-white font-medium"
                   value={formData.schoolId}
                   onChange={handleChange}
                 >
@@ -278,7 +285,7 @@ const StudentRegistration = () => {
                       required
                       minLength="6"
                       placeholder="Enter password"
-                      className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                      className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
                       value={formData.password}
                       onChange={handleChange}
                     />
@@ -305,7 +312,7 @@ const StudentRegistration = () => {
                       required
                       minLength="6"
                       placeholder="Re-enter password"
-                      className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                      className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
                       value={formData.confirmPassword}
                       onChange={handleChange}
                     />
@@ -328,13 +335,13 @@ const StudentRegistration = () => {
 
               {/* Submit Button */}
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.01, translateY: -2 }}
+                whileTap={{ scale: 0.99 }}
                 type="submit"
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 mt-8"
+                className="w-full bg-[#4c84ff] text-white font-black py-5 rounded-xl hover:shadow-[0_10px_25px_-5px_rgba(76,132,255,0.4)] transition-all duration-300 flex items-center justify-center gap-3 mt-10 uppercase tracking-wider shadow-lg shadow-blue-500/20"
               >
-                <CheckCircle size={20} />
-                Register Student
+                <CheckCircle size={22} />
+                Create Account
               </motion.button>
             </div>
           </form>

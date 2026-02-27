@@ -1,14 +1,14 @@
-API Performance Summary - Generated 2026-02-26 23:32:04.918130
+API Performance Summary - Generated 2026-02-27 11:01:09.463848
 ======================================================================
 Endpoint Name                       | Status   | Time (ms)    | Size (KB) 
 ----------------------------------------------------------------------
-Students (Page 0)                   | 200      | 2743.07      | 2.79      
-Students (ID 711)                   | 200      | 1183.45      | 0.31      
-Exams (Page 0)                      | 200      | 1215.32      | 5.78      
-Exam Applications (Page 0)          | 200      | 3963.38      | 1.77      
-Exam Results (Page 0)               | 200      | 1395.44      | 0.31      
-Regions (List)                      | 200      | 1172.23      | 0.11      
-Schools (Page 0)                    | 200      | 1633.05      | 0.52      
-Exam Centres (Page 0)               | 200      | 1662.29      | 0.52      
-Get All Students (Legacy)           | 200      | 1569.50      | 10.5      
-Get All Exams (Legacy)              | 200      | 1178.95      | 5.48      
+Students (Page 0)                   | 200      | 2149.40      | 2.79      
+Students (ID 711)                   | 200      | 1239.42      | 0.31      
+Exams (Page 0)                      | 200      | 1223.84      | 5.78      
+Exam Applications (Page 0)          | 200      | 4293.70      | 1.77      
+Exam Results (Page 0)               | 200      | 3722.95      | 3.94      
+Regions (List)                      | 200      | 1242.00      | 0.11      
+Schools (Page 0)                    | 200      | 1816.15      | 0.52      
+Exam Centres (Page 0)               | 200      | 1864.52      | 0.52      
+Get All Students (Legacy)           | 200      | 1931.54      | 10.5      
+Get All Exams (Legacy)              | 200      | 1330.93      | 5.48      

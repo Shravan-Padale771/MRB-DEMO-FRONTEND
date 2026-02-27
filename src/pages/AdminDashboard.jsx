@@ -112,11 +112,6 @@ const AdminDashboard = () => {
     },
   });
 
-  const [studentForm, setStudentForm] = useState({
-    username: "",
-    password: "",
-    schoolId: "",
-  });
 
   const [resultForm, setResultForm] = useState({
     applicationId: "",
@@ -297,15 +292,6 @@ const AdminDashboard = () => {
     onError: () => toast.error("Failed to delete exam"),
   });
 
-  const createStudentMutation = useMutation({
-    mutationFn: ({ schoolId, studentData }) => addStudent(schoolId, studentData),
-    onSuccess: () => {
-      toast.success("Student Added!");
-      setStudentForm({ username: "", password: "", schoolId: "" });
-      queryClient.invalidateQueries({ queryKey: ["students"] });
-    },
-    onError: () => toast.error("Failed to add student"),
-  });
 
   const publishResultMutation = useMutation({
     mutationFn: (payload) => addExamResult(payload),
@@ -363,14 +349,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleCreateStudent = (e) => {
-    e.preventDefault();
-    if (!studentForm.schoolId) {
-      return toast.error("Please select a school");
-    }
-    const { schoolId, ...studentData } = studentForm;
-    createStudentMutation.mutate({ schoolId, studentData });
-  };
 
   const handlePublishResult = (e, directPayload = null) => {
     if (e) e.preventDefault();
@@ -675,12 +653,7 @@ const AdminDashboard = () => {
           />
         )}
         {activeTab === "students" && (
-          <StudentManager
-            studentForm={studentForm}
-            setStudentForm={setStudentForm}
-            handleCreateStudent={handleCreateStudent}
-            isLoading={createStudentMutation.isPending}
-          />
+          <StudentManager />
         )}
       </div>
     </DashboardLayout>

@@ -186,137 +186,161 @@ const StudentDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <header className="flex justify-between items-center mb-10 max-w-7xl mx-auto bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <div className="flex items-center gap-4">
-          <div className="h-14 w-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md">
-            {currentUser?.firstName ? currentUser.firstName.charAt(0).toUpperCase() : (currentUser?.username?.charAt(0).toUpperCase() || "?")}
+    <div className="min-h-screen bg-[#f8f9fe] relative overflow-hidden transition-all duration-500">
+      {/* Decorative background elements for consistency with Admin UI */}
+      <div className="absolute top-[-5%] right-[-5%] w-[35%] h-[35%] rounded-full bg-blue-500/5 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-5%] left-[10%] w-[25%] h-[25%] rounded-full bg-purple-500/5 blur-[90px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 relative z-10">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/40">
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 bg-[#4c84ff] rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/20">
+              {currentUser?.firstName ? currentUser.firstName.charAt(0).toUpperCase() : (currentUser?.username?.charAt(0).toUpperCase() || "?")}
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+                Welcome, <span className="text-[#4c84ff]">{currentUser?.firstName ? `${currentUser.firstName} ${currentUser.lastName || ''}` : (currentUser?.username || "Student")}</span>
+              </h1>
+              <div className="flex items-center gap-3 mt-2">
+                <span className="text-[11px] font-black text-[#4c84ff] bg-blue-50/50 px-2 py-0.5 rounded uppercase tracking-wider border border-blue-100/50">
+                  Student ID: #{currentUser?.studentId || "N/A"}
+                </span>
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest border-l border-gray-200 pl-3">
+                  {currentUser?.schoolName || currentUser?.school?.schoolName || "No School"}
+                </span>
+              </div>
+            </div>
           </div>
+          <button
+            onClick={() => setCurrentUser(null)}
+            className="flex items-center gap-2 text-gray-400 hover:text-red-500 hover:bg-red-50/50 px-4 py-2 rounded-xl transition-all duration-300 font-bold text-sm border border-transparent hover:border-red-100"
+          >
+            <LogOut size={18} /> Logout
+          </button>
+        </header>
+
+
+        <div className="grid lg:grid-cols-3 gap-10">
+          <div className="lg:col-span-2 space-y-8">
+            <h2 className="text-2xl font-black text-gray-900 border-l-4 border-[#4c84ff] pl-5 py-1 flex items-center gap-3 tracking-tight uppercase text-sm">
+              <BookOpen size={20} className="text-[#4c84ff]" /> Available Exams
+            </h2>
+            {exams.length === 0 ? (
+              <div className="text-center p-12 bg-white rounded-xl border-2 border-dashed">
+                <BookOpen className="mx-auto text-gray-400 mb-3" size={40} />
+                <p className="text-gray-500 font-medium">No exams available</p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-6">
+                {exams.map((exam) => (
+                  <motion.div
+                    key={exam.examNo}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ translateY: -8, shadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
+                    className="bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:border-blue-100/50 transition-all duration-500 flex flex-col justify-between group"
+                  >
+                    <div className="mb-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="text-xl font-bold text-gray-900 flex-1">
+                          {exam.exam_name}
+                        </h3>
+                        <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
+                          Exam #{exam.examNo}
+                        </span>
+                      </div>
+                      <div className="space-y-2 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <FileText size={16} className="text-gray-400" />
+                          <span>
+                            <strong>{exam.no_of_papers}</strong> Papers
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <DollarSign size={16} className="text-green-500" />
+                          <span className="font-semibold text-green-600">
+                            ${exam.exam_fees}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Apply field which opens exam form  */}
+                    <motion.button
+                      whileHover={{ scale: 1.02, translateY: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => openApplyModal(exam)}
+                      className="w-full bg-[#4c84ff] text-white py-3.5 rounded-xl hover:shadow-[0_10px_20px_-5px_rgba(76,132,255,0.4)] font-bold transition-all duration-300 uppercase tracking-wider text-sm shadow-md shadow-blue-500/10"
+                    >
+                      Apply Now
+                    </motion.button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">
-              Welcome, {currentUser?.firstName ? `${currentUser.firstName} ${currentUser.lastName || ''}` : (currentUser?.username || "Student")}
-            </h1>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">
-              Student ID: #{currentUser?.studentId || "N/A"} • {currentUser?.schoolName || currentUser?.school?.schoolName || "No School"}
-            </p>
+            <MyResults myResults={myResults} student={currentUser} />
           </div>
         </div>
-        <button
-          onClick={() => setCurrentUser(null)}
-          className="flex items-center gap-2 text-gray-600 hover:text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors duration-200"
-        >
-          <LogOut size={18} /> Logout
-        </button>
-      </header>
 
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <h2 className="text-2xl font-bold mb-8 text-gray-800 border-l-4 border-indigo-600 pl-4 flex items-center gap-2">
-            <BookOpen size={24} /> Available Exams
-          </h2>
-          {exams.length === 0 ? (
-            <div className="text-center p-12 bg-white rounded-xl border-2 border-dashed">
-              <BookOpen className="mx-auto text-gray-400 mb-3" size={40} />
-              <p className="text-gray-500 font-medium">No exams available</p>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-6">
-              {exams.map((exam) => (
-                <motion.div
-                  key={exam.examNo}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  whileHover={{ translateY: -5 }}
-                  className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 flex flex-col justify-between"
-                >
-                  <div className="mb-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <h3 className="text-xl font-bold text-gray-900 flex-1">
-                        {exam.exam_name}
-                      </h3>
-                      <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
-                        Exam #{exam.examNo}
-                      </span>
-                    </div>
-                    <div className="space-y-2 text-sm text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <FileText size={16} className="text-gray-400" />
-                        <span>
-                          <strong>{exam.no_of_papers}</strong> Papers
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign size={16} className="text-green-500" />
-                        <span className="font-semibold text-green-600">
-                          ${exam.exam_fees}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Apply field which opens exam form  */}
+        <AnimatePresence>
+          {selectedExam && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden"
+              >
+                <div className="bg-[#4c84ff] p-6 flex justify-between items-center text-white">
+                  <h3 className="font-bold text-lg uppercase tracking-tight">
+                    Apply for {selectedExam.exam_name}
+                  </h3>
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => openApplyModal(exam)}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg hover:shadow-lg font-semibold transition-all duration-300"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setSelectedExam(null)}
+                    className="hover:bg-white/20 p-2 rounded-lg transition-colors"
                   >
-                    Apply Now
+                    <X size={20} />
                   </motion.button>
-                </motion.div>
-              ))}
+                </div>
+                <div className="p-8">
+
+
+
+
+
+                  {/* this is exam form containing student and exam details used ApplyModal.jsx  */}
+                  <ApplyModal
+                    exam={selectedExam}
+                    student={currentUser}
+                    onClose={() => setSelectedExam(null)}
+                    onSuccess={fetchMyResults}
+                  />
+
+
+
+
+                </div>
+              </motion.div>
             </div>
           )}
-        </div>
-
-        <div>
-          <MyResults myResults={myResults} student={currentUser} />
-        </div>
+        </AnimatePresence>
+        <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.08);
+          border-radius: 10px;
+        }
+      `}</style>
       </div>
-
-      <AnimatePresence>
-        {selectedExam && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden"
-            >
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 flex justify-between items-center text-white">
-                <h3 className="font-bold text-lg">
-                  Apply for {selectedExam.exam_name}
-                </h3>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setSelectedExam(null)}
-                  className="hover:bg-white/20 p-2 rounded-lg transition-colors"
-                >
-                  <X size={20} />
-                </motion.button>
-              </div>
-              <div className="p-8">
-
-
-
-
-
-                {/* this is exam form containing student and exam details used ApplyModal.jsx  */}
-                <ApplyModal
-                  exam={selectedExam}
-                  student={currentUser}
-                  onClose={() => setSelectedExam(null)}
-                  onSuccess={fetchMyResults}
-                />
-
-
-
-
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
