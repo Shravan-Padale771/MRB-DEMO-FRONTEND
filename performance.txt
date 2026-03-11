@@ -108,3 +108,29 @@ final test for all endpoints
 [2026-03-11 17:31:05] GET /regions | Status: 500 | Duration: 1.1619s
 [2026-03-11 17:31:18] GET /regions | Status: 200 | Duration: 0.0402s
 [2026-03-11 17:31:30] GET /regions | Status: 200 | Duration: 0.0331s
+performance test cache ec2 instance[2026-03-12 00:10:34] GET /getAllStudents | Status: 200 | Duration: 1.7250s
+[2026-03-12 00:10:36] GET /students | Status: 200 | Duration: 0.8947s
+[2026-03-12 00:10:38] GET /getAllExams | Status: 200 | Duration: 1.5305s
+[2026-03-12 00:10:40] GET /exams | Status: 200 | Duration: 1.5266s
+[2026-03-12 00:10:41] GET /getRegions | Status: 200 | Duration: 1.1809s
+[2026-03-12 00:10:43] GET /regions | Status: 200 | Duration: 0.8003s
+[2026-03-12 00:10:45] GET /getAllExamCentres | Status: 200 | Duration: 1.7067s
+[2026-03-12 00:10:47] GET /exam-centres | Status: 200 | Duration: 1.6900s
+[2026-03-12 00:10:49] GET /getAllSchools | Status: 200 | Duration: 1.6941s
+[2026-03-12 00:10:51] GET /schools | Status: 200 | Duration: 1.6823s
+[2026-03-12 00:10:56] GET /getAllApplications | Status: 200 | Duration: 4.4544s
+[2026-03-12 00:11:00] GET /exam-applications | Status: 200 | Duration: 3.3493s
+second attempt[2026-03-12 00:11:39] GET /getAllStudents | Status: 200 | Duration: 0.7867s
+[2026-03-12 00:11:41] GET /students | Status: 200 | Duration: 0.8169s
+[2026-03-12 00:11:42] GET /getAllExams | Status: 200 | Duration: 0.8139s
+[2026-03-12 00:11:43] GET /exams | Status: 200 | Duration: 0.7967s
+[2026-03-12 00:11:45] GET /getRegions | Status: 200 | Duration: 1.1348s
+[2026-03-12 00:11:46] GET /regions | Status: 200 | Duration: 0.8155s
+[2026-03-12 00:11:48] GET /getAllExamCentres | Status: 200 | Duration: 0.8073s
+[2026-03-12 00:11:49] GET /exam-centres | Status: 200 | Duration: 0.8136s
+[2026-03-12 00:11:50] GET /getAllSchools | Status: 200 | Duration: 0.7912s
+[2026-03-12 00:11:51] GET /schools | Status: 200 | Duration: 0.7845s
+[2026-03-12 00:11:53] GET /getAllApplications | Status: 200 | Duration: 0.7893s
+[2026-03-12 00:11:54] GET /exam-applications | Status: 200 | Duration: 0.8076s
+[2026-03-12 00:11:56] GET /getAllResults | Status: 200 | Duration: 1.3050s
+[2026-03-12 00:11:57] GET /exam-results | Status: 200 | Duration: 0.8203s

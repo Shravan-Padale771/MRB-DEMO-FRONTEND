@@ -1562,8 +1562,25 @@
             </tbody>
         </table>
         
+        <h3 id="s5c">5.3 N+1 Query Problem Resolution</h3>
+        <p>During initial load testing of the <code>/getAllApplications</code> endpoint, a classic ORM <strong>N+1 query problem</strong> was discovered. Fetching a list of applications inadvertently triggered separate database queries to fetch the associated <code>Student</code> and <code>Exam</code> entities for <em>every single application</em> in the list.</p>
+        <p>This resulted in massive overhead (e.g., 100 applications = 1 query for apps + 100 queries for students + 100 queries for exams = 201 total queries), leading to response times of over 6 seconds.</p>
+        <p><strong>The Solution:</strong> The backend was refactored to implement rigorous <strong>Data Transfer Objects (DTOs)</strong> combined with custom JPQL <code>JOIN FETCH</code> queries. Instead of returning deeply nested Hibernate proxy entities that trigger lazy loading, the API now projects exactly the required fields into a flat <code>ApplicationDTO</code>.</p>
+        
+        <div class="code-block">
+            <span class="cmt">// Example of the flat, efficient DTO output (output_json/GET_getAllApplications.json)</span>
+            {
+                <span class="str">"applicationId"</span>: <span class="kw">1</span>,
+                <span class="str">"examNo"</span>: <span class="kw">5</span>,
+                <span class="str">"examName"</span>: <span class="str">"Rashtrabhasha Prabodh Pariksha (May 2026)"</span>,
+                <span class="str">"studentId"</span>: <span class="kw">1</span>,
+                <span class="str">"studentName"</span>: <span class="str">"Aarav Sharma"</span>,
+                <span class="str">"status"</span>: <span class="str">"PENDING"</span>
+            }
+        </div>
+
         <div class="info-card green">
-            <strong>Conclusion:</strong> Implementing caching using Redis/Spring Cache resulted in up to ~268x faster response times for heavy payloads like applications and results, massively increasing the scalability of the application. The system now reliably serves list endpoints in ~20-40ms, down from 1-6 seconds.
+            <strong>Conclusion:</strong> Implementing caching using Redis/Spring Cache resulted in up to ~268x faster response times for heavy payloads like applications and results. Furthermore, the integration of DTOs permanently resolved the N+1 query vulnerability, ensuring reliable list endpoint delivery in ~20-40ms, down from 1-6 seconds.
         </div>
     </div>
 
