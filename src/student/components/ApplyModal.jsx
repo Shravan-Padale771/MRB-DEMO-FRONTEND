@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
-import { applyForExam } from "../../api";
+import { createExamApplication } from "../../api";
 
 const ApplyModal = ({ exam, student, onClose, onSuccess }) => {
   const [agreed, setAgreed] = useState(false);
@@ -16,7 +16,7 @@ const ApplyModal = ({ exam, student, onClose, onSuccess }) => {
     }
 
     try {
-      await applyForExam({
+      await createExamApplication({
         student: { studentId: student.studentId },
         exam: { examNo: exam.examNo },
         status: "APPLIED",

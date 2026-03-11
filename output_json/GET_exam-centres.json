@@ -1,0 +1,21 @@
+{
+    "content": [
+        {
+            "centreId": 1,
+            "centreCode": "EC34212",
+            "centreName": "Modern Exam Centre",
+            "regionId": 1,
+            "regionName": "Pune"
+        },
+        {
+            "centreId": 2,
+            "centreCode": "EC8768",
+            "centreName": "SPPA Exam Centre Shivajinagar",
+            "regionId": 2,
+            "regionName": "Mumbai"
+        }
+    ],
+    "number": 0,
+    "size": 20,
+    "totalElements": 2
+}

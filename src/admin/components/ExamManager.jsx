@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, BookOpen, ChevronRight, ChevronLeft, Check, Edit, Trash2, X, Filter, RefreshCw } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import Pagination from '../../common/components/Pagination';
 import { getExams } from '../../api';
 
 const ExamManager = ({
@@ -26,13 +27,12 @@ const ExamManager = ({
             examName: filterName || undefined,
             page,
             size,
-            sort: 'examNo,desc'
         }),
         keepPreviousData: true
     });
 
     const exams = examsData?.content || [];
-    const totalPages = examsData?.totalPages || 0;
+    const totalPages = examsData?.totalPages ?? (examsData?.totalElements ? Math.ceil(examsData.totalElements / size) : 0);
 
     const steps = [
         { id: 'basic', title: 'Basic Info' },
@@ -599,27 +599,12 @@ const ExamManager = ({
                         </div>
 
                         {totalPages > 1 && (
-                            <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-6">
-                                <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
-                                    Page {page + 1} of {totalPages}
-                                </span>
-                                <div className="flex gap-2">
-                                    <button
-                                        disabled={page === 0}
-                                        onClick={() => setPage(p => p - 1)}
-                                        className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
-                                    >
-                                        <ChevronLeft size={16} />
-                                    </button>
-                                    <button
-                                        disabled={page >= totalPages - 1}
-                                        onClick={() => setPage(p => p + 1)}
-                                        className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
-                                    >
-                                        <ChevronRight size={16} />
-                                    </button>
-                                </div>
-                            </div>
+                            <Pagination 
+                                currentPage={page} 
+                                totalPages={totalPages} 
+                                onPageChange={setPage} 
+                                className="mt-6"
+                            />
                         )}
                     </>
                 )}

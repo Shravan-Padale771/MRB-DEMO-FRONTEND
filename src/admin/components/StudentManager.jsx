@@ -4,7 +4,8 @@ import { Users, Filter, XCircle, ChevronLeft, ChevronRight, Search, Printer, Lay
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import StudentLedger from './StudentLedger';
-import { getAllRegions, getAllExamCentres, getStudents, getAllSchools } from '../../api';
+import Pagination from '../../common/components/Pagination';
+import { getRegions, getExamCentres, getStudents, getSchools } from '../../api';
 
 const StudentManager = ({ isDashboard = false }) => {
     const navigate = useNavigate();
@@ -21,9 +22,14 @@ const StudentManager = ({ isDashboard = false }) => {
     const [isLedgerOpen, setIsLedgerOpen] = useState(false);
 
     // Metadata Queries
-    const { data: regions = [] } = useQuery({ queryKey: ['regions'], queryFn: getAllRegions });
-    const { data: centres = [] } = useQuery({ queryKey: ['examCentres'], queryFn: getAllExamCentres });
-    const { data: allSchools = [] } = useQuery({ queryKey: ['schools'], queryFn: getAllSchools });
+    const { data: regionsPage } = useQuery({ queryKey: ['regions'], queryFn: () => getRegions({ size: 1000 }) });
+    const regions = regionsPage?.content || [];
+
+    const { data: centresPage } = useQuery({ queryKey: ['examCentres'], queryFn: () => getExamCentres({ size: 1000 }) });
+    const centres = centresPage?.content || [];
+
+    const { data: schoolsPage } = useQuery({ queryKey: ['schools'], queryFn: () => getSchools({ size: 1000 }) });
+    const allSchools = schoolsPage?.content || [];
 
     // API Query for Students
     const { data: studentsData, isLoading } = useQuery({
@@ -35,7 +41,6 @@ const StudentManager = ({ isDashboard = false }) => {
             studentId: filterStudentId || undefined,
             page,
             size,
-            sort: 'studentId,desc'
         }),
         keepPreviousData: true
     });
@@ -56,7 +61,7 @@ const StudentManager = ({ isDashboard = false }) => {
 
     const ledgerStudents = allStudentsData?.content || [];
     const students = studentsData?.content || [];
-    const totalPages = studentsData?.totalPages || 0;
+    const totalPages = studentsData?.totalPages ?? (studentsData?.totalElements ? Math.ceil(studentsData.totalElements / size) : 0);
 
     // Derived states for filter options
     const availableCentres = useMemo(() => {
@@ -316,27 +321,11 @@ const StudentManager = ({ isDashboard = false }) => {
                                 )}
 
                                 {totalPages > 1 && (
-                                    <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-6">
-                                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
-                                            Page {page + 1} of {totalPages}
-                                        </span>
-                                        <div className="flex gap-2">
-                                            <button
-                                                disabled={page === 0}
-                                                onClick={() => setPage(p => p - 1)}
-                                                className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold"
-                                            >
-                                                <ChevronLeft size={18} />
-                                            </button>
-                                            <button
-                                                disabled={page >= totalPages - 1}
-                                                onClick={() => setPage(p => p + 1)}
-                                                className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all font-bold"
-                                            >
-                                                <ChevronRight size={18} />
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <Pagination 
+                                        currentPage={page} 
+                                        totalPages={totalPages} 
+                                        onPageChange={setPage} 
+                                    />
                                 )}
                             </>
                         )}
@@ -345,7 +334,7 @@ const StudentManager = ({ isDashboard = false }) => {
             ) : (
                 <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
                     {students.length === 0 ? (
-                        <div className="text-center p-8 text-gray-400 italic font-bold">No recent students</div>
+                        <div className="text-center p-8 text-gray-400 italic font-bold">No students found</div>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">

@@ -2,26 +2,28 @@ import React, { useState } from 'react';
 import { MapPin, Plus, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { addRegion, getAllRegions, getAllSchools } from '../../api';
+import { createRegion, getRegions, getSchools } from '../../api';
 
 const RegionManager = () => {
     const queryClient = useQueryClient();
     const [regionName, setRegionName] = useState("");
 
     // Queries
-    const { data: regions = [], isLoading: isLoadingRegions, refetch: refetchRegions } = useQuery({
+    const { data: regionsPage, isLoading: isLoadingRegions, refetch: refetchRegions } = useQuery({
         queryKey: ['regions'],
-        queryFn: getAllRegions,
+        queryFn: () => getRegions({ size: 1000 }),
     });
+    const regions = regionsPage?.content || [];
 
-    const { data: schools = [], isLoading: isLoadingSchools } = useQuery({
+    const { data: schoolsPage, isLoading: isLoadingSchools } = useQuery({
         queryKey: ['schools'],
-        queryFn: getAllSchools,
+        queryFn: () => getSchools({ size: 1000 }),
     });
+    const schools = schoolsPage?.content || [];
 
     // Mutation
     const addRegionMutation = useMutation({
-        mutationFn: (payload) => addRegion(payload),
+        mutationFn: (payload) => createRegion(payload),
         onSuccess: () => {
             toast.success("Region added successfully!");
             setRegionName("");

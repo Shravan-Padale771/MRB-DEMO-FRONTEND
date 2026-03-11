@@ -2,7 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { Building2, Plus, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { addExamCentre, getExamCentres, getAllRegions } from '../../api';
+import Pagination from '../../common/components/Pagination';
+import { createExamCentre, getExamCentres, getRegions } from '../../api';
 
 const ExamCentreManager = () => {
     const queryClient = useQueryClient();
@@ -16,10 +17,11 @@ const ExamCentreManager = () => {
     const [size] = useState(10);
 
     // Metadata Queries
-    const { data: regions = [], isLoading: isLoadingRegions } = useQuery({
+    const { data: regionsPage, isLoading: isLoadingRegions } = useQuery({
         queryKey: ['regions'],
-        queryFn: getAllRegions,
+        queryFn: () => getRegions({ size: 1000 }),
     });
+    const regions = regionsPage?.content || [];
 
     // API Query for Exam Centres
     const { data: centresData, isLoading: isLoadingCentres, refetch: refetchCentres } = useQuery({
@@ -34,11 +36,11 @@ const ExamCentreManager = () => {
     });
 
     const centres = centresData?.content || [];
-    const totalPages = centresData?.totalPages || 0;
+    const totalPages = centresData?.totalPages ?? (centresData?.totalElements ? Math.ceil(centresData.totalElements / size) : 0);
 
     // Mutation
     const addCentreMutation = useMutation({
-        mutationFn: ({ regionId, payload }) => addExamCentre(regionId, payload),
+        mutationFn: ({ regionId, payload }) => createExamCentre({ ...payload, region: { regionId } }),
         onSuccess: () => {
             toast.success("Exam Centre added!");
             setFormData({ centreCode: "", centreName: "", regionId: "" });
@@ -195,27 +197,11 @@ const ExamCentreManager = () => {
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-6">
-                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
-                            Page {page + 1} of {totalPages}
-                        </span>
-                        <div className="flex gap-2">
-                            <button
-                                disabled={page === 0}
-                                onClick={() => setPage(p => p - 1)}
-                                className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
-                            >
-                                <ChevronLeft size={18} />
-                            </button>
-                            <button
-                                disabled={page >= totalPages - 1}
-                                onClick={() => setPage(p => p + 1)}
-                                className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
-                            >
-                                <ChevronRight size={18} />
-                            </button>
-                        </div>
-                    </div>
+                    <Pagination 
+                        currentPage={page} 
+                        totalPages={totalPages} 
+                        onPageChange={setPage} 
+                    />
                 )}
             </div>
         </div>

@@ -1,0 +1,352 @@
+[
+    {
+        "id": 1,
+        "applicationId": 1,
+        "studentName": "Aarav Ramesh Sharma",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"54.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 59, \"Pratham Prashnpatra\": 50}, \"totalObtained\": 109}",
+        "publishedAt": "2026-02-26T23:32:10.441967",
+        "totalMarks": 200.0,
+        "percentage": 54.5
+    },
+    {
+        "id": 2,
+        "applicationId": 2,
+        "studentName": "Aarav Ramesh Sharma",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"78.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 81, \"Pratham Prashnpatra\": 76}, \"totalObtained\": 157}",
+        "publishedAt": "2026-02-26T23:32:12.297247",
+        "totalMarks": 200.0,
+        "percentage": 78.5
+    },
+    {
+        "id": 3,
+        "applicationId": 3,
+        "studentName": "Priya Suresh Patil",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"78.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 93, \"Pratham Prashnpatra\": 63}, \"totalObtained\": 156}",
+        "publishedAt": "2026-02-26T23:32:13.729785",
+        "totalMarks": 200.0,
+        "percentage": 78.0
+    },
+    {
+        "id": 5,
+        "applicationId": 5,
+        "studentName": "Sneha Anil Kulkarni",
+        "examName": "Rashtrabhasha Pravin Pariksha (October 2026)",
+        "resultData": "{\"score\": \"53.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 60, \"Pratham Prashnpatra\": 46}, \"totalObtained\": 106}",
+        "publishedAt": "2026-02-26T23:32:16.421601",
+        "totalMarks": 200.0,
+        "percentage": 53.0
+    },
+    {
+        "id": 6,
+        "applicationId": 6,
+        "studentName": "Arjun Deepak Mehta",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"50.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 38, \"Pratham Prashnpatra\": 62}, \"totalObtained\": 100}",
+        "publishedAt": "2026-02-26T23:32:17.877417",
+        "totalMarks": 200.0,
+        "percentage": 50.0
+    },
+    {
+        "id": 7,
+        "applicationId": 7,
+        "studentName": "Kavya Manoj Joshi",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"57.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 57, \"Pratham Prashnpatra\": 58}, \"totalObtained\": 115}",
+        "publishedAt": "2026-02-26T23:32:19.322451",
+        "totalMarks": 200.0,
+        "percentage": 57.5
+    },
+    {
+        "id": 8,
+        "applicationId": 8,
+        "studentName": "Vikram Ganesh Rao",
+        "examName": "Rashtrabhasha Pravin Pariksha (October 2026)",
+        "resultData": "{\"score\": \"57.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 63, \"Pratham Prashnpatra\": 52}, \"totalObtained\": 115}",
+        "publishedAt": "2026-02-26T23:32:20.726777",
+        "totalMarks": 200.0,
+        "percentage": 57.5
+    },
+    {
+        "id": 10,
+        "applicationId": 10,
+        "studentName": "Sahil Rajan Verma",
+        "examName": "Rashtrabhasha Pravin Pariksha (October 2026)",
+        "resultData": "{\"score\": \"62.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 76, \"Pratham Prashnpatra\": 49}, \"totalObtained\": 125}",
+        "publishedAt": "2026-02-26T23:32:23.611353",
+        "totalMarks": 200.0,
+        "percentage": 62.5
+    },
+    {
+        "id": 41,
+        "applicationId": 11,
+        "studentName": "Pooja Santosh Naik",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"79.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 74, \"Pratham Prashnpatra\": 85}, \"totalObtained\": 159}",
+        "publishedAt": "2026-02-26T23:34:43.980183",
+        "totalMarks": 200.0,
+        "percentage": 79.5
+    },
+    {
+        "id": 42,
+        "applicationId": 12,
+        "studentName": "Rahul Shyam Gupta",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"67.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 79, \"Pratham Prashnpatra\": 56}, \"totalObtained\": 135}",
+        "publishedAt": "2026-02-26T23:34:45.534805",
+        "totalMarks": 200.0,
+        "percentage": 67.5
+    },
+    {
+        "id": 44,
+        "applicationId": 14,
+        "studentName": "Omkar Dilip Jadhav",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"66.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 52, \"Pratham Prashnpatra\": 80}, \"totalObtained\": 132}",
+        "publishedAt": "2026-02-26T23:34:48.654969",
+        "totalMarks": 200.0,
+        "percentage": 66.0
+    },
+    {
+        "id": 45,
+        "applicationId": 15,
+        "studentName": "Dipika Nitin Pawar",
+        "examName": "Rashtrabhasha Pravin Pariksha (October 2026)",
+        "resultData": "{\"score\": \"78.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 78, \"Pratham Prashnpatra\": 78}, \"totalObtained\": 156}",
+        "publishedAt": "2026-02-26T23:34:50.33206",
+        "totalMarks": 200.0,
+        "percentage": 78.0
+    },
+    {
+        "id": 46,
+        "applicationId": 16,
+        "studentName": "Kunal Rajesh Singh",
+        "examName": "Rashtrabhasha Pravin Pariksha (October 2026)",
+        "resultData": "{\"score\": \"58.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 80, \"Pratham Prashnpatra\": 37}, \"totalObtained\": 117}",
+        "publishedAt": "2026-02-26T23:34:52.000839",
+        "totalMarks": 200.0,
+        "percentage": 58.5
+    },
+    {
+        "id": 47,
+        "applicationId": 17,
+        "studentName": "Aishwarya Mohan Shinde",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"52.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 59, \"Pratham Prashnpatra\": 45}, \"totalObtained\": 104}",
+        "publishedAt": "2026-02-26T23:34:53.521359",
+        "totalMarks": 200.0,
+        "percentage": 52.0
+    },
+    {
+        "id": 48,
+        "applicationId": 18,
+        "studentName": "Tejas Sunil Mane",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"58.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 45, \"Pratham Prashnpatra\": 71}, \"totalObtained\": 116}",
+        "publishedAt": "2026-02-26T23:34:55.084734",
+        "totalMarks": 200.0,
+        "percentage": 58.0
+    },
+    {
+        "id": 50,
+        "applicationId": 20,
+        "studentName": "Nikhil Ashok Bhosale",
+        "examName": "Rashtrabhasha Pravin Pariksha (October 2026)",
+        "resultData": "{\"score\": \"62.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 38, \"Pratham Prashnpatra\": 86}, \"totalObtained\": 124}",
+        "publishedAt": "2026-02-26T23:34:58.008811",
+        "totalMarks": 200.0,
+        "percentage": 62.0
+    },
+    {
+        "id": 51,
+        "applicationId": 21,
+        "studentName": "Shruti Hemant Gaikwad",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"66.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 49, \"Pratham Prashnpatra\": 84}, \"totalObtained\": 133}",
+        "publishedAt": "2026-02-26T23:34:59.701869",
+        "totalMarks": 200.0,
+        "percentage": 66.5
+    },
+    {
+        "id": 52,
+        "applicationId": 22,
+        "studentName": "Aarav Ramesh Sharma",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"85.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 88, \"Pratham Prashnpatra\": 83}, \"totalObtained\": 171}",
+        "publishedAt": "2026-02-26T23:35:01.294523",
+        "totalMarks": 200.0,
+        "percentage": 85.5
+    },
+    {
+        "id": 53,
+        "applicationId": 23,
+        "studentName": "Aarav Ramesh Sharma",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"64.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 36, \"Pratham Prashnpatra\": 93}, \"totalObtained\": 129}",
+        "publishedAt": "2026-02-26T23:35:02.918971",
+        "totalMarks": 200.0,
+        "percentage": 64.5
+    },
+    {
+        "id": 54,
+        "applicationId": 24,
+        "studentName": "Priya Suresh Patil",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"56.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 62, \"Pratham Prashnpatra\": 50}, \"totalObtained\": 112}",
+        "publishedAt": "2026-02-26T23:35:04.238863",
+        "totalMarks": 200.0,
+        "percentage": 56.0
+    },
+    {
+        "id": 56,
+        "applicationId": 26,
+        "studentName": "Sneha Anil Kulkarni",
+        "examName": "Rashtrabhasha Pravin Pariksha (October 2026)",
+        "resultData": "{\"score\": \"70.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 51, \"Pratham Prashnpatra\": 90}, \"totalObtained\": 141}",
+        "publishedAt": "2026-02-26T23:35:07.611504",
+        "totalMarks": 200.0,
+        "percentage": 70.5
+    },
+    {
+        "id": 57,
+        "applicationId": 27,
+        "studentName": "Arjun Deepak Mehta",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"48.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 40, \"Pratham Prashnpatra\": 57}, \"totalObtained\": 97}",
+        "publishedAt": "2026-02-26T23:35:09.137779",
+        "totalMarks": 200.0,
+        "percentage": 48.5
+    },
+    {
+        "id": 58,
+        "applicationId": 28,
+        "studentName": "Kavya Manoj Joshi",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"86.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 90, \"Pratham Prashnpatra\": 82}, \"totalObtained\": 172}",
+        "publishedAt": "2026-02-26T23:35:10.660044",
+        "totalMarks": 200.0,
+        "percentage": 86.0
+    },
+    {
+        "id": 59,
+        "applicationId": 29,
+        "studentName": "Vikram Ganesh Rao",
+        "examName": "Rashtrabhasha Pravin Pariksha (October 2026)",
+        "resultData": "{\"score\": \"70.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 87, \"Pratham Prashnpatra\": 53}, \"totalObtained\": 140}",
+        "publishedAt": "2026-02-26T23:35:12.075437",
+        "totalMarks": 200.0,
+        "percentage": 70.0
+    },
+    {
+        "id": 61,
+        "applicationId": 31,
+        "studentName": "Sahil Rajan Verma",
+        "examName": "Rashtrabhasha Pravin Pariksha (October 2026)",
+        "resultData": "{\"score\": \"63.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 83, \"Pratham Prashnpatra\": 44}, \"totalObtained\": 127}",
+        "publishedAt": "2026-02-26T23:35:15.467818",
+        "totalMarks": 200.0,
+        "percentage": 63.5
+    },
+    {
+        "id": 62,
+        "applicationId": 32,
+        "studentName": "Pooja Santosh Naik",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"66.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 69, \"Pratham Prashnpatra\": 64}, \"totalObtained\": 133}",
+        "publishedAt": "2026-02-26T23:35:17.110035",
+        "totalMarks": 200.0,
+        "percentage": 66.5
+    },
+    {
+        "id": 63,
+        "applicationId": 33,
+        "studentName": "Rahul Shyam Gupta",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"37.00%\", \"remarks\": \"Fail\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 39, \"Pratham Prashnpatra\": 35}, \"totalObtained\": 74}",
+        "publishedAt": "2026-02-26T23:35:18.713193",
+        "totalMarks": 200.0,
+        "percentage": 37.0
+    },
+    {
+        "id": 65,
+        "applicationId": 35,
+        "studentName": "Omkar Dilip Jadhav",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"69.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 64, \"Pratham Prashnpatra\": 75}, \"totalObtained\": 139}",
+        "publishedAt": "2026-02-26T23:35:21.682973",
+        "totalMarks": 200.0,
+        "percentage": 69.5
+    },
+    {
+        "id": 66,
+        "applicationId": 36,
+        "studentName": "Dipika Nitin Pawar",
+        "examName": "Rashtrabhasha Pravin Pariksha (October 2026)",
+        "resultData": "{\"score\": \"70.50%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 67, \"Pratham Prashnpatra\": 74}, \"totalObtained\": 141}",
+        "publishedAt": "2026-02-26T23:35:23.462399",
+        "totalMarks": 200.0,
+        "percentage": 70.5
+    },
+    {
+        "id": 67,
+        "applicationId": 37,
+        "studentName": "Kunal Rajesh Singh",
+        "examName": "Rashtrabhasha Pravin Pariksha (October 2026)",
+        "resultData": "{\"score\": \"77.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 78, \"Pratham Prashnpatra\": 76}, \"totalObtained\": 154}",
+        "publishedAt": "2026-02-26T23:35:25.2841",
+        "totalMarks": 200.0,
+        "percentage": 77.0
+    },
+    {
+        "id": 68,
+        "applicationId": 38,
+        "studentName": "Aishwarya Mohan Shinde",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"76.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 69, \"Pratham Prashnpatra\": 83}, \"totalObtained\": 152}",
+        "publishedAt": "2026-02-26T23:35:26.800326",
+        "totalMarks": 200.0,
+        "percentage": 76.0
+    },
+    {
+        "id": 69,
+        "applicationId": 39,
+        "studentName": "Tejas Sunil Mane",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"89.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 91, \"Pratham Prashnpatra\": 87}, \"totalObtained\": 178}",
+        "publishedAt": "2026-02-26T23:35:28.125677",
+        "totalMarks": 200.0,
+        "percentage": 89.0
+    },
+    {
+        "id": 71,
+        "applicationId": 41,
+        "studentName": "Nikhil Ashok Bhosale",
+        "examName": "Rashtrabhasha Pravin Pariksha (October 2026)",
+        "resultData": "{\"score\": \"62.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 76, \"Pratham Prashnpatra\": 48}, \"totalObtained\": 124}",
+        "publishedAt": "2026-02-26T23:35:31.868063",
+        "totalMarks": 200.0,
+        "percentage": 62.0
+    },
+    {
+        "id": 72,
+        "applicationId": 42,
+        "studentName": "Shruti Hemant Gaikwad",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"51.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 63, \"Pratham Prashnpatra\": 39}, \"totalObtained\": 102}",
+        "publishedAt": "2026-02-26T23:35:33.398356",
+        "totalMarks": 200.0,
+        "percentage": 51.0
+    },
+    {
+        "id": 73,
+        "applicationId": 43,
+        "studentName": "Sumit Sanjay Hatekar",
+        "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
+        "resultData": "{\"score\": \"48.00%\", \"remarks\": \"Pass\", \"totalMax\": 200, \"breakdown\": {\"Dvitiya Prashnpatra\": 56, \"Pratham Prashnpatra\": 40}, \"totalObtained\": 96}",
+        "publishedAt": "2026-02-26T23:35:34.976358",
+        "totalMarks": 200.0,
+        "percentage": 48.0
+    }
+]

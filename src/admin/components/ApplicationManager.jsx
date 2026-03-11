@@ -4,7 +4,8 @@ import { FileText, Filter, XCircle, Search, Printer, List, LayoutGrid, Award, Ar
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import ApplicationLedger from './ApplicationLedger';
-import { getAllExams, getAllRegions, getAllExamCentres, getAllSchools, getExamApplications } from '../../api';
+import Pagination from '../../common/components/Pagination';
+import { getExams, getRegions, getExamCentres, getSchools, getExamApplications } from '../../api';
 
 const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectApplication }) => {
     // Filter State
@@ -19,10 +20,17 @@ const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectA
     const [isLedgerOpen, setIsLedgerOpen] = useState(false);
 
     // Queries
-    const { data: exams = [] } = useQuery({ queryKey: ['exams'], queryFn: getAllExams });
-    const { data: regions = [] } = useQuery({ queryKey: ['regions'], queryFn: getAllRegions });
-    const { data: centres = [] } = useQuery({ queryKey: ['examCentres'], queryFn: getAllExamCentres });
-    const { data: schools = [] } = useQuery({ queryKey: ['schools'], queryFn: getAllSchools });
+    const { data: examsPage } = useQuery({ queryKey: ['exams'], queryFn: () => getExams({ size: 1000 }) });
+    const exams = examsPage?.content || [];
+
+    const { data: regionsPage } = useQuery({ queryKey: ['regions'], queryFn: () => getRegions({ size: 1000 }) });
+    const regions = regionsPage?.content || [];
+
+    const { data: centresPage } = useQuery({ queryKey: ['examCentres'], queryFn: () => getExamCentres({ size: 1000 }) });
+    const centres = centresPage?.content || [];
+
+    const { data: schoolsPage } = useQuery({ queryKey: ['schools'], queryFn: () => getSchools({ size: 1000 }) });
+    const schools = schoolsPage?.content || [];
 
     const { data: applicationsData, isLoading } = useQuery({
         queryKey: ['applications', filterExam, filterRegion, filterCentre, filterSchool, filterStatus, page, size],
@@ -34,7 +42,6 @@ const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectA
             status: filterStatus || undefined,
             page,
             size,
-            sort: 'applicationId,desc'
         }),
         keepPreviousData: true
     });
@@ -54,7 +61,7 @@ const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectA
     });
 
     const applications = applicationsData?.content || [];
-    const totalPages = applicationsData?.totalPages || 0;
+    const totalPages = applicationsData?.totalPages ?? (applicationsData?.totalElements ? Math.ceil(applicationsData.totalElements / size) : 0);
     const ledgerApplications = allApplicationsData?.content || [];
 
     // Cascading Logic
@@ -281,13 +288,11 @@ const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectA
                                     </div>
                                 )}
                                 {totalPages > 1 && (
-                                    <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-6">
-                                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Page {page + 1} of {totalPages}</span>
-                                        <div className="flex gap-2">
-                                            <button disabled={page === 0} onClick={() => setPage(p => p - 1)} className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"><ChevronLeft size={18} /></button>
-                                            <button disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)} className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"><ChevronRight size={18} /></button>
-                                        </div>
-                                    </div>
+                                    <Pagination 
+                                        currentPage={page} 
+                                        totalPages={totalPages} 
+                                        onPageChange={setPage} 
+                                    />
                                 )}
                             </>
                         )}
@@ -296,7 +301,7 @@ const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectA
             ) : (
                 <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
                     {applications.length === 0 ? (
-                        <div className="text-center p-8 text-gray-400 italic font-bold">No recent applications</div>
+                        <div className="text-center p-8 text-gray-400 italic font-bold">No applications found</div>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">

@@ -3,7 +3,8 @@ import { Building2, Plus, RefreshCw, ChevronLeft, ChevronRight, Settings2 } from
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { addSchool, getSchools, getAllExamCentres, getAllRegions } from '../../api';
+import Pagination from '../../common/components/Pagination';
+import { createSchool, getSchools, getExamCentres, getRegions } from '../../api';
 
 const SchoolManager = () => {
     const queryClient = useQueryClient();
@@ -18,15 +19,17 @@ const SchoolManager = () => {
     const [size] = useState(10);
 
     // Metadata Queries
-    const { data: regions = [] } = useQuery({
+    const { data: regionsPage } = useQuery({
         queryKey: ['regions'],
-        queryFn: getAllRegions,
+        queryFn: () => getRegions({ size: 1000 }),
     });
+    const regions = regionsPage?.content || [];
 
-    const { data: centres = [] } = useQuery({
+    const { data: centresPage } = useQuery({
         queryKey: ['examCentres'],
-        queryFn: getAllExamCentres,
+        queryFn: () => getExamCentres({ size: 1000 }),
     });
+    const centres = centresPage?.content || [];
 
     // API Query for Schools
     const { data: schoolsData, isLoading: isLoadingSchools, refetch: refetchSchools } = useQuery({
@@ -42,11 +45,11 @@ const SchoolManager = () => {
     });
 
     const schools = schoolsData?.content || [];
-    const totalPages = schoolsData?.totalPages || 0;
+    const totalPages = schoolsData?.totalPages ?? (schoolsData?.totalElements ? Math.ceil(schoolsData.totalElements / size) : 0);
 
     // Mutation
     const addSchoolMutation = useMutation({
-        mutationFn: ({ centreId, schoolData }) => addSchool(centreId, schoolData),
+        mutationFn: ({ centreId, schoolData }) => createSchool({ ...schoolData, examCentre: { centreId } }),
         onSuccess: () => {
             toast.success("School Added!");
             setFormData({ schoolName: "", centreId: "" });
@@ -235,27 +238,11 @@ const SchoolManager = () => {
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-6">
-                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
-                            Page {page + 1} of {totalPages}
-                        </span>
-                        <div className="flex gap-2">
-                            <button
-                                disabled={page === 0}
-                                onClick={() => setPage(p => p - 1)}
-                                className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
-                            >
-                                <ChevronLeft size={18} />
-                            </button>
-                            <button
-                                disabled={page >= totalPages - 1}
-                                onClick={() => setPage(p => p + 1)}
-                                className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
-                            >
-                                <ChevronRight size={18} />
-                            </button>
-                        </div>
-                    </div>
+                    <Pagination 
+                        currentPage={page} 
+                        totalPages={totalPages} 
+                        onPageChange={setPage} 
+                    />
                 )}
             </div>
         </div >

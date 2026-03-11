@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Award, Filter, XCircle, Search, Keyboard, FastForward } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useQuery } from '@tanstack/react-query';
-import { getAllRegions, getAllExamCentres, getAllSchools, getAllStudents, getAllExams } from '../../api';
+import { getRegions, getExamCentres, getSchools, getStudents, getExams } from '../../api';
 
 const ResultPublisher = ({
     resultForm,
@@ -23,11 +23,20 @@ const ResultPublisher = ({
 
 
     // Metadata Queries
-    const { data: regions = [] } = useQuery({ queryKey: ['regions'], queryFn: getAllRegions });
-    const { data: centres = [] } = useQuery({ queryKey: ['examCentres'], queryFn: getAllExamCentres });
-    const { data: schools = [] } = useQuery({ queryKey: ['schools'], queryFn: getAllSchools });
-    const { data: students = [] } = useQuery({ queryKey: ['students'], queryFn: getAllStudents });
-    const { data: exams = [] } = useQuery({ queryKey: ['exams'], queryFn: getAllExams });
+    const { data: regionsPage } = useQuery({ queryKey: ['regions'], queryFn: () => getRegions({ size: 1000 }) });
+    const regions = regionsPage?.content || [];
+
+    const { data: centresPage } = useQuery({ queryKey: ['examCentres'], queryFn: () => getExamCentres({ size: 1000 }) });
+    const centres = centresPage?.content || [];
+
+    const { data: schoolsPage } = useQuery({ queryKey: ['schools'], queryFn: () => getSchools({ size: 1000 }) });
+    const schools = schoolsPage?.content || [];
+
+    const { data: studentsPage } = useQuery({ queryKey: ['students'], queryFn: () => getStudents({ size: 1000 }) });
+    const students = studentsPage?.content || [];
+
+    const { data: examsPage } = useQuery({ queryKey: ['exams'], queryFn: () => getExams({ size: 1000 }) });
+    const exams = examsPage?.content || [];
 
     // Set default exam filter to first available exam
     React.useEffect(() => {

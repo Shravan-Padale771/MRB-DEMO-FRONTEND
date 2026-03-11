@@ -129,31 +129,139 @@
             "schoolId": 1,
             "schoolName": "The Modern School of Science",
             "examApplications": null
+        },
+        {
+            "studentId": 11,
+            "firstName": "Pooja",
+            "middleName": "Santosh",
+            "lastName": "Naik",
+            "contact": "9876543210",
+            "email": "pooja.naik@modernschool.edu",
+            "age": 14,
+            "motherTongue": "Marathi",
+            "schoolId": 1,
+            "schoolName": "The Modern School of Science",
+            "examApplications": null
+        },
+        {
+            "studentId": 12,
+            "firstName": "Rahul",
+            "middleName": "Shyam",
+            "lastName": "Gupta",
+            "contact": "9123456781",
+            "email": "rahul.gupta@sopvarada.edu",
+            "age": 15,
+            "motherTongue": "Hindi",
+            "schoolId": 2,
+            "schoolName": "SOP School of Varada",
+            "examApplications": null
+        },
+        {
+            "studentId": 13,
+            "firstName": "Swati",
+            "middleName": "Prakash",
+            "lastName": "More",
+            "contact": "9123456782",
+            "email": "swati.more@sopvarada.edu",
+            "age": 13,
+            "motherTongue": "Marathi",
+            "schoolId": 2,
+            "schoolName": "SOP School of Varada",
+            "examApplications": null
+        },
+        {
+            "studentId": 14,
+            "firstName": "Omkar",
+            "middleName": "Dilip",
+            "lastName": "Jadhav",
+            "contact": "9123456783",
+            "email": "omkar.jadhav@sopvarada.edu",
+            "age": 14,
+            "motherTongue": "Marathi",
+            "schoolId": 2,
+            "schoolName": "SOP School of Varada",
+            "examApplications": null
+        },
+        {
+            "studentId": 15,
+            "firstName": "Dipika",
+            "middleName": "Nitin",
+            "lastName": "Pawar",
+            "contact": "9123456784",
+            "email": "dipika.pawar@sopvarada.edu",
+            "age": 16,
+            "motherTongue": "Marathi",
+            "schoolId": 2,
+            "schoolName": "SOP School of Varada",
+            "examApplications": null
+        },
+        {
+            "studentId": 16,
+            "firstName": "Kunal",
+            "middleName": "Rajesh",
+            "lastName": "Singh",
+            "contact": "9123456785",
+            "email": "kunal.singh@sopvarada.edu",
+            "age": 17,
+            "motherTongue": "Hindi",
+            "schoolId": 2,
+            "schoolName": "SOP School of Varada",
+            "examApplications": null
+        },
+        {
+            "studentId": 17,
+            "firstName": "Aishwarya",
+            "middleName": "Mohan",
+            "lastName": "Shinde",
+            "contact": "9123456786",
+            "email": "aishwarya.shinde@sopvarada.edu",
+            "age": 15,
+            "motherTongue": "Marathi",
+            "schoolId": 2,
+            "schoolName": "SOP School of Varada",
+            "examApplications": null
+        },
+        {
+            "studentId": 18,
+            "firstName": "Tejas",
+            "middleName": "Sunil",
+            "lastName": "Mane",
+            "contact": "9123456787",
+            "email": "tejas.mane@sopvarada.edu",
+            "age": 14,
+            "motherTongue": "Marathi",
+            "schoolId": 2,
+            "schoolName": "SOP School of Varada",
+            "examApplications": null
+        },
+        {
+            "studentId": 19,
+            "firstName": "Rutuja",
+            "middleName": "Umesh",
+            "lastName": "Kamble",
+            "contact": "9123456788",
+            "email": "rutuja.kamble@sopvarada.edu",
+            "age": 13,
+            "motherTongue": "Marathi",
+            "schoolId": 2,
+            "schoolName": "SOP School of Varada",
+            "examApplications": null
+        },
+        {
+            "studentId": 20,
+            "firstName": "Nikhil",
+            "middleName": "Ashok",
+            "lastName": "Bhosale",
+            "contact": "9123456789",
+            "email": "nikhil.bhosale@sopvarada.edu",
+            "age": 16,
+            "motherTongue": "Marathi",
+            "schoolId": 2,
+            "schoolName": "SOP School of Varada",
+            "examApplications": null
         }
     ],
-    "pageable": {
-        "pageNumber": 0,
-        "pageSize": 10,
-        "sort": {
-            "empty": true,
-            "sorted": false,
-            "unsorted": true
-        },
-        "offset": 0,
-        "paged": true,
-        "unpaged": false
-    },
-    "last": false,
-    "totalPages": 5,
-    "totalElements": 43,
-    "first": true,
-    "numberOfElements": 10,
-    "size": 10,
     "number": 0,
-    "sort": {
-        "empty": true,
-        "sorted": false,
-        "unsorted": true
-    },
-    "empty": false
+    "size": 20,
+    "totalElements": 43
 }

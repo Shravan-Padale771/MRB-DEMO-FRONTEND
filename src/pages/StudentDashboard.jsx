@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  getAllStudents,
-  getAllExams,
-  applyForExam,
-  getStudentResults,
+  getStudents,
+  getExams,
+  createExamApplication,
+  getExamResults,
 } from "../api";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,15 +44,13 @@ const StudentDashboard = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [s, e] = await Promise.all([getAllStudents(), getAllExams()]);
-        setStudents(s || []);
-        setExams(e || []);
+        const [studentPage, examPage] = await Promise.all([
+          getStudents({ size: 1000 }),
+          getExams({ size: 1000 })
+        ]);
+        setStudents(studentPage?.content || []);
+        setExams(examPage?.content || []);
         console.log("This is fetched data of students and exams");
-
-        console.log(s);
-        console.log(e);
-
-
       } catch (error) {
         console.error("Failed to load data", error);
       }
@@ -69,8 +67,8 @@ const StudentDashboard = () => {
   const fetchMyResults = async () => {
     if (!currentUser?.studentId) return;
     try {
-      const results = await getStudentResults(currentUser.studentId);
-      setMyResults(results || []);
+      const data = await getExamResults({ studentId: currentUser.studentId });
+      setMyResults(data?.content || []);
     } catch (error) {
       console.error("Could not fetch results", error);
     }
@@ -93,7 +91,7 @@ const StudentDashboard = () => {
     };
 
     try {
-      await applyForExam(payload);
+      await createExamApplication(payload);
       toast.success("Application Submitted Successfully!");
       setSelectedExam(null);
       setApplicationForm({

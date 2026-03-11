@@ -19,9 +19,10 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import {
     getStudentById,
-    getAllSchools,
-    getAllRegions,
-    getAllExamCentres,
+    getStudentById,
+    getSchools,
+    getRegions,
+    getExamCentres,
     getExamApplications,
     getExamResults,
     getStudents
@@ -38,16 +39,16 @@ const EntityManager = () => {
         queryFn: async () => {
             if (type === 'student') return getStudentById(id);
             if (type === 'school') {
-                const schools = await getAllSchools();
-                return schools.find(s => s.schoolId.toString() === id);
+                const page = await getSchools({ size: 1000 });
+                return (page?.content || []).find(s => s.schoolId.toString() === id);
             }
             if (type === 'region') {
-                const regions = await getAllRegions();
-                return regions.find(r => r.regionId.toString() === id);
+                const page = await getRegions({ size: 1000 });
+                return (page?.content || []).find(r => r.regionId.toString() === id);
             }
             if (type === 'centre') {
-                const centres = await getAllExamCentres();
-                return centres.find(c => c.centreId.toString() === id);
+                const page = await getExamCentres({ size: 1000 });
+                return (page?.content || []).find(c => c.centreId.toString() === id);
             }
             return null;
         }

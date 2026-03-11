@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { Award, CheckCircle, Trophy, Filter, XCircle, Search, TrendingUp, ChevronLeft, ChevronRight, FileText, Printer, LayoutGrid, List } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import ResultLedger from './ResultLedger';
-import { getAllRegions, getAllExamCentres, getAllSchools, getAllExams, getExamResults } from '../../api';
+import Pagination from '../../common/components/Pagination';
+import { getRegions, getExamCentres, getSchools, getExams, getExamResults } from '../../api';
 
 const ResultViewer = ({ isDashboard = false }) => {
     // Filter State
@@ -22,10 +23,17 @@ const ResultViewer = ({ isDashboard = false }) => {
     const [isLedgerOpen, setIsLedgerOpen] = useState(false);
 
     // Metadata Queries
-    const { data: regions = [] } = useQuery({ queryKey: ['regions'], queryFn: getAllRegions });
-    const { data: centres = [] } = useQuery({ queryKey: ['examCentres'], queryFn: getAllExamCentres });
-    const { data: schools = [] } = useQuery({ queryKey: ['schools'], queryFn: getAllSchools });
-    const { data: exams = [] } = useQuery({ queryKey: ['exams'], queryFn: getAllExams });
+    const { data: regionsPage } = useQuery({ queryKey: ['regions'], queryFn: () => getRegions({ size: 1000 }) });
+    const regions = regionsPage?.content || [];
+
+    const { data: centresPage } = useQuery({ queryKey: ['examCentres'], queryFn: () => getExamCentres({ size: 1000 }) });
+    const centres = centresPage?.content || [];
+
+    const { data: schoolsPage } = useQuery({ queryKey: ['schools'], queryFn: () => getSchools({ size: 1000 }) });
+    const schools = schoolsPage?.content || [];
+
+    const { data: examsPage } = useQuery({ queryKey: ['exams'], queryFn: () => getExams({ size: 1000 }) });
+    const exams = examsPage?.content || [];
 
 
 
@@ -47,7 +55,7 @@ const ResultViewer = ({ isDashboard = false }) => {
     });
 
     const results = resultsData?.content || [];
-    const totalPages = resultsData?.totalPages || 0;
+    const totalPages = resultsData?.totalPages ?? (resultsData?.totalElements ? Math.ceil(resultsData.totalElements / size) : 0);
 
     // Separate Query for Bullk Ledger (Larger size, non-paginated intent)
     const { data: allResultsData, isLoading: isLoadingAll } = useQuery({
@@ -471,27 +479,11 @@ const ResultViewer = ({ isDashboard = false }) => {
                         )}
 
                         {!isDashboard && totalPages > 1 && (
-                            <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-6">
-                                <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
-                                    Page {page + 1} of {totalPages}
-                                </span>
-                                <div className="flex gap-2">
-                                    <button
-                                        disabled={page === 0}
-                                        onClick={() => setPage(p => p - 1)}
-                                        className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
-                                    >
-                                        <ChevronLeft size={18} />
-                                    </button>
-                                    <button
-                                        disabled={page >= totalPages - 1}
-                                        onClick={() => setPage(p => p + 1)}
-                                        className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-30 transition-all"
-                                    >
-                                        <ChevronRight size={18} />
-                                    </button>
-                                </div>
-                            </div>
+                            <Pagination 
+                                currentPage={page} 
+                                totalPages={totalPages} 
+                                onPageChange={setPage} 
+                            />
                         )}
                     </>
                 )}

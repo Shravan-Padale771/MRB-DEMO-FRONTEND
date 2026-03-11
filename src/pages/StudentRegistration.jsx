@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { UserPlus, Eye, EyeOff, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
-import { registerStudent, getAllSchools } from "../api";
+import { createStudent, getSchools } from "../api";
 import { useEffect } from "react";
 
 const StudentRegistration = () => {
@@ -15,8 +15,8 @@ const StudentRegistration = () => {
   useEffect(() => {
     const fetchSchools = async () => {
       try {
-        const data = await getAllSchools();
-        setSchools(data || []);
+        const data = await getSchools({ size: 1000 });
+        setSchools(data?.content || []);
       } catch (err) {
         console.error("Failed to fetch schools", err);
       }
@@ -68,7 +68,7 @@ const StudentRegistration = () => {
       }
 
       // Call backend API
-      const response = await registerStudent(studentData, schoolId);
+      const response = await createStudent({ ...studentData, school: { schoolId } });
 
       toast.success("Registration Successful! Redirecting to login...");
       console.log("Registered Student:", response);

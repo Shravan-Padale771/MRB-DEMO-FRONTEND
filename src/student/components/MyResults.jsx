@@ -3,14 +3,16 @@ import { motion } from 'framer-motion';
 import { Award, CheckCircle, Calendar, FileText } from 'lucide-react';
 import Marksheet from './Marksheet';
 
-import { getAllExams, getAllApplications } from '../../api';
+import { getExams, getExamApplications } from '../../api';
 import { useQuery } from '@tanstack/react-query';
 
 const MyResults = ({ myResults, student }) => {
     const [selectedResult, setSelectedResult] = useState(null);
 
-    const { data: exams = [] } = useQuery({ queryKey: ['exams'], queryFn: getAllExams });
-    const { data: applications = [] } = useQuery({ queryKey: ['applications'], queryFn: getAllApplications });
+    const { data: examsPage } = useQuery({ queryKey: ['exams'], queryFn: () => getExams({ size: 1000 }) });
+    const exams = examsPage?.content || [];
+    const { data: applicationsPage } = useQuery({ queryKey: ['applications'], queryFn: () => getExamApplications({ size: 1000 }) });
+    const applications = applicationsPage?.content || [];
 
     // Process results to include full exam/application details for Marksheet
     const processedResults = myResults.map(result => {

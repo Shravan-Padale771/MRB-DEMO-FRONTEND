@@ -10,11 +10,9 @@ const api = axios.create({
 });
 
 // --- STUDENT ENDPOINTS ---
-export const getAllStudents = async () => {
-  const response = await api.get("/getAllStudents");
-  return response.data;
-};
-
+/**
+ * GET /students (Paginated)
+ */
 export const getStudents = async ({
   page = 0,
   size = 20,
@@ -37,34 +35,34 @@ export const getStudents = async ({
   return response.data;
 };
 
-export const addStudent = async (schoolId, studentData) => {
-  const response = await api.post(
-    `/addStudent?schoolId=${schoolId}`,
-    studentData,
-  );
+/**
+ * POST /students
+ */
+export const createStudent = async (studentData) => {
+  const response = await api.post("/students", studentData);
   return response.data;
 };
 
-export const registerStudent = async (studentData, schoolId = 1) => {
-  // Backend expects schoolId as query param and student data in body
-  const response = await api.post(
-    `/addStudent?schoolId=${schoolId}`,
-    studentData,
-  );
+/**
+ * PUT /students/{id}
+ */
+export const updateStudent = async (id, studentData) => {
+  const response = await api.put(`/students/${id}`, studentData);
   return response.data;
 };
 
-export const getStudentById = async (id) => {
-  const response = await api.get(`/getStudent?id=${id}`);
+/**
+ * DELETE /students/{id}
+ */
+export const deleteStudent = async (id) => {
+  const response = await api.delete(`/students/${id}`);
   return response.data;
 };
 
 // --- EXAM ENDPOINTS ---
-export const getAllExams = async () => {
-  const response = await api.get("/getAllExams");
-  return response.data;
-};
-
+/**
+ * GET /exams (Paginated)
+ */
 export const getExams = async ({
   page = 0,
   size = 20,
@@ -83,62 +81,34 @@ export const getExams = async ({
   return response.data;
 };
 
-export const addExam = async (examData) => {
-  const response = await api.post("/addExam", examData);
+/**
+ * POST /exams
+ */
+export const createExam = async (examData) => {
+  const response = await api.post("/exams", examData);
   return response.data;
 };
 
+/**
+ * PUT /exams/{id}
+ */
 export const updateExam = async (id, examData) => {
-  const response = await api.put(`/updateExam?exam_no=${id}`, examData);
+  const response = await api.put(`/exams/${id}`, examData);
   return response.data;
 };
 
+/**
+ * DELETE /exams/{id}
+ */
 export const deleteExam = async (id) => {
-  const response = await api.delete(`/deleteExam?id=${id}`);
+  const response = await api.delete(`/exams/${id}`);
   return response.data;
 };
 
-// --- APPLICATION ENDPOINTS ---
-export const applyForExam = async (applicationData) => {
-
-
-  // applicationData should look like:
-  // { student: { studentId: 1 }, exam: { examNo: 1 }, formData: "...", status: "PENDING" }
-  const response = await api.post("/fill-form", applicationData);
-  return response.data;
-};
-
-export const getApplicationStatus = async (appId, examNo) => {
-  const response = await api.get(
-    `/get-form?applicationId=${appId}&examNo=${examNo}`,
-  );
-  return response.data;
-};
-
-// ... existing code ...
-
-// --- RESULT ENDPOINTS ---
-export const addExamResult = async (resultData) => {
-  // resultData structure:
-  // { application: { applicationId: 123 }, resultData: "Passed", publishedAt: "2026-..." }
-  const response = await api.post("/addExamResult", resultData);
-  return response.data;
-};
-
-export const getExamResult = async (applicationId) => {
-  const response = await api.get(
-    `/getExamResult?applicationId=${applicationId}`,
-  );
-  return response.data;
-};
-
-// Add these to src/api.js
-export const getAllApplications = async () => {
-  const response = await api.get("/getAllApplications"); // New Endpoint
-  return response.data;
-};
-
-// --- EXAM APPLICATIONS (Paginated + Filtered) ---
+// --- EXAM APPLICATION ENDPOINTS ---
+/**
+ * GET /exam-applications (Paginated)
+ */
 export const getExamApplications = async ({
   page = 0,
   size = 20,
@@ -165,48 +135,34 @@ export const getExamApplications = async ({
   return response.data;
 };
 
-export const getAllResults = async () => {
-  const response = await api.get("/getAllResults"); // New Endpoint
+/**
+ * POST /exam-applications
+ */
+export const createExamApplication = async (applicationData) => {
+  const response = await api.post("/exam-applications", applicationData);
   return response.data;
 };
 
-export const getStudentResults = async (studentId) => {
-  const response = await api.get(`/getStudentResults?studentId=${studentId}`);
+/**
+ * PUT /exam-applications/{id}
+ */
+export const updateExamApplication = async (id, applicationData) => {
+  const response = await api.put(`/exam-applications/${id}`, applicationData);
   return response.data;
 };
 
-export const getExamResults = async ({
-  page = 0,
-  size = 20,
-  studentId,
-  examId,
-  schoolId,
-  regionId,
-  centreId,
-  minPercentage,
-  maxPercentage,
-  sort,
-} = {}) => {
-  const params = new URLSearchParams({ page, size });
-  if (studentId) params.append("studentId", studentId);
-  if (examId) params.append("examId", examId);
-  if (schoolId) params.append("schoolId", schoolId);
-  if (regionId) params.append("regionId", regionId);
-  if (centreId) params.append("centreId", centreId);
-  if (minPercentage) params.append("minPercentage", minPercentage);
-  if (maxPercentage) params.append("maxPercentage", maxPercentage);
-  if (sort) params.append("sort", sort);
-
-  const response = await api.get(`/exam-results?${params.toString()}`);
+/**
+ * DELETE /exam-applications/{id}
+ */
+export const deleteExamApplication = async (id) => {
+  const response = await api.delete(`/exam-applications/${id}`);
   return response.data;
 };
 
 // --- REGION ENDPOINTS ---
-export const getAllRegions = async () => {
-  const response = await api.get("/getRegions");
-  return response.data;
-};
-
+/**
+ * GET /regions (Paginated)
+ */
 export const getRegions = async ({
   page = 0,
   size = 20,
@@ -221,18 +177,34 @@ export const getRegions = async ({
   return response.data;
 };
 
-export const addRegion = async (regionData) => {
-  console.log("API: POST /addregion Payload:", regionData);
-  const response = await api.post("/addregion", regionData);
+/**
+ * POST /regions
+ */
+export const createRegion = async (regionData) => {
+  const response = await api.post("/regions", regionData);
+  return response.data;
+};
+
+/**
+ * PUT /regions/{id}
+ */
+export const updateRegion = async (id, regionData) => {
+  const response = await api.put(`/regions/${id}`, regionData);
+  return response.data;
+};
+
+/**
+ * DELETE /regions/{id}
+ */
+export const deleteRegion = async (id) => {
+  const response = await api.delete(`/regions/${id}`);
   return response.data;
 };
 
 // --- EXAM CENTRE ENDPOINTS ---
-export const getAllExamCentres = async () => {
-  const response = await api.get("/getAllExamCentres");
-  return response.data;
-};
-
+/**
+ * GET /exam-centres (Paginated)
+ */
 export const getExamCentres = async ({
   page = 0,
   size = 20,
@@ -251,20 +223,34 @@ export const getExamCentres = async ({
   return response.data;
 };
 
-export const addExamCentre = async (regionId, centreData) => {
-  const response = await api.post(
-    `/addExamCentre?regionId=${regionId}`,
-    centreData,
-  );
+/**
+ * POST /exam-centres
+ */
+export const createExamCentre = async (centreData) => {
+  const response = await api.post("/exam-centres", centreData);
+  return response.data;
+};
+
+/**
+ * PUT /exam-centres/{id}
+ */
+export const updateExamCentre = async (id, centreData) => {
+  const response = await api.put(`/exam-centres/${id}`, centreData);
+  return response.data;
+};
+
+/**
+ * DELETE /exam-centres/{id}
+ */
+export const deleteExamCentre = async (id) => {
+  const response = await api.delete(`/exam-centres/${id}`);
   return response.data;
 };
 
 // --- SCHOOL ENDPOINTS ---
-export const getAllSchools = async () => {
-  const response = await api.get("/getAllSchools");
-  return response.data;
-};
-
+/**
+ * GET /schools (Paginated)
+ */
 export const getSchools = async ({
   page = 0,
   size = 20,
@@ -283,11 +269,39 @@ export const getSchools = async ({
   return response.data;
 };
 
-export const addSchool = async (centreId, schoolData) => {
-  const response = await api.post(
-    `/addSchool?centreId=${centreId}`,
-    schoolData,
-  );
+/**
+ * POST /schools
+ */
+export const createSchool = async (schoolData) => {
+  const response = await api.post("/schools", schoolData);
+  return response.data;
+};
+
+// --- RESULT ENDPOINTS ---
+export const createExamResult = async (resultData) => {
+  const response = await api.post("/exam-results", resultData);
+  return response.data;
+};
+
+export const getExamResults = async ({
+  page = 0,
+  size = 20,
+  studentId,
+  examId,
+  schoolId,
+  regionId,
+  centreId,
+  sort,
+} = {}) => {
+  const params = new URLSearchParams({ page, size });
+  if (studentId) params.append("studentId", studentId);
+  if (examId) params.append("examId", examId);
+  if (schoolId) params.append("schoolId", schoolId);
+  if (regionId) params.append("regionId", regionId);
+  if (centreId) params.append("centreId", centreId);
+  if (sort) params.append("sort", sort);
+
+  const response = await api.get(`/exam-results?${params.toString()}`);
   return response.data;
 };
 

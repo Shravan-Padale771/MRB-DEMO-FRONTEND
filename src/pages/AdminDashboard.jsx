@@ -32,17 +32,17 @@ import GlobalSearch from "../admin/components/GlobalSearch";
 
 
 import {
-  addExam,
+  createExam,
   updateExam,
   deleteExam,
-  addStudent,
-  getAllStudents,
-  getAllExams,
-  addExamResult,
-  getAllApplications,
-  getAllResults,
-  getAllSchools,
-  getAllRegions,
+  createStudent,
+  getStudents,
+  getExams,
+  createExamResult,
+  getExamApplications,
+  getExamResults,
+  getSchools,
+  getRegions,
 } from "../api";
 
 
@@ -133,35 +133,41 @@ const AdminDashboard = () => {
   });
 
   // Queries
-  const { data: students = [], isLoading: isLoadingStudents } = useQuery({
+  const { data: studentsPage, isLoading: isLoadingStudents } = useQuery({
     queryKey: ["students"],
-    queryFn: getAllStudents,
+    queryFn: () => getStudents({ size: 1000 }),
   });
+  const students = studentsPage?.content || [];
 
-  const { data: exams = [], isLoading: isLoadingExams } = useQuery({
+  const { data: examsPage, isLoading: isLoadingExams } = useQuery({
     queryKey: ["exams"],
-    queryFn: getAllExams,
+    queryFn: () => getExams({ size: 1000 }),
   });
+  const exams = examsPage?.content || [];
 
-  const { data: applications = [], isLoading: isLoadingApplications } = useQuery({
+  const { data: applicationsPage, isLoading: isLoadingApplications } = useQuery({
     queryKey: ["applications"],
-    queryFn: getAllApplications,
+    queryFn: () => getExamApplications({ size: 1000 }),
   });
+  const applications = applicationsPage?.content || [];
 
-  const { data: results = [], isLoading: isLoadingResults } = useQuery({
+  const { data: resultsPage, isLoading: isLoadingResults } = useQuery({
     queryKey: ["results"],
-    queryFn: getAllResults,
+    queryFn: () => getExamResults({ size: 1000 }),
   });
+  const results = resultsPage?.content || [];
 
-  const { data: schools = [], isLoading: isLoadingSchools } = useQuery({
+  const { data: schoolsPage, isLoading: isLoadingSchools } = useQuery({
     queryKey: ["schools"],
-    queryFn: getAllSchools,
+    queryFn: () => getSchools({ size: 1000 }),
   });
+  const schools = schoolsPage?.content || [];
 
-  const { data: regions = [], isLoading: isLoadingRegions } = useQuery({
+  const { data: regionsPage, isLoading: isLoadingRegions } = useQuery({
     queryKey: ["regions"],
-    queryFn: getAllRegions,
+    queryFn: () => getRegions({ size: 1000 }),
   });
+  const regions = regionsPage?.content || [];
 
   const loading = isLoadingStudents || isLoadingExams || isLoadingApplications || isLoadingResults || isLoadingSchools || isLoadingRegions;
 
@@ -264,7 +270,7 @@ const AdminDashboard = () => {
 
   // Mutations
   const createExamMutation = useMutation({
-    mutationFn: (payload) => addExam(payload),
+    mutationFn: (payload) => createExam(payload),
     onSuccess: () => {
       toast.success("Exam Created!");
       resetExamForm();
@@ -294,7 +300,7 @@ const AdminDashboard = () => {
 
 
   const publishResultMutation = useMutation({
-    mutationFn: (payload) => addExamResult(payload),
+    mutationFn: (payload) => createExamResult(payload),
     onSuccess: () => {
       toast.success("Result Published!");
       setResultForm({

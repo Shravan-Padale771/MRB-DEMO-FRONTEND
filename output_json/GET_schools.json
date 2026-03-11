@@ -1,0 +1,19 @@
+{
+    "content": [
+        {
+            "schoolId": 1,
+            "schoolName": "The Modern School of Science",
+            "centreId": 1,
+            "centreName": "Modern Exam Centre"
+        },
+        {
+            "schoolId": 2,
+            "schoolName": "SOP School of Varada",
+            "centreId": 2,
+            "centreName": "SPPA Exam Centre Shivajinagar"
+        }
+    ],
+    "number": 0,
+    "size": 20,
+    "totalElements": 2
+}

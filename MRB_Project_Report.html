@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MRB – Exam Management System | Project Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --blue: #2563eb;
+            --indigo: #4338ca;
+            --light: #eff6ff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --muted: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            background: #fff;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* ── PRINT ── */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+
+            body {
+                font-size: 12px;
+            }
+
+            .cover {
+                min-height: 100vh;
+            }
+        }
+
+        /* ── COVER PAGE ── */
+        .cover {
+            background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #1e1b4b 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.18);
+        }
+
+        .cover::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        .cover-badge {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 30px;
+            padding: 6px 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+        }
+
+        .cover h1 {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            line-height: 1.15;
+            margin-bottom: 16px;
+        }
+
+        .cover h1 span {
+            color: #93c5fd;
+        }
+
+        .cover .subtitle {
+            font-size: 16px;
+            color: #bfdbfe;
+            margin-bottom: 48px;
+            font-weight: 400;
+        }
+
+        .cover-divider {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            border-radius: 2px;
+            margin: 0 auto 40px;
+        }
+
+        .cover-meta {
+            display: flex;
+            gap: 48px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cover-meta-item {
+            text-align: center;
+        }
+
+        .cover-meta-item .label {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #93c5fd;
+            margin-bottom: 4px;
+        }
+
+        .cover-meta-item .value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* ── LAYOUT ── */
+        .page {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 48px 40px;
+        }
+
+        /* ── SECTION HEADING ── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-number {
+            background: var(--blue);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 800;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .section-header h2 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 24px 0 10px;
+            color: var(--indigo);
+        }
+
+        h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin: 16px 0 6px;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 10px;
+            color: #334155;
+        }
+
+        /* ── INFO CARD ── */
+        .info-card {
+            background: var(--light);
+            border: 1px solid #bfdbfe;
+            border-left: 4px solid var(--blue);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 14px 0;
+        }
+
+        .info-card.purple {
+            background: #f5f3ff;
+            border-color: #c4b5fd;
+            border-left-color: var(--indigo);
+        }
+
+        .info-card.green {
+            background: #f0fdf4;
+            border-color: #86efac;
+            border-left-color: #16a34a;
+        }
+
+        .info-card.amber {
+            background: #fffbeb;
+            border-color: #fcd34d;
+            border-left-color: #d97706;
+        }
+
+        /* ── TABLE ── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            font-size: 12.5px;
+        }
+
+        th {
+            background: #1e3a8a;
+            color: #fff;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 11.5px;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 9px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* ── TWO-COL GRID ── */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 14px 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+            margin: 14px 0;
+        }
+
+        /* ── METRIC BOX ── */
+        .metric-box {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-box .num {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--blue);
+        }
+
+        .metric-box .lbl {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* ── CODE BLOCK ── */
+        .code-block {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 16px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 11.5px;
+            line-height: 1.8;
+            margin: 14px 0;
+            overflow-x: auto;
+        }
+
+        .code-block .kw {
+            color: #93c5fd;
+        }
+
+        .code-block .str {
+            color: #86efac;
+        }
+
+        .code-block .cmt {
+            color: #475569;
+            font-style: italic;
+        }
+
+        .code-block .fn {
+            color: #f9a8d4;
+        }
+
+        /* ── PILL TAGS ── */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .tag {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: var(--light);
+            color: var(--blue);
+            border: 1px solid #bfdbfe;
+        }
+
+        .tag.purple {
+            background: #f5f3ff;
+            color: var(--indigo);
+            border-color: #c4b5fd;
+        }
+
+        .tag.green {
+            background: #f0fdf4;
+            color: #16a34a;
+            border-color: #86efac;
+        }
+
+        .tag.gray {
+            background: #f1f5f9;
+            color: #475569;
+            border-color: #cbd5e1;
+        }
+
+        /* ── FLOW STEPS ── */
+        .flow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 14px 0;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .flow-step:last-child {
+            border-bottom: none;
+        }
+
+        .flow-num {
+            background: linear-gradient(135deg, var(--blue), var(--indigo));
+            color: #fff;
+            font-weight: 800;
+            font-size: 12px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .flow-content h4 {
+            margin: 0 0 4px;
+            font-size: 13px;
+        }
+
+        .flow-content p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* ── COMPONENT BOX ── */
+        .comp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 14px 0;
+        }
+
+        .comp-box {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            background: #fafafa;
+        }
+
+        .comp-box .comp-title {
+            font-weight: 700;
+            font-size: 12.5px;
+            color: var(--indigo);
+            margin-bottom: 4px;
+        }
+
+        .comp-box .comp-desc {
+            font-size: 11.5px;
+            color: var(--muted);
+        }
+
+        /* ── API TABLE BADGE ── */
+        .method {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .method.get {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .method.post {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .method.put {
+            background: #fef9c3;
+            color: #92400e;
+        }
+
+        .method.del {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* ── PRINT BTN ── */
+        .print-btn {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            padding: 14px 24px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+            transition: transform 0.2s;
+            z-index: 999;
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ── TOC ── */
+        .toc-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dotted var(--border);
+            font-size: 13px;
+        }
+
+        .toc-item a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .toc-item a:hover {
+            color: var(--blue);
+        }
+
+        .toc-page {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* ── ARCHITECTURE DIAGRAM (HTML) ── */
+        .arch-container {
+            margin: 24px 0;
+            padding: 30px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            position: relative;
+        }
+
+        .arch-tier {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .arch-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            width: 240px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .arch-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.08);
+            border-color: var(--blue);
+        }
+
+        .arch-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .arch-card-icon {
+            font-size: 18px;
+        }
+
+        .arch-card-title {
+            font-weight: 800;
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .arch-card-list {
+            list-style: none;
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .arch-card-list li {
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .arch-card-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--blue);
+        }
+
+        .arch-arrow-down {
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--blue), var(--indigo));
+            position: relative;
+        }
+
+        .arch-arrow-down::after {
+            content: '▼';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--indigo);
+            font-size: 10px;
+        }
+
+        .arch-label {
+            position: absolute;
+            background: #fff;
+            padding: 2px 10px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--indigo);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            white-space: nowrap;
+        }
+
+        .arch-tier-label {
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            font-size: 10px;
+            font-weight: 900;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            width: 0;
+            white-space: nowrap;
+        }
+
+        hr.section-sep {
+            border: none;
+            border-top: 2px solid var(--border);
+            margin: 40px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button class="print-btn no-print" onclick="window.print()">🖨️ Save as PDF</button>
+
+    <!-- ═══════════════════════════════════════════
+     COVER PAGE
+═══════════════════════════════════════════ -->
+    <div class="cover">
+        <div class="cover-badge">Project Report — 2026</div>
+        <h1>Maharashtra Rashtrabhasha Board<br /><span>Exam Management System</span></h1>
+        <p class="subtitle">MRB Demo Frontend — Full-Stack Web Application</p>
+        <div class="cover-divider"></div>
+        <div class="cover-meta">
+            <div class="cover-meta-item">
+                <div class="label">Platform</div>
+                <div class="value">Web Application</div>
+            </div>
+            <div class="cover-meta-item">
+                <div class="label">Frontend</div>
+                <div class="value">React 19 + Vite</div>
+            </div>
+            <div class="cover-meta-item">
+                <div class="label">Backend API</div>
+                <div class="value">Spring Boot (localhost:8080)</div>
+            </div>
+            <div class="cover-meta-item">
+                <div class="label">Date</div>
+                <div class="value">March 2026</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 1 — REQUIREMENTS ANALYSIS -->
+    <div class="page page-break" id="s1">
+        <div class="section-header">
+            <div class="section-number">1</div>
+            <h2>Requirements Analysis &amp; Planning</h2>
+        </div>
+
+        <!-- 1.1 INPUTS -->
+        <h3 id="s1a">1.1 Identified Inputs</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Input Category</th>
+                    <th>Fields / Parameters</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Student Registration</strong></td>
+                    <td>firstName, middleName, lastName, contact, email, age, motherTongue, password, schoolId</td>
+                    <td>Student Registration Form</td>
+                </tr>
+                <tr>
+                    <td><strong>Exam Creation</strong></td>
+                    <td>exam_name, exam_code, status, no_of_papers, exam_fees, application_start_date,
+                        application_end_date, exam_start/end_date, papers[ ], exam_details{ }</td>
+                    <td>Admin – Exam Manager</td>
+                </tr>
+                <tr>
+                    <td><strong>Exam Application</strong></td>
+                    <td>student { studentId }, exam { examNo }, formData, status (PENDING)</td>
+                    <td>Student Portal – Apply</td>
+                </tr>
+                <tr>
+                    <td><strong>Result Entry</strong></td>
+                    <td>applicationId, paperMarks{ }, oralMarks, projectMarks, remarks, publishedAt</td>
+                    <td>Admin – Result Publisher</td>
+                </tr>
+                <tr>
+                    <td><strong>Region &amp; Centre</strong></td>
+                    <td>regionName; centreName, centreCode, regionId</td>
+                    <td>Admin – Region / Centre Manager</td>
+                </tr>
+                <tr>
+                    <td><strong>School</strong></td>
+                    <td>schoolName, centreId</td>
+                    <td>Admin – School Manager</td>
+                </tr>
+                <tr>
+                    <td><strong>Search / Filters</strong></td>
+                    <td>page, size, sort, firstName, examId, status, regionId, schoolId, minPercentage, maxPercentage
+                    </td>
+                    <td>API Query Params</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 1.2 OUTPUTS -->
+        <h3 id="s1b">1.2 Identified Outputs</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Output</th>
+                    <th>Description</th>
+                    <th>Consumed by</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Paginated Student List</strong></td>
+                    <td>Filtered, sorted student records with school/region info</td>
+                    <td>Admin Dashboard</td>
+                </tr>
+                <tr>
+                    <td><strong>Exam Listings</strong></td>
+                    <td>Active exams with fees, dates, paper details</td>
+                    <td>Admin + Student Portal</td>
+                </tr>
+                <tr>
+                    <td><strong>Application Records</strong></td>
+                    <td>Application status (PENDING/APPROVED/REJECTED), linked student &amp; exam</td>
+                    <td>Admin + Student</td>
+                </tr>
+                <tr>
+                    <td><strong>Exam Results</strong></td>
+                    <td>percentage, totalMarks, resultData JSON (breakdown per paper), publishedAt</td>
+                    <td>Admin + Student (marksheet)</td>
+                </tr>
+                <tr>
+                    <td><strong>Marksheet (PDF-style)</strong></td>
+                    <td>Rendered marksheet with paper-wise marks, grade, signatory details</td>
+                    <td>Student Portal</td>
+                </tr>
+                <tr>
+                    <td><strong>Dashboard Analytics</strong></td>
+                    <td>Metric cards (counts), bar chart (application trends), pie chart (region distribution)</td>
+                    <td>Admin Dashboard</td>
+                </tr>
+                <tr>
+                    <td><strong>Global Search Results</strong></td>
+                    <td>Ctrl+K search across students, exams, schools, applications</td>
+                    <td>Admin Dashboard</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 1.3 CONSTRAINTS -->
+        <h3 id="s1c">1.3 System Constraints</h3>
+        <div class="grid-3">
+            <div class="info-card amber">
+                <strong>Security Constraints</strong><br />
+                • <strong>Role-Based Access:</strong> Separate portals for Admin and Student to ensure sensitive
+                operations (like result publication) are restricted.<br />
+                • <strong>Authentication:</strong> Future implementation must include secure login to protect personal
+                student details and exam records.<br />
+                • <strong>Data Privacy:</strong> Encryption of student data is required to comply with privacy standards
+                for educational records.
+            </div>
+            <div class="info-card purple">
+                <strong>Scalability Constraints</strong><br />
+                • <strong>High Volume:</strong> System must efficiently process thousands of student registrations and
+                exam applications simultaneously.<br />
+                • <strong>Concurrent Access:</strong> Architecture must support simultaneous access from hundreds of
+                schools and thousands of students during result cycles.<br />
+                • <strong>Multi-Region:</strong> Scalable organizational hierarchy (Region > Centre > School) to manage
+                growth across Maharashtra.
+            </div>
+            <div class="info-card green">
+                <strong>Database Constraints</strong><br />
+                • <strong>Relational Storage:</strong> All core entities (Students, Exams, Results) must be stored in an
+                RDBMS to maintain complex relationships.<br />
+                • <strong>Data Integrity:</strong> Strict consistency required between applications and results using
+                unique <code>applicationId</code> mappings.<br />
+                • <strong>JSON Support:</strong> Flexible storage for dynamic paper structures within strictly typed
+                relational tables.
+            </div>
+        </div>
+
+        <!-- 2.4 TECH STACK -->
+        <h3 id="s2d">2.4 Tools, Technology &amp; Platform</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Layer</th>
+                    <th>Technology</th>
+                    <th>Version</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>UI Framework</td>
+                    <td>React</td>
+                    <td>19.2</td>
+                    <td>Component-based SPA</td>
+                </tr>
+                <tr>
+                    <td>Build Tool</td>
+                    <td>Vite</td>
+                    <td>7.x</td>
+                    <td>Fast dev server &amp; bundler</td>
+                </tr>
+                <tr>
+                    <td>Styling</td>
+                    <td>Tailwind CSS</td>
+                    <td>4.x</td>
+                    <td>Utility-first responsive design</td>
+                </tr>
+                <tr>
+                    <td>Routing</td>
+                    <td>React Router DOM</td>
+                    <td>7.x</td>
+                    <td>SPA client-side routing</td>
+                </tr>
+                <tr>
+                    <td>Data Fetching</td>
+                    <td>TanStack Query (React Query)</td>
+                    <td>5.x</td>
+                    <td>Server state, caching, mutations</td>
+                </tr>
+                <tr>
+                    <td>HTTP Client</td>
+                    <td>Axios</td>
+                    <td>1.x</td>
+                    <td>REST API calls</td>
+                </tr>
+                <tr>
+                    <td>Animations</td>
+                    <td>Framer Motion</td>
+                    <td>12.x</td>
+                    <td>Micro-animations &amp; page transitions</td>
+                </tr>
+                <tr>
+                    <td>Charts</td>
+                    <td>Recharts</td>
+                    <td>3.x</td>
+                    <td>Dashboard bar, pie, area charts</td>
+                </tr>
+                <tr>
+                    <td>Icons</td>
+                    <td>Lucide React</td>
+                    <td>0.562</td>
+                    <td>Consistent icon set</td>
+                </tr>
+                <tr>
+                    <td>Notifications</td>
+                    <td>react-hot-toast</td>
+                    <td>2.x</td>
+                    <td>Toast notifications</td>
+                </tr>
+                <tr>
+                    <td>Backend API</td>
+                    <td>Spring Boot</td>
+                    <td>—</td>
+                    <td>REST endpoints at :8080</td>
+                </tr>
+
+                <tr>
+                    <td>OS / Platform</td>
+                    <td>Windows 11</td>
+                    <td>—</td>
+                    <td>Development environment</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+     SECTION 3 — SYSTEM DESIGN
+═══════════════════════════════════════════ -->
+    <div class="page page-break" id="s2">
+        <div class="section-header">
+            <div class="section-number">2</div>
+            <h2>System Design</h2>
+        </div>
+
+        <!-- 2.1 Architecture -->
+        <h3 id="s2a">2.1 System Components & Data Flow</h3>
+        <p>The project is structured as a direct interaction between the user interface and a central database via a
+            backend API:</p>
+
+        <!-- 2.1 Architecture Diagram (Detailed HTML/CSS) -->
+        <div class="arch-container">
+            <!-- TIER 1: CLIENT -->
+            <div class="arch-tier-label">Client Tier</div>
+            <div class="arch-tier">
+                <div class="arch-card">
+                    <div class="arch-card-header">
+                        <span class="arch-card-icon">💻</span>
+                        <div class="arch-card-title">Admin Dashboard</div>
+                    </div>
+                    <ul class="arch-card-list">
+                        <li>Exam & Student Control</li>
+                        <li>Result Publishing Logic</li>
+                        <li>Analytics & Reporting</li>
+                        <li>School/Region Management</li>
+                    </ul>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-card-header">
+                        <span class="arch-card-icon">🎓</span>
+                        <div class="arch-card-title">Student Portal</div>
+                    </div>
+                    <ul class="arch-card-list">
+                        <li>Candidate Registration</li>
+                        <li>Exam Discovery & Apply</li>
+                        <li>Live Status Tracking</li>
+                        <li>Digital Marksheet View</li>
+                    </ul>
+                </div>
+                <div class="arch-card" style="width: 180px;">
+                    <div class="arch-card-header">
+                        <span class="arch-card-icon">⚙️</span>
+                        <div class="arch-card-title">src/api.js</div>
+                    </div>
+                    <ul class="arch-card-list">
+                        <li>Axios Integration</li>
+                        <li>Centralized Requests</li>
+                        <li>Token/Error Handling</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="arch-arrow-down">
+                <div class="arch-label">REST API (JSON over HTTP)</div>
+            </div>
+
+            <!-- TIER 2: BACKEND -->
+            <div class="arch-tier-label" style="top: 50%">Server Tier</div>
+            <div class="arch-tier">
+                <div class="arch-card" style="width: 480px; border-style: dashed; border-color: var(--indigo);">
+                    <div class="arch-card-header">
+                        <span class="arch-card-icon">🚀</span>
+                        <div class="arch-card-title">Spring Boot Backend Service (:8080)</div>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <ul class="arch-card-list" style="flex: 1;">
+                            <li style="font-weight: 700; color: var(--text);">Controllers</li>
+                            <li>StudentController</li>
+                            <li>ExamController</li>
+                            <li>ApplicationController</li>
+                            <li>ResultController</li>
+                        </ul>
+                        <ul class="arch-card-list" style="flex: 1;">
+                            <li style="font-weight: 700; color: var(--text);">Business Logic</li>
+                            <li>Grade Calculations</li>
+                            <li>Percentile Logic</li>
+                            <li>Status Transitions</li>
+                            <li>Security Guards</li>
+                        </ul>
+                        <ul class="arch-card-list" style="flex: 1;">
+                            <li style="font-weight: 700; color: var(--text);">Data Access</li>
+                            <li>JPA Repositories</li>
+                            <li>Hibernate ORM</li>
+                            <li>Entity Mappings</li>
+                            <li>Transaction Mgmt</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arch-arrow-down">
+                <div class="arch-label">Hibernate / SQL</div>
+            </div>
+
+            <!-- TIER 3: DATABASE -->
+            <div class="arch-tier-label" style="top: 85%">Data Tier</div>
+            <div class="arch-tier">
+                <div class="arch-card" style="width: 600px; background: #eff6ff; border-color: #bfdbfe;">
+                    <div class="arch-card-header">
+                        <span class="arch-card-icon">🗄️</span>
+                        <div class="arch-card-title">Relational Database (Schema)</div>
+                    </div>
+                    <div
+                        style="display: flex; gap: 20px; font-size: 10px; color: var(--indigo); font-weight: 600; justify-content: space-around;">
+                        <span>[Students]</span>
+                        <span>[Exams]</span>
+                        <span>[Applications]</span>
+                        <span>[Results]</span>
+                        <span>[Schools]</span>
+                        <span>[Centres]</span>
+                        <span>[Regions]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p style="text-align: center; font-size: 11px; color: var(--muted); font-style: italic; margin-top: -10px;">
+            Figure 1 — Real-time System Flow: Modular Frontend architecture communicating with an extensible Spring Boot
+            service and a normalized Relational Data Store.
+        </p>
+
+        <!-- 2.2 DATA MODELS -->
+        <h3 id="s2b">2.2 Data Models / Entities</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Entity</th>
+                    <th>Key Fields</th>
+                    <th>Relationships</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Student</strong></td>
+                    <td>studentId, firstName, middleName, lastName, contact, email, age, motherTongue, password</td>
+                    <td>Belongs to School</td>
+                </tr>
+                <tr>
+                    <td><strong>Exam</strong></td>
+                    <td>examNo, exam_name, exam_code, status, no_of_papers, exam_fees, papers (JSON), exam_details
+                        (JSON), application_start/end_date, exam_start/end_date</td>
+                    <td>Has many Applications</td>
+                </tr>
+                <tr>
+                    <td><strong>ExamApplication</strong></td>
+                    <td>applicationId, student{ }, exam{ }, formData, status (PENDING/APPROVED/REJECTED), appliedAt</td>
+                    <td>Student ↔ Exam (junction)</td>
+                </tr>
+                <tr>
+                    <td><strong>ExamResult</strong></td>
+                    <td>resultId, application{ }, totalMarks, percentage, resultData (JSON), publishedAt</td>
+                    <td>One-to-One with Application</td>
+                </tr>
+                <tr>
+                    <td><strong>Region</strong></td>
+                    <td>regionId, regionName</td>
+                    <td>Has many Schools, Centres</td>
+                </tr>
+                <tr>
+                    <td><strong>ExamCentre</strong></td>
+                    <td>centreId, centreName, centreCode, region{ }</td>
+                    <td>Belongs to Region; has many Schools</td>
+                </tr>
+                <tr>
+                    <td><strong>School</strong></td>
+                    <td>schoolId, schoolName, examCentre{ }</td>
+                    <td>Belongs to ExamCentre; has many Students</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 3.3 API ENDPOINTS -->
+        <h3 id="s2c">2.3 API Endpoint Design (localhost:8080)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                    <th>Purpose</th>
+                    <th>Key Params</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="method get">GET</span></td>
+                    <td>/students</td>
+                    <td>Paginated student list</td>
+                    <td>page, size, firstName, schoolId, sort</td>
+                </tr>
+                <tr>
+                    <td><span class="method post">POST</span></td>
+                    <td>/addStudent?schoolId={id}</td>
+                    <td>Register student</td>
+                    <td>Body: student fields</td>
+                </tr>
+                <tr>
+                    <td><span class="method get">GET</span></td>
+                    <td>/getAllStudents</td>
+                    <td>All students (legacy)</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td><span class="method get">GET</span></td>
+                    <td>/exams</td>
+                    <td>Paginated exams</td>
+                    <td>page, size, status, examCode</td>
+                </tr>
+                <tr>
+                    <td><span class="method post">POST</span></td>
+                    <td>/addExam</td>
+                    <td>Create exam</td>
+                    <td>Body: full exam object</td>
+                </tr>
+                <tr>
+                    <td><span class="method put">PUT</span></td>
+                    <td>/updateExam?exam_no={id}</td>
+                    <td>Update exam</td>
+                    <td>Body: updated exam</td>
+                </tr>
+                <tr>
+                    <td><span class="method del">DELETE</span></td>
+                    <td>/deleteExam?id={id}</td>
+                    <td>Delete exam</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td><span class="method post">POST</span></td>
+                    <td>/fill-form</td>
+                    <td>Apply for exam</td>
+                    <td>Body: student, exam, formData, status</td>
+                </tr>
+                <tr>
+                    <td><span class="method get">GET</span></td>
+                    <td>/exam-applications</td>
+                    <td>Paginated applications</td>
+                    <td>examId, studentId, status, regionId, schoolId</td>
+                </tr>
+                <tr>
+                    <td><span class="method post">POST</span></td>
+                    <td>/addExamResult</td>
+                    <td>Publish result</td>
+                    <td>Body: application, totalMarks, percentage, resultData, publishedAt</td>
+                </tr>
+                <tr>
+                    <td><span class="method get">GET</span></td>
+                    <td>/exam-results</td>
+                    <td>Paginated results</td>
+                    <td>examId, studentId, minPercentage, maxPercentage</td>
+                </tr>
+                <tr>
+                    <td><span class="method get">GET</span></td>
+                    <td>/getStudentResults?studentId={id}</td>
+                    <td>Student's results</td>
+                    <td>—</td>
+                </tr>
+                <tr>
+                    <td><span class="method get">GET</span></td>
+                    <td>/regions, /schools, /exam-centres</td>
+                    <td>Org hierarchy lists</td>
+                    <td>page, size, regionId</td>
+                </tr>
+                <tr>
+                    <td><span class="method post">POST</span></td>
+                    <td>/addregion, /addSchool, /addExamCentre</td>
+                    <td>Create org entities</td>
+                    <td>Body per entity</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 3.4 WORKFLOW -->
+        <h3 id="s2d">2.4 Workflow / Process Flow</h3>
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-num">1</div>
+                <div class="flow-content">
+                    <h4>Admin Setup — Organizational Hierarchy</h4>
+                    <p>Admin creates Regions → Exam Centres (under regions) → Schools (under centres). This hierarchy
+                        determines where students and results are grouped.</p>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">2</div>
+                <div class="flow-content">
+                    <h4>Student Registration</h4>
+                    <p>Students register at <code>/student/register</code> providing personal details + school
+                        selection. The API call is <code>POST /addStudent?schoolId={id}</code>.</p>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">3</div>
+                <div class="flow-content">
+                    <h4>Exam Creation</h4>
+                    <p>Admin creates exams with full metadata: papers array, exam_details (identity, schedule, rules,
+                        administrative info), fees, and date windows.</p>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">4</div>
+                <div class="flow-content">
+                    <h4>Application Period</h4>
+                    <p>Students browse active exams and apply via <code>POST /fill-form</code>. Application status
+                        starts as PENDING. Admin can review via Application Manager.</p>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">5</div>
+                <div class="flow-content">
+                    <h4>Result Publication</h4>
+                    <p>Admin enters paper-wise marks in Result Publisher. System calculates
+                        percentage, determines Pass/Fail (≥40%), and publishes via <code>POST /addExamResult</code>.</p>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">6</div>
+                <div class="flow-content">
+                    <h4>Student Result Viewing</h4>
+                    <p>Student logs in by Student ID, views results via Result Viewer, and downloads an official
+                        Marksheet (Anksoochi) rendered in the browser.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- workflow Diagram -->
+        <div style="margin:24px 0;text-align:center;">
+            <img src="workflow_diagram.png" alt="Exam Lifecycle Workflow Diagram"
+                style="max-width:100%;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 4px 16px rgba(0,0,0,0.08);" />
+            <p style="margin-top:8px;font-size:11px;color:#64748b;font-style:italic;">Figure 2 — Exam Lifecycle Workflow
+                / Process Flow Diagram</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+     SECTION 4 — DEVELOPMENT & IMPLEMENTATION
+═══════════════════════════════════════════ -->
+    <div class="page page-break" id="s3">
+        <div class="section-header">
+            <div class="section-number">3</div>
+            <h2>Development &amp; Implementation</h2>
+        </div>
+
+        <!-- 4.1 PROJECT STRUCTURE -->
+        <h3 id="s3a">3.1 Project Directory Structure</h3>
+        <div class="code-block">
+            <span class="cmt">MRB-DEMO-FRONTEND/</span>
+            ├── <span class="kw">src/</span>
+            │ ├── <span class="fn">App.jsx</span> <span class="cmt">← Router: /, /admin, /student,
+                /student/register</span>
+            │ ├── <span class="fn">api.js</span> <span class="cmt">← Centralized Axios API layer (all endpoints)</span>
+            │ ├── <span class="kw">pages/</span>
+            │ │ ├── <span class="fn">LandingPage.jsx</span> <span class="cmt">← Role selection (Admin / Student)</span>
+            │ │ ├── <span class="fn">AdminDashboard.jsx</span> <span class="cmt">← Admin hub (state management,
+                mutations)</span>
+            │ │ ├── <span class="fn">StudentDashboard.jsx</span><span class="cmt">← Student portal (login, exams,
+                results)</span>
+            │ │ └── <span class="fn">StudentRegistration.jsx</span>
+            │ ├── <span class="kw">admin/components/</span> <span class="cmt">← 16 admin components</span>
+            │ │ ├── DashboardLayout, Sidebar, MetricCard, GlobalSearch
+            │ │ ├── ExamManager, StudentManager, ApplicationManager
+            │ │ ├── ResultPublisher, ResultViewer
+            │ │ ├── RegionManager, ExamCentreManager, SchoolManager
+            │ │ ├── ApplicationLedger, StudentLedger, ResultLedger
+            │ │ └── EntityManager
+            │ └── <span class="kw">student/components/</span> <span class="cmt">← 5 student components</span>
+            │ ├── StudentLogin, ExamList, ApplyModal
+            │ ├── MyResults, Marksheet
+            ├── <span class="kw">output_data/</span> <span class="cmt">← API response snapshots (JSON)</span>
+        </div>
+
+        <!-- 4.2 FRONTEND COMPONENTS -->
+        <h3 id="s3b">3.2 Frontend Components Detail</h3>
+
+        <h4>Admin Components</h4>
+        <div class="comp-grid">
+            <div class="comp-box">
+                <div class="comp-title">AdminDashboard.jsx (664 lines)</div>
+                <div class="comp-desc">Central hub. Manages React Query (useQuery + useMutation) for all entities.
+                    Controls active tab state routing between sub-managers. Hosts result publication logic and real-time
+                    percentage calculation.</div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-title">ExamManager.jsx (largest, ~46KB)</div>
+                <div class="comp-desc">Full CRUD for exams. Renders a complex form with nested papers[], grading
+                    schemes, administrative metadata, and structured exam_details JSON. Supports create, edit, delete.
+                </div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-title">StudentManager.jsx</div>
+                <div class="comp-desc">Paginated student listing with filter bar (name, school, region). Integrated
+                    add-student form. Links to EntityManager for per-student detail view.</div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-title">ApplicationManager.jsx</div>
+                <div class="comp-desc">Paginated application listing filtered by exam, student, status, region, school.
+                    Supports routing to Result Publisher with pre-set filters.</div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-title">ResultPublisher.jsx (~30KB)</div>
+                <div class="comp-desc">Advanced result entry form. Auto-fetches exam papers per application. Calculates
+                    percentage live as marks are entered. Supports oral/project marks if exam config requires.</div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-title">ResultViewer.jsx (~34KB)</div>
+                <div class="comp-desc">Paginated result viewer with filters: examId, studentId, schoolId, regionId,
+                    minPercentage, maxPercentage, borderline fail detection. Used both on Dashboard and full-page.</div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-title">GlobalSearch.jsx</div>
+                <div class="comp-desc">Ctrl+K command palette search across students, exams, schools, applications.
+                    Highlights match and navigates to relevant admin tab.</div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-title">EntityManager.jsx</div>
+                <div class="comp-desc">Generic detail view for any entity type (student, school, region, centre)
+                    accessed via /admin/manage/:type/:id. Shows full details and related sub-entities.</div>
+            </div>
+        </div>
+
+        <h4>Student Components</h4>
+        <div class="comp-grid">
+            <div class="comp-box">
+                <div class="comp-title">StudentDashboard.jsx</div>
+                <div class="comp-desc">Student login (by Student ID), exam list, application status, and results tab
+                    system.</div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-title">Marksheet.jsx (~13KB)</div>
+                <div class="comp-desc">Renders official Anksoochi (marksheet) with all exam details, paper-wise marks,
+                    grade, division, signatory. Designed to match the official MRB format.</div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-title">ApplyModal.jsx</div>
+                <div class="comp-desc">Modal to submit exam application (POST /fill-form) with student + exam data.
+                </div>
+            </div>
+            <div class="comp-box">
+                <div class="comp-title">ExamList.jsx + MyResults.jsx</div>
+                <div class="comp-desc">Browse available exams; view personal result history with expandable marksheets.
+                </div>
+            </div>
+        </div>
+
+        <!-- 3.3 API LAYER -->
+        <h3 id="s3c">3.3 API Communication Layer (src/api.js)</h3>
+        <p>All backend communication is centralized in <code>src/api.js</code> using an Axios instance configured with
+            base URL and JSON content-type headers. Functions accept structured parameter objects and build
+            <code>URLSearchParams</code> for query strings.
+        </p>
+
+        <div class="code-block">
+            <span class="cmt">// Axios instance (src/api.js)</span>
+            <span class="kw">const</span> api = axios.<span class="fn">create</span>({
+            baseURL: <span class="str">"http://localhost:8080/"</span>,
+            headers: { <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span> }
+            });
+
+            <span class="cmt">// Example: Paginated + Multi-filter exam-results</span>
+            <span class="kw">export const</span> <span class="fn">getExamResults</span> = <span class="kw">async</span>
+            ({
+            page=<span class="str">0</span>, size=<span class="str">20</span>, studentId, examId, schoolId,
+            regionId, centreId, minPercentage, maxPercentage, sort
+            }) => {
+            <span class="kw">const</span> params = <span class="kw">new</span> URLSearchParams({ page, size });
+            <span class="kw">if</span> (studentId) params.<span class="fn">append</span>(<span
+                class="str">"studentId"</span>, studentId);
+            <span class="kw">if</span> (minPercentage) params.<span class="fn">append</span>(<span
+                class="str">"minPercentage"</span>, minPercentage);
+            <span class="cmt">// ... other filters</span>
+            <span class="kw">return</span> (<span class="kw">await</span> api.<span class="fn">get</span>(<span
+                class="str">`/exam-results?${params}`</span>)).data;
+            };
+        </div>
+
+        <p>React Query (<code>useQuery</code> / <code>useMutation</code>) wraps all API calls with:</p>
+        <div class="tags">
+            <span class="tag">5-min stale time</span>
+            <span class="tag">30-min cache</span>
+            <span class="tag">1 retry on failure</span>
+            <span class="tag">No refetch on window focus</span>
+            <span class="tag">Optimistic cache invalidation</span>
+        </div>
+
+
+
+
+        <!-- ═══════════════════════════════════════════
+     SECTION 4 — FUTURE SCOPE & PROPOSED ALGORITHMS
+═══════════════════════════════════════════ -->
+        <div class="page page-break" id="s4">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <h2>Proposed Future Enhancements (PROPOSED ALGORITHMS)</h2>
+            </div>
+            <p>The following features and algorithms are proposed for the next phase of development to further automate
+                the
+                board's operations and enhance system security.</p>
+
+            <div class="grid-2">
+                <div class="info-card purple">
+                    <strong>1. Automated Seat Allocation</strong><br />
+                    A constraint-satisfaction algorithm can be implemented to automatically assign students to exam
+                    centers
+                    based on geographic proximity and center seat capacity, ensuring an even distribution and reducing
+                    travel for students.
+                </div>
+                <div class="info-card amber">
+                    <strong>2. Verifiable Marksheet Hashing</strong><br />
+                    To prevent fraudulent marksheets, a <strong>SHA-256 Hashing</strong> algorithm is proposed. It would
+                    generate a unique digital fingerprint for every student's result, embeddable as a QR code for
+                    instant
+                    authentication by employers or institutions.
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="info-card green">
+                    <strong>3. Statistical Anomaly Detection</strong><br />
+                    A pattern-matching algorithm to analyze result sets for outliers. It can flag centers with
+                    suspiciously
+                    high pass rates or identical answer patterns for manual review, acting as an automated anti-cheating
+                    measure.
+                </div>
+                <div class="info-card"
+                    style="background:#eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb; border-radius: 10px; padding: 16px 20px;">
+                    <strong>4. Intelligent Exam Scheduling</strong><br />
+                    A heuristic-based scheduling algorithm to manage complex timetables for multiple exam levels
+                    (Prathamik,
+                    Prabodh, Pravin), ensuring zero time conflicts for students appearing in multiple papers.
+                </div>
+            </div>
+
+            <div class="info-card" style="margin-top:20px; text-align:center;">
+                <strong>5. Weighted Performance Analytics:</strong> Comparative ranking algorithms to provide statewide
+                percentile scores and school-wise performance benchmarks.
+            </div>
+        </div>
+
+    <!-- ═══════════════════════════════════════════
+     SECTION 5 — TESTING & DEBUGGING
+═══════════════════════════════════════════ -->
+    <div class="page page-break" id="s5">
+        <div class="section-header">
+            <div class="section-number">5</div>
+            <h2>Testing &amp; Debugging</h2>
+        </div>
+        
+        <h3 id="s5a">5.1 Automated API Testing</h3>
+        <p>A Python script (<code>test.py</code>) was developed to fully automate and log interactions with all endpoints. It systematically makes requests to both the legacy endpoints and the new RESTful endpoints.</p>
+        <p>Test results are saved as JSON outputs, and comprehensive performance metrics (response duration) are gathered in <code>performance.txt</code> for analysis.</p>
+
+        <h3 id="s5b">5.2 Performance Optimization (Caching)</h3>
+        <p>A significant performance bottleneck was identified in the retrieval of large, frequently accessed datasets. By implementing a caching layer on the Spring Boot backend, response times for API endpoints were drastically reduced. Below is a comparison of the API endpoint execution times before and after caching, drawn from the <code>test.py</code> output.</p>
+
+        <!-- PERFORMANCE TABLE -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Endpoint</th>
+                    <th>Without Cache (Duration)</th>
+                    <th>After Cache (Duration)</th>
+                    <th>Improvement Factor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>/getAllStudents</code></td>
+                    <td>1.6320s</td>
+                    <td>0.0258s</td>
+                    <td>~63x faster</td>
+                </tr>
+                <tr>
+                    <td><code>/students</code></td>
+                    <td>1.4748s</td>
+                    <td>0.0213s</td>
+                    <td>~69x faster</td>
+                </tr>
+                <tr>
+                    <td><code>/getAllExams</code></td>
+                    <td>1.0660s</td>
+                    <td>0.0238s</td>
+                    <td>~44x faster</td>
+                </tr>
+                <tr>
+                    <td><code>/exams</code></td>
+                    <td>1.0275s</td>
+                    <td>0.0269s</td>
+                    <td>~38x faster</td>
+                </tr>
+                <tr>
+                    <td><code>/getRegions</code></td>
+                    <td>1.0234s</td>
+                    <td>1.0072s</td>
+                    <td>No change (Not cached)</td>
+                </tr>
+                <tr>
+                    <td><code>/regions</code></td>
+                    <td>1.0252s</td>
+                    <td>0.0295s</td>
+                    <td>~34x faster</td>
+                </tr>
+                <tr>
+                    <td><code>/getAllExamCentres</code></td>
+                    <td>1.3835s</td>
+                    <td>0.0204s</td>
+                    <td>~67x faster</td>
+                </tr>
+                <tr>
+                    <td><code>/exam-centres</code></td>
+                    <td>1.3494s</td>
+                    <td>0.0184s</td>
+                    <td>~73x faster</td>
+                </tr>
+                <tr>
+                    <td><code>/getAllSchools</code></td>
+                    <td>1.3235s</td>
+                    <td>0.0213s</td>
+                    <td>~62x faster</td>
+                </tr>
+                <tr>
+                    <td><code>/schools</code></td>
+                    <td>1.4162s</td>
+                    <td>0.0239s</td>
+                    <td>~59x faster</td>
+                </tr>
+                <tr>
+                    <td><code>/getAllApplications</code></td>
+                    <td>6.7053s</td>
+                    <td>0.0250s</td>
+                    <td>~268x faster</td>
+                </tr>
+                <tr>
+                    <td><code>/exam-applications</code></td>
+                    <td>4.7630s</td>
+                    <td>0.0196s</td>
+                    <td>~243x faster</td>
+                </tr>
+                <tr>
+                    <td><code>/getAllResults</code></td>
+                    <td>6.3560s</td>
+                    <td>0.0330s</td>
+                    <td>~192x faster</td>
+                </tr>
+                <tr>
+                    <td><code>/exam-results</code></td>
+                    <td>4.1174s</td>
+                    <td>0.0181s</td>
+                    <td>~227x faster</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="info-card green">
+            <strong>Conclusion:</strong> Implementing caching using Redis/Spring Cache resulted in up to ~268x faster response times for heavy payloads like applications and results, massively increasing the scalability of the application. The system now reliably serves list endpoints in ~20-40ms, down from 1-6 seconds.
+        </div>
+    </div>
+
+        <hr class="section-sep" style="margin-top:30px" />
+        <div style="text-align:center;padding:24px 0;color:var(--muted)">
+            <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px">MRB Exam Management System
+            </div>
+            <div style="font-size:12px">Project Report — Maharashtra Rashtrabhasha Board · March 2026</div>
+            <div style="font-size:11px;margin-top:8px;color:#94a3b8">Generated from codebase: MRB-DEMO-FRONTEND · React
+                19 +
+                Vite + Spring Boot API</div>
+        </div>
+
+</body>
+
+</html>
