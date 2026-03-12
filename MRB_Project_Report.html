@@ -645,6 +645,116 @@
             border-top: 2px solid var(--border);
             margin: 40px 0;
         }
+
+        /* ── DIAGRAM COMPONENTS ── */
+        .diag-container {
+            margin: 24px 0;
+            padding: 40px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ERD Entities */
+        .erd-entity {
+            background: #fff;
+            border: 2px solid var(--blue);
+            border-radius: 4px;
+            width: 140px;
+            padding: 10px;
+            text-align: center;
+            font-weight: 700;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 2;
+        }
+
+        .erd-entity .pk { font-size: 9px; color: #ef4444; margin-top: 4px; display: block; }
+        .erd-entity .attrs { font-size: 9px; color: var(--muted); font-weight: 400; text-align: left; border-top: 1px solid #f1f5f9; margin-top: 6px; padding-top: 4px; }
+
+        /* ERD/UML Relationships */
+        .diag-line { position: absolute; background: #94a3b8; z-index: 1; }
+        .diag-line.v { width: 2px; }
+        .diag-line.h { height: 2px; }
+        
+        .diag-label {
+            position: absolute;
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--indigo);
+            background: #fff;
+            padding: 1px 4px;
+            border-radius: 4px;
+            z-index: 3;
+        }
+
+        /* DFD Components */
+        .dfd-process {
+            width: 100px;
+            height: 100px;
+            border: 2px solid var(--indigo);
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 700;
+            font-size: 11px;
+            padding: 10px;
+            box-shadow: 0 4px 10px rgba(67, 56, 202, 0.1);
+        }
+
+        .dfd-external {
+            width: 120px;
+            padding: 15px;
+            border: 2px solid #334155;
+            background: #f1f5f9;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .dfd-store {
+            width: 140px;
+            border-top: 2px solid var(--blue);
+            border-bottom: 2px solid var(--blue);
+            background: #fff;
+            padding: 10px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        /* Use Case Components */
+        .uc-actor {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: 700;
+            font-size: 11px;
+        }
+        .uc-actor-icon { font-size: 40px; margin-bottom: 5px; }
+
+        .uc-bubble {
+            padding: 15px 25px;
+            border: 2px solid var(--blue);
+            border-radius: 50% / 50%;
+            background: #fff;
+            text-align: center;
+            font-weight: 600;
+            font-size: 11px;
+            min-width: 140px;
+        }
+
+        .uc-boundary {
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 40px;
+            background: rgba(255,255,255,0.5);
+            min-height: 400px;
+            width: 500px;
+        }
     </style>
 </head>
 
@@ -1045,45 +1155,385 @@
             <tbody>
                 <tr>
                     <td><strong>Student</strong></td>
-                    <td>studentId, firstName, middleName, lastName, contact, email, age, motherTongue, password</td>
-                    <td>Belongs to School</td>
+                    <td>studentId (Long), firstName, email, password</td>
+                    <td>N : 1 with School (school_id)</td>
                 </tr>
                 <tr>
                     <td><strong>Exam</strong></td>
-                    <td>examNo, exam_name, exam_code, status, no_of_papers, exam_fees, papers (JSON), exam_details
-                        (JSON), application_start/end_date, exam_start/end_date</td>
-                    <td>Has many Applications</td>
+                    <td>examNo (Long), exam_name, exam_code (Unique), status</td>
+                    <td>1 : N with Application</td>
                 </tr>
                 <tr>
                     <td><strong>ExamApplication</strong></td>
-                    <td>applicationId, student{ }, exam{ }, formData, status (PENDING/APPROVED/REJECTED), appliedAt</td>
-                    <td>Student ↔ Exam (junction)</td>
+                    <td>applicationId (Long), formData (JSON), status</td>
+                    <td>Linking Student & Exam; 1 : 1 with Result</td>
                 </tr>
                 <tr>
                     <td><strong>ExamResult</strong></td>
-                    <td>resultId, application{ }, totalMarks, percentage, resultData (JSON), publishedAt</td>
-                    <td>One-to-One with Application</td>
+                    <td>id (Long), totalMarks, percentage, resultData (JSON)</td>
+                    <td>1 : 1 with Application (Unique FK)</td>
                 </tr>
                 <tr>
                     <td><strong>Region</strong></td>
-                    <td>regionId, regionName</td>
-                    <td>Has many Schools, Centres</td>
+                    <td>regionId (Long), regionName</td>
+                    <td>1 : N with ExamCentre</td>
                 </tr>
                 <tr>
                     <td><strong>ExamCentre</strong></td>
-                    <td>centreId, centreName, centreCode, region{ }</td>
-                    <td>Belongs to Region; has many Schools</td>
+                    <td>centreId (Long), centreName, centreCode</td>
+                    <td>N : 1 with Region; 1 : N with School</td>
                 </tr>
                 <tr>
                     <td><strong>School</strong></td>
-                    <td>schoolId, schoolName, examCentre{ }</td>
-                    <td>Belongs to ExamCentre; has many Students</td>
+                    <td>schoolId (Long), schoolName</td>
+                    <td>N : 1 with centre_id</td>
                 </tr>
             </tbody>
         </table>
 
-        <!-- 3.3 API ENDPOINTS -->
-        <h3 id="s2c">2.3 API Endpoint Design (localhost:8080)</h3>
+        <!-- 2.3 DATA DICTIONARY -->
+        <h3 id="s2e">2.3 Data Dictionary</h3>
+        <p>Detailed field specifications for the core database table schemas.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Field Name</th>
+                    <th>Data Type</th>
+                    <th>Constraints</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>examNo</code></td>
+                    <td>BIGINT (Long)</td>
+                    <td>PK, Identity</td>
+                    <td>Unique identifier for an exam cycle</td>
+                </tr>
+                <tr>
+                    <td><code>examCode</code></td>
+                    <td>VARCHAR</td>
+                    <td>Unique, Not Null</td>
+                    <td>Short alphanumeric code for IDs (e.g. PP2026)</td>
+                </tr>
+                <tr>
+                    <td><code>studentId</code></td>
+                    <td>BIGINT (Long)</td>
+                    <td>PK, Identity</td>
+                    <td>Unique identifier for a registered student</td>
+                </tr>
+                <tr>
+                    <td><code>schoolId</code></td>
+                    <td>BIGINT (Long)</td>
+                    <td>PK, Identity</td>
+                    <td>Unique identifier for a school entity</td>
+                </tr>
+                <tr>
+                    <td><code>applicationId</code></td>
+                    <td>BIGINT (Long)</td>
+                    <td>PK, Identity</td>
+                    <td>Link between student, exam, and result</td>
+                </tr>
+                <tr>
+                    <td><code>formData</code></td>
+                    <td>JSON (String)</td>
+                    <td>Nullable</td>
+                    <td>Dynamic fields from application form</td>
+                </tr>
+                <tr>
+                    <td><code>status</code></td>
+                    <td>VARCHAR</td>
+                    <td>Not Null</td>
+                    <td>PENDING, APPROVED, REJECTED, SUBMITTED</td>
+                </tr>
+                <tr>
+                    <td><code>percentage</code></td>
+                    <td>DOUBLE</td>
+                    <td>Check (0-100)</td>
+                    <td>Calculated student performance score</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 2.4 ER DIAGRAM -->
+        <h3 id="s2f">2.4 Entity Relationship (ER) Diagram</h3>
+        <p>The following diagram illustrates the relational mapping and cardinality between the backend entities.</p>
+        
+        <div style="margin: 24px 0; text-align: center;">
+            <img src="mrb_er_diagram_premium.png" alt="Premium ER Diagram - High Fidelity" 
+                style="max-width: 100%; height: auto; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.12);" />
+            <p style="margin-top: 12px; font-size: 11px; color: var(--muted); font-style: italic;">
+                Figure 1 — Entity Relationship (ER) Diagram (High-Fidelity Architectural Overview)
+            </p>
+        </div>
+
+        <div class="info-card info" style="margin-top: 20px;">
+            <h4 style="margin-top: 0; color: var(--indigo); border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">Relational Mapping & Cardinality Details</h4>
+            <p>The system utilizes a <strong>Relational Database Management System (RDBMS)</strong> with the following mapping strategies:</p>
+            <ul style="margin-left: 20px; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <li><strong>One-to-Many (1:N) Bidirectional:</strong>
+                    <br/><span style="font-size: 11px; color: var(--muted);">Region ↔ Exam Centre ↔ School ↔ Student. Each parent node contains a collection of children, while each child maintains a reference (Foreign Key) to its parent.</span>
+                </li>
+                <li><strong>Many-to-One (N:1):</strong>
+                    <br/><span style="font-size: 11px; color: var(--muted);">Multiple Students and Exams map to a single Application instance through Foreign Keys (student_id, exam_no) in the <code>ExamApplication</code> entity.</span>
+                </li>
+                <li><strong>One-to-One (1:1):</strong>
+                    <br/><span style="font-size: 11px; color: var(--muted);">Each <code>ExamApplication</code> maps to exactly one <code>ExamResult</code>, ensured by a UNIQUE constraint on the application_id foreign key.</span>
+                </li>
+                <li><strong>Many-to-Many (N:M) via Bridge:</strong>
+                    <br/><span style="font-size: 11px; color: var(--muted);">The relationship between <code>Student</code> and <code>Exam</code> is Many-to-Many, realized through the <code>ExamApplication</code> bridge entity to maintain relational integrity.</span>
+                </li>
+                <li><strong>Lazy Loading:</strong>
+                    <br/><span style="font-size: 11px; color: var(--muted);">Mappings are configured for Lazy Fetching to optimize performance when retrieving large datasets like Student or School lists.</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 2.5 DATA FLOW DIAGRAM (DFD) -->
+        <h3 id="s2g">2.5 Functional Data Flow & Lifecycle</h3>
+        <p>This section illustrates the dynamic movement of data through the system, from initial user registration to final result publication.</p>
+
+        <div style="margin: 32px 0; text-align: center;">
+            <img src="mrb_dfd_lifecycle_premium.png" alt="Premium DFD Lifecycle - High Fidelity" 
+                style="max-width: 100%; height: auto; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 20px 40px rgba(0,0,0,0.15);" />
+            <p style="margin-top: 16px; font-size: 11px; color: var(--muted); font-style: italic;">
+                Figure 2 — End-to-End Operational Lifecycle: From Registration to Result Publication
+            </p>
+        </div>
+
+        <div class="info-card green">
+            <h4 style="margin-top: 0; color: #16a34a; border-bottom: 1px solid #dcfce7; padding-bottom: 8px; margin-bottom: 12px;">Lifecycle Workflow Analysis</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <strong>1. Onboarding & Setup:</strong>
+                    <p style="font-size: 11px; color: var(--muted);">Students provide identity data during <strong>Registration</strong>. Simultaneously, Management creates <strong>Exam Cycles</strong> with specific eligibility criteria and scheduling metrics.</p>
+                </div>
+                <div>
+                    <strong>2. Application Hub:</strong>
+                    <p style="font-size: 11px; color: var(--muted);">Students browse active exams and <strong>Apply</strong>. The system performs <strong>Auto-Approval</strong> for complete data or routes to Management for <strong>Manual Review</strong> if anomalies are detected.</p>
+                </div>
+                <div>
+                    <strong>3. Execution Readiness:</strong>
+                    <p style="font-size: 11px; color: var(--muted);">Once approved, a secure <strong>Hall Ticket</strong> is generated and pushed to the Student Dashboard, serving as the primary authorization for physical or digital exams.</p>
+                </div>
+                <div>
+                    <strong>4. Performance & Insight:</strong>
+                    <p style="font-size: 11px; color: var(--muted);">After <strong>Exam Execution</strong>, marks are entered and validated. The system then <strong>Publishes Results</strong>, automatically generating the digital marksheet and performance analytics.</p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 2.6 UML USE CASE DIAGRAM -->
+        <h3 id="s2h">2.6 UML Use Case Diagram</h3>
+        <p>Describes the functional requirements of the system through actor interactions.</p>
+        
+        <div class="diag-container" style="height: 550px; display: flex; justify-content: space-around; align-items: center; padding: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 100px;">
+                <div class="uc-actor"><span class="uc-actor-icon">👤</span>Student</div>
+                <div class="uc-actor"><span class="uc-actor-icon">👨‍💼</span>Admin</div>
+            </div>
+
+            <div class="uc-boundary" style="display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 20px;">
+                <div style="font-weight: 800; color: var(--muted); margin-bottom: 20px;">MRB Exam Management System</div>
+                <div class="uc-bubble">Register / Login</div>
+                <div class="uc-bubble">Search Exams</div>
+                <div class="uc-bubble">Fill Application Form</div>
+                <div class="uc-bubble">Manage Exam Centers</div>
+                <div class="uc-bubble">Approve Applications</div>
+                <div class="uc-bubble">Generate/View Results</div>
+            </div>
+        </div>
+
+        <!-- 2.7 UML CLASS DIAGRAM -->
+        <h3 id="s2i">2.7 UML Class Diagram (Core Components)</h3>
+        <p>A structural view of the Spring Boot backend services and their DTO relationships.</p>
+
+        <div class="diag-container" style="height: 480px;">
+            <!-- Controller Layer -->
+            <div class="erd-entity" style="top: 20px; left: 50px; width: 180px; border-color: var(--indigo);">
+                ExamController
+                <div class="attrs">
+                    + fillForm()<br/>
+                    + searchApplications()<br/>
+                    + getResult()
+                </div>
+            </div>
+
+            <!-- Service Layer -->
+            <div class="erd-entity" style="top: 180px; left: 50px; width: 180px; border-color: #16a34a;">
+                ApplicationService
+                <div class="attrs">
+                    - validateStudent()<br/>
+                    - checkConflict()<br/>
+                    - saveApplication()
+                </div>
+            </div>
+
+            <div class="erd-entity" style="top: 180px; left: 280px; width: 180px; border-color: #16a34a;">
+                ExamResultService
+                <div class="attrs">
+                    - calculateMarks()<br/>
+                    - publishResult()<br/>
+                    - generateDTO()
+                </div>
+            </div>
+
+            <!-- DTO Layer -->
+            <div class="erd-entity" style="top: 340px; left: 50px; width: 180px; border-style: dotted;">
+                ApplicationDTO
+                <div class="attrs">
+                    + studentId<br/>
+                    + examName<br/>
+                    + status
+                </div>
+            </div>
+
+            <div class="erd-entity" style="top: 340px; left: 280px; width: 180px; border-style: dotted;">
+                ExamResultDTO
+                <div class="attrs">
+                    + totalMarks<br/>
+                    + percentage<br/>
+                    + publishedAt
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 2.10 UML OBJECT DIAGRAM -->
+        <h3 id="s2k">2.10 UML Object Diagram (Runtime Snapshot)</h3>
+        <p>A snapshot of the system state during a specific application submission.</p>
+        
+        <div class="diag-container" style="height: 380px;">
+            <div class="erd-entity" style="top: 40px; left: 60px; width: 220px; background: #fffbeb; border-color: #f59e0b;">
+                <u>stu12: Student</u>
+                <div class="attrs">
+                    firstName = "Aarav"<br/>
+                    studentId = 12<br/>
+                    schoolId = 104
+                </div>
+            </div>
+
+            <div class="erd-entity" style="top: 180px; left: 300px; width: 220px; background: #fff7ed; border-color: #ea580c;">
+                <u>app501: Application</u>
+                <div class="attrs">
+                    applicationId = 501<br/>
+                    status = "PENDING"<br/>
+                    examNo = 5
+                </div>
+            </div>
+
+            <div class="erd-entity" style="top: 40px; left: 540px; width: 220px; background: #fdf2f2; border-color: #ef4444;">
+                <u>ex5: Exam</u>
+                <div class="attrs">
+                    examNo = 5<br/>
+                    examCode = "PP2026"<br/>
+                    status = "ACTIVE"
+                </div>
+            </div>
+
+            <div class="diag-line h" style="top: 100px; left: 280px; width: 50px; transform: rotate(30deg);"></div>
+            <div class="diag-line h" style="top: 100px; left: 490px; width: 50px; transform: rotate(-30deg);"></div>
+            <div class="diag-label" style="top: 130px; left: 220px;">appliedBy</div>
+            <div class="diag-label" style="top: 130px; left: 450px;">targetExam</div>
+        </div>
+
+        <!-- 2.11 UML STATE DIAGRAM -->
+        <h3 id="s2l">2.11 UML State Diagram (Application Lifecycle)</h3>
+        <p>Models the transitions of an exam application from submission to result publication.</p>
+
+        <div class="diag-container" style="height: 250px; display: flex; align-items: center; justify-content: center; gap: 40px; padding: 20px;">
+            <div style="width: 20px; height: 20px; background: #000; border-radius: 50%;"></div>
+            <div class="diag-line h" style="position: relative; width: 40px;"></div>
+            <div class="uc-bubble" style="background:#f1f5f9;">SUBMITTED</div>
+            <div class="diag-line h" style="position: relative; width: 40px;"></div>
+            <div class="uc-bubble" style="background:#fefce8; border-color:#eab308;">PENDING (Audit)</div>
+            
+            <div style="display: flex; flex-direction: column; gap: 30px;">
+                <div style="display: flex; align-items: center;">
+                    <div class="diag-line h" style="position: relative; width: 40px; transform: rotate(-20deg);"></div>
+                    <div class="uc-bubble" style="background:#f0fdf4; border-color:#22c55e;">APPROVED</div>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <div class="diag-line h" style="position: relative; width: 40px; transform: rotate(20deg);"></div>
+                    <div class="uc-bubble" style="background:#fef2f2; border-color:#ef4444;">REJECTED</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2.10 UML ACTIVITY DIAGRAM -->
+        <h3 id="s2n">2.10 UML Activity Diagram (Result Publication)</h3>
+        <p>Models the step-by-step logic for calculating and publishing student results with decision branches.</p>
+        
+        <div class="diag-container" style="height: 480px; display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 20px;">
+            <div style="width: 20px; height: 20px; background: #000; border-radius: 50%;"></div>
+            <div class="diag-line v" style="position: relative; height: 30px;"></div>
+            <div class="uc-bubble">Enter Paper Marks</div>
+            <div class="diag-line v" style="position: relative; height: 30px;"></div>
+            <!-- Decision Diamond -->
+            <div style="width: 40px; height: 40px; border: 2px solid #64748b; transform: rotate(45deg); display: flex; align-items: center; justify-content: center;">
+                <span style="transform: rotate(-45deg); font-size: 8px; font-weight: 800;">PASS?</span>
+            </div>
+            
+            <div style="display: flex; gap: 80px; margin-top: 10px;">
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div class="diag-label" style="position: static; margin-bottom: 5px;">Yes (>=40%)</div>
+                    <div class="uc-bubble" style="background:#f0fdf4; border-color:#22c55e;">Set Status: PASS</div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div class="diag-label" style="position: static; margin-bottom: 5px;">No (<40%)</div>
+                    <div class="uc-bubble" style="background:#fef2f2; border-color:#ef4444;">Set Status: FAIL</div>
+                </div>
+            </div>
+
+            <div class="diag-line v" style="position: relative; height: 30px;"></div>
+            <div class="uc-bubble">Generate Marksheet Hash</div>
+            <div class="diag-line v" style="position: relative; height: 30px;"></div>
+            <!-- Final State -->
+            <div style="width: 24px; height: 24px; border: 2px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <div style="width: 14px; height: 14px; background: #000; border-radius: 50%;"></div>
+            </div>
+        </div>
+
+        <!-- 2.11 UML COLLABORATION / COMMUNICATION DIAGRAM -->
+        <h3 id="s2m">2.11 UML Collaboration Diagram</h3>
+        <p>Illustrates the interactive structural relationships between objects at runtime.</p>
+
+        <div class="diag-container" style="height: 420px;">
+            <div class="erd-entity" style="top: 180px; left: 40px; width: 140px; border-style: none; background: transparent;">
+                <span style="font-size: 30px;">👤</span><br/>Student
+            </div>
+
+            <div class="erd-entity" style="top: 40px; left: 200px; width: 180px; border-color: var(--indigo);">
+                :ExamController
+            </div>
+
+            <div class="erd-entity" style="top: 180px; left: 450px; width: 180px; border-color: #16a34a;">
+                :ApplicationService
+            </div>
+
+            <div class="erd-entity" style="top: 320px; left: 200px; width: 180px; border-color: #9333ea;">
+                :AppRepository
+            </div>
+
+            <!-- Messages -->
+            <div class="diag-line h" style="top: 100px; left: 110px; width: 100px; transform: rotate(-30deg);"></div>
+            <div class="diag-label" style="top: 60px; left: 60px; width: 120px;">1: fillForm(data)</div>
+
+            <div class="diag-line h" style="top: 100px; left: 360px; width: 100px; transform: rotate(30deg);"></div>
+            <div class="diag-label" style="top: 60px; left: 400px; width: 140px;">2: saveApplication(app)</div>
+
+            <div class="diag-line h" style="top: 280px; left: 360px; width: 100px; transform: rotate(-30deg);"></div>
+            <div class="diag-label" style="top: 290px; left: 400px; width: 120px;">3: save(entity)</div>
+
+            <div class="diag-line h" style="top: 280px; left: 110px; width: 100px; transform: rotate(30deg);"></div>
+            <div class="diag-label" style="top: 290px; left: 60px; width: 120px;">4: HTTP 201 Created</div>
+        </div>
+
+        <hr class="section-sep" />
+
+        <!-- 2.12 API ENDPOINTS -->
+        <h3 id="s2c">2.12 API Endpoint Design (Spring Boot)</h3>
         <table>
             <thead>
                 <tr>
@@ -1181,65 +1631,28 @@
             </tbody>
         </table>
 
-        <!-- 3.4 WORKFLOW -->
-        <h3 id="s2d">2.4 Workflow / Process Flow</h3>
-        <div class="flow">
-            <div class="flow-step">
-                <div class="flow-num">1</div>
-                <div class="flow-content">
-                    <h4>Admin Setup — Organizational Hierarchy</h4>
-                    <p>Admin creates Regions → Exam Centres (under regions) → Schools (under centres). This hierarchy
-                        determines where students and results are grouped.</p>
-                </div>
+        <!-- 2.9 WORKFLOW / PROCESS FLOW -->
+        <h3 id="s2d">2.9 Workflow / Process Flow Diagram</h3>
+        <p>The following diagram illustrates the complete exam lifecycle, from organizational setup to student results.</p>
+        
+        <div class="diag-container" style="height: 350px; display: flex; flex-direction: column; justify-content: space-around; align-items: center; padding: 20px;">
+            <div style="display: flex; gap: 40px; align-items: center;">
+                <div class="uc-bubble" style="background: #f1f5f9; border-color: #94a3b8;">Setup (Admin)</div>
+                <div class="diag-line h" style="position: relative; width: 40px;"></div>
+                <div class="uc-bubble">Registration</div>
+                <div class="diag-line h" style="position: relative; width: 40px;"></div>
+                <div class="uc-bubble">Application</div>
             </div>
-            <div class="flow-step">
-                <div class="flow-num">2</div>
-                <div class="flow-content">
-                    <h4>Student Registration</h4>
-                    <p>Students register at <code>/student/register</code> providing personal details + school
-                        selection. The API call is <code>POST /addStudent?schoolId={id}</code>.</p>
-                </div>
-            </div>
-            <div class="flow-step">
-                <div class="flow-num">3</div>
-                <div class="flow-content">
-                    <h4>Exam Creation</h4>
-                    <p>Admin creates exams with full metadata: papers array, exam_details (identity, schedule, rules,
-                        administrative info), fees, and date windows.</p>
-                </div>
-            </div>
-            <div class="flow-step">
-                <div class="flow-num">4</div>
-                <div class="flow-content">
-                    <h4>Application Period</h4>
-                    <p>Students browse active exams and apply via <code>POST /fill-form</code>. Application status
-                        starts as PENDING. Admin can review via Application Manager.</p>
-                </div>
-            </div>
-            <div class="flow-step">
-                <div class="flow-num">5</div>
-                <div class="flow-content">
-                    <h4>Result Publication</h4>
-                    <p>Admin enters paper-wise marks in Result Publisher. System calculates
-                        percentage, determines Pass/Fail (≥40%), and publishes via <code>POST /addExamResult</code>.</p>
-                </div>
-            </div>
-            <div class="flow-step">
-                <div class="flow-num">6</div>
-                <div class="flow-content">
-                    <h4>Student Result Viewing</h4>
-                    <p>Student logs in by Student ID, views results via Result Viewer, and downloads an official
-                        Marksheet (Anksoochi) rendered in the browser.</p>
-                </div>
-            </div>
-        </div>
+            
+            <div style="width: 2px; height: 30px; background: #94a3b8;"></div>
 
-        <!-- workflow Diagram -->
-        <div style="margin:24px 0;text-align:center;">
-            <img src="workflow_diagram.png" alt="Exam Lifecycle Workflow Diagram"
-                style="max-width:100%;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 4px 16px rgba(0,0,0,0.08);" />
-            <p style="margin-top:8px;font-size:11px;color:#64748b;font-style:italic;">Figure 2 — Exam Lifecycle Workflow
-                / Process Flow Diagram</p>
+            <div style="display: flex; gap: 40px; align-items: center;">
+                <div class="uc-bubble" style="background: #fdf2f2; border-color: #f87171;">Audit / Approve</div>
+                <div class="diag-line h" style="position: relative; width: 40px;"></div>
+                <div class="uc-bubble" style="background: #f0fdf4; border-color: #4ade80;">Result Publish</div>
+                <div class="diag-line h" style="position: relative; width: 40px;"></div>
+                <div class="uc-bubble" style="background: #eff6ff; border-style: double;">Download Marksheet</div>
+            </div>
         </div>
     </div>
 
@@ -1404,47 +1817,50 @@
                 <div class="section-number">4</div>
                 <h2>Proposed Future Enhancements (PROPOSED ALGORITHMS)</h2>
             </div>
-            <p>The following features and algorithms are proposed for the next phase of development to further automate
-                the
-                board's operations and enhance system security.</p>
+            <p>To further automate the Maharashtra Rashtrabhasha Board's operations and enhance system integrity, the following technical algorithms are proposed for implementation in Phase 2.</p>
+
+            <!-- 4.1 SEAT ALLOCATION -->
+            <h3 id="s4a">4.1 Composite Seat Number Allocation Algorithm</h3>
+            <p>A deterministic algorithm to generate unique, traceable seat numbers for every student appearing in an exam cycle. Instead of random IDs, the seat number is a <strong>12-digit composite key</strong> designed for administrative routing.</p>
+            
+            <div class="info-card purple">
+                <strong>Logic: <code>[RR][CCC][SSS][IIII]</code></strong><br />
+                • <code>RR</code> (Region Code): 2 digits (e.g., 01 for Pune, 02 for Mumbai).<br />
+                • <code>CCC</code> (Centre Code): 3 digits identifying the specific exam centre.<br />
+                • <code>SSS</code> (School Code): 3 digits for the student's base school.<br />
+                • <code>IIII</code> (Index): 4-digit auto-incrementing serial number within that school.<br />
+                <br />
+                <strong>Benefit:</strong> Allows instantaneous sorting of answer sheets at the board office without querying the database, as the physical destination is encoded in the ID.
+            </div>
 
             <div class="grid-2">
-                <div class="info-card purple">
-                    <strong>1. Automated Seat Allocation</strong><br />
-                    A constraint-satisfaction algorithm can be implemented to automatically assign students to exam
-                    centers
-                    based on geographic proximity and center seat capacity, ensuring an even distribution and reducing
-                    travel for students.
-                </div>
+                <!-- 4.2 ANOMALY DETECTION -->
                 <div class="info-card amber">
-                    <strong>2. Verifiable Marksheet Hashing</strong><br />
-                    To prevent fraudulent marksheets, a <strong>SHA-256 Hashing</strong> algorithm is proposed. It would
-                    generate a unique digital fingerprint for every student's result, embeddable as a QR code for
-                    instant
-                    authentication by employers or institutions.
+                    <h4 style="margin-top:0">4.2 Statistical Anomaly & Fraud Detection</h4>
+                    <p>A pattern-matching algorithm to identify suspicious result clusters. It calculates the <strong>Standard Deviation (σ)</strong> of marks within each exam centre.</p>
+                    <ul style="font-size:11.5px; padding-left:14px; color:var(--muted)">
+                        <li><strong>Identical Pattern Check:</strong> Flags centres where >30% of students have identical marks in paper-wise breakdowns.</li>
+                        <li><strong>Outlier Detection:</strong> Flags centres whose <code>AvgScore > (GlobalAvg + 3σ)</code>.</li>
+                        <li><strong>Passing Rate Spike:</strong> Triggers alert if a centre's passing rate increases by >40% compared to previous 3 years.</li>
+                    </ul>
                 </div>
-            </div>
 
-            <div class="grid-2">
+                <!-- 4.3 VERIFIABLE HASHING -->
                 <div class="info-card green">
-                    <strong>3. Statistical Anomaly Detection</strong><br />
-                    A pattern-matching algorithm to analyze result sets for outliers. It can flag centers with
-                    suspiciously
-                    high pass rates or identical answer patterns for manual review, acting as an automated anti-cheating
-                    measure.
-                </div>
-                <div class="info-card"
-                    style="background:#eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb; border-radius: 10px; padding: 16px 20px;">
-                    <strong>4. Intelligent Exam Scheduling</strong><br />
-                    A heuristic-based scheduling algorithm to manage complex timetables for multiple exam levels
-                    (Prathamik,
-                    Prabodh, Pravin), ensuring zero time conflicts for students appearing in multiple papers.
+                    <h4 style="margin-top:0">4.3 Verifiable Marksheet Hashing</h4>
+                    <p>To eliminate forgery, every marksheet will carry a digital fingerprint generated via the <strong>SHA-256 Hashing</strong> algorithm.</p>
+                    <div class="code-block" style="font-size:10px; padding:10px">
+                        hash = SHA256(studentId + examNo + totalMarks + secretKey)
+                    </div>
+                    <p style="font-size:11px">The hash is embedded in a QR code. External verifiers (colleges/employers) scan it to hit a <code>/verify</code> endpoint that re-calculates the hash and confirms authenticity.</p>
                 </div>
             </div>
 
-            <div class="info-card" style="margin-top:20px; text-align:center;">
-                <strong>5. Weighted Performance Analytics:</strong> Comparative ranking algorithms to provide statewide
-                percentile scores and school-wise performance benchmarks.
+            <!-- 4.4 EXAM SCHEDULING -->
+            <h3 id="s4d">4.4 Intelligent Conflict-Free Scheduling</h3>
+            <p>A <strong>Graph Coloring Algorithm</strong> based approach to manage thousands of papers across hundreds of centers with zero conflicts.</p>
+            <div class="info-card" style="background:#eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb; border-radius: 10px; padding: 16px 20px;">
+                <strong>Mechanism:</strong> The system identifies "Student Overlap" — cases where one student appears for multiple exams (e.g., Prathamik and Prabodh). These papers are treated as connected nodes in a graph. The algorithm assigns the minimum number of "time-colors" such that no two connected nodes share the same time slot, optimizing the total exam duration for the Board.
             </div>
         </div>
 
@@ -1454,12 +1870,22 @@
     <div class="page page-break" id="s5">
         <div class="section-header">
             <div class="section-number">5</div>
-            <h2>Testing &amp; Debugging</h2>
+            <h2>Testing, Debugging &amp; Validations</h2>
         </div>
         
-        <h3 id="s5a">5.1 Automated API Testing</h3>
-        <p>A Python script (<code>test.py</code>) was developed to fully automate and log interactions with all endpoints. It systematically makes requests to both the legacy endpoints and the new RESTful endpoints.</p>
-        <p>Test results are saved as JSON outputs, and comprehensive performance metrics (response duration) are gathered in <code>performance.txt</code> for analysis.</p>
+        <h3 id="s5a">5.1 Automated API Testing & Debugging</h3>
+        <p>A comprehensive testing and debugging suite was developed to ensure the robustness of the Spring Boot backend and React frontend interaction.</p>
+        
+        <div class="info-card amber">
+            <strong>Debugging Strategy:</strong> During development, <code>cURL</code> and specialized Python scripts (<code>test.py</code>) were used to intercept and log raw HTTP responses. This allowed for rapid identification of JSON serialization errors and N+1 query bottlenecks before they reached the UI.
+        </div>
+
+        <p>Automation logic includes:</p>
+        <ul style="margin: 10px 0 20px 20px; color: var(--muted); font-size: 12.5px;">
+            <li><strong>Regression Suite:</strong> 40+ automated request variations in Python to verify all CRUD operations across Regions, Centres, Schools, Students, and Exams.</li>
+            <li><strong>JSON Schema Validation:</strong> Automatic checks to ensure backend DTOs match frontend prop-types, preventing "undefined" errors.</li>
+            <li><strong>Performance Logging:</strong> Continuous measurement of response times recorded in <code>performance.txt</code> to validate cache hits.</li>
+        </ul>
 
         <h3 id="s5b">5.2 Performance Optimization (Caching)</h3>
         <p>A significant performance bottleneck was identified in the retrieval of large, frequently accessed datasets. By implementing a caching layer on the Spring Boot backend, response times for API endpoints were drastically reduced. Below is a comparison of the API endpoint execution times before and after caching, drawn from the <code>test.py</code> output.</p>
@@ -1582,6 +2008,86 @@
         <div class="info-card green">
             <strong>Conclusion:</strong> Implementing caching using Redis/Spring Cache resulted in up to ~268x faster response times for heavy payloads like applications and results. Furthermore, the integration of DTOs permanently resolved the N+1 query vulnerability, ensuring reliable list endpoint delivery in ~20-40ms, down from 1-6 seconds.
         </div>
+
+        <!-- 5.4 VITEST / JUNIT -->
+        <h3 id="s5d">5.4 Automated Component Testing (Vitest / JUnit Style)</h3>
+        <p>Core React components are verified using <strong>Vitest</strong> and <strong>React Testing Library</strong>. These unit tests ensure that critical UI logic—such as pagination calculations, filter state updates, and data formatting—works correctly in isolation before integration.</p>
+        
+        <div class="grid-2">
+            <div class="metric-box">
+                <div class="num">100%</div>
+                <div class="lbl">Passed Component Tests</div>
+            </div>
+            <div class="metric-box">
+                <div class="num">0</div>
+                <div class="lbl">Regression Defects</div>
+            </div>
+        </div>
+
+        <!-- Screenshot Gallery: Vitest -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 20px;">
+            <div style="text-align: center;">
+                <img src="src/__tests__/screenshots junit/Screenshot 2026-03-12 145006.png" alt="Vitest Terminal Output" style="width:100%; border-radius:12px; border:1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                <p style="font-size: 10px; color: var(--muted); margin-top: 6px;">Unit test execution in terminal</p>
+            </div>
+            <div style="text-align: center;">
+                <img src="src/__tests__/screenshots junit/Screenshot 2026-03-12 145701.png" alt="Test Result Summary" style="width:100%; border-radius:12px; border:1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                <p style="font-size: 10px; color: var(--muted); margin-top: 6px;">Passed assertions summary</p>
+            </div>
+        </div>
+
+        <hr class="section-sep" style="margin: 30px 0; border-top: 1px dashed var(--border);" />
+
+        <!-- 5.5 CYPRESS E2E -->
+        <h3 id="s5e">5.5 End-to-End Workflow Verification (Cypress)</h3>
+        <p>Complete business flows are validated using <strong>Cypress E2E Testing</strong>. These automated "browser-driven" tests simulate real admin interactions across the entire platform, verifying that the frontend correctly communicates with the Spring Boot backend API.</p>
+        
+        <div class="tags" style="justify-content: center; margin-bottom: 24px;">
+            <span class="tag green">Student Directory Test</span>
+            <span class="tag green">Exam Lifecycle Test</span>
+            <span class="tag green">Application Approval Flow</span>
+            <span class="tag green">Result Publication Test</span>
+            <span class="tag green">Region & School Management</span>
+        </div>
+
+        <!-- STAGGERED CYPRESS GALLERY -->
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 24px 0;">
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <img src="src/__tests__/e2e/screenshots/Screenshot 2026-03-12 150857.png" style="width:100%; border-radius:12px; border:1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+                <img src="src/__tests__/e2e/screenshots/Screenshot 2026-03-12 151319.png" style="width:100%; border-radius:12px; border:1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+                <img src="src/__tests__/e2e/screenshots/Screenshot 2026-03-12 152727.png" style="width:100%; border-radius:12px; border:1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+                <img src="src/__tests__/e2e/screenshots/Screenshot 2026-03-12 152943.png" style="width:100%; border-radius:12px; border:1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 40px;">
+                <img src="src/__tests__/e2e/screenshots/Screenshot 2026-03-12 153020.png" style="width:100%; border-radius:12px; border:1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+                <img src="src/__tests__/e2e/screenshots/Screenshot 2026-03-12 153148.png" style="width:100%; border-radius:12px; border:1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+                <img src="src/__tests__/e2e/screenshots/Screenshot 2026-03-12 153254.png" style="width:100%; border-radius:12px; border:1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+                <img src="src/__tests__/e2e/screenshots/Screenshot 2026-03-12 153429.png" style="width:100%; border-radius:12px; border:1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+                <img src="src/__tests__/e2e/screenshots/Screenshot 2026-03-12 153449.png" style="width:100%; border-radius:12px; border:1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
+            </div>
+        </div>
+
+        <div class="info-card green" style="text-align: center;">
+            <strong>Reliability Assurance:</strong> With a combined suite of <strong>35+ Unit Tests</strong> and <strong>7 Multi-Stage E2E Spec Files</strong>, the system maintains high data integrity and UI stability across large-scale exam cycles.
+        </div>
+
+        <h3 id="s5f">5.6 Business Rule & Data Validations</h3>
+        <p>The system enforces strict multi-layer validation to ensure the accuracy of exam records and student data.</p>
+        <div class="grid-3">
+            <div class="metric-box">
+                <div class="lbl" style="color:var(--indigo); font-weight:700;">Client-Side</div>
+                <div style="font-size:11px; margin-top:8px;">Regex-based email validation, mandatory field checks, and date-range constraints in React forms.</div>
+            </div>
+            <div class="metric-box">
+                <div class="lbl" style="color:var(--blue); font-weight:700;">Server-Side</div>
+                <div style="font-size:11px; margin-top:8px;">Conflict detection in <code>ExamApplicationService</code> to prevent duplicate registrations for the same student-exam pair.</div>
+            </div>
+            <div class="metric-box">
+                <div class="lbl" style="color:var(--text); font-weight:700;">Database</div>
+                <div style="font-size:11px; margin-top:8px;">Relational integrity through foreign key constraints and UNIQUE indexes on exam codes and student emails.</div>
+            </div>
+        </div>
+
     </div>
 
         <hr class="section-sep" style="margin-top:30px" />

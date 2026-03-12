@@ -19,11 +19,10 @@ const Pagination = ({ currentPage, totalPages, onPageChange, className = "" }) =
                 <button
                     key={i}
                     onClick={() => onPageChange(i)}
-                    className={`min-w-[32px] h-8 px-2 rounded-lg font-bold text-xs transition-all ${
-                        currentPage === i
-                            ? "bg-[#4c84ff] text-white shadow-md shadow-blue-200"
-                            : "bg-white text-gray-500 hover:bg-gray-50 border border-gray-200"
-                    }`}
+                    className={`min-w-[32px] h-8 px-2 rounded-lg font-bold text-xs transition-all ${currentPage === i
+                        ? "bg-[#4c84ff] text-white shadow-md shadow-blue-200"
+                        : "bg-white text-gray-500 hover:bg-gray-50 border border-gray-200"
+                        }`}
                 >
                     {i + 1}
                 </button>
@@ -37,7 +36,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange, className = "" }) =
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                 Page {currentPage + 1} of {totalPages}
             </span>
-            
+
             <div className="flex items-center gap-1">
                 <button
                     disabled={currentPage === 0}
