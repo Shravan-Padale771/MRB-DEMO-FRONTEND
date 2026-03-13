@@ -19,6 +19,7 @@ const ExamManager = ({
     const [page, setPage] = useState(0);
     const [size] = useState(10);
     const [filterName, setFilterName] = useState("");
+    const [errors, setErrors] = useState({});
 
     // API Query for Exams
     const { data: examsData, isLoading, refetch } = useQuery({
@@ -53,8 +54,66 @@ const ExamManager = ({
         administrative: examForm.exam_details?.administrative || {}
     };
 
-    const nextStep = () => setActiveStep(prev => Math.min(prev + 1, steps.length - 1));
-    const prevStep = () => setActiveStep(prev => Math.max(prev - 1, 0));
+    const validateStep = (step) => {
+        const newErrors = {};
+        
+        if (step === 0) {
+            if (!examForm.exam_code?.trim()) newErrors.exam_code = "Exam Code is required";
+            if (!examForm.exam_name?.trim()) newErrors.exam_name = "Exam Name is required";
+            if (examForm.exam_fees < 0 || examForm.exam_fees === "" || examForm.exam_fees === null) {
+                newErrors.exam_fees = "Exam Fees cannot be negative";
+            }
+        } 
+        else if (step === 1) {
+            if (!examForm.application_start_date) newErrors.application_start_date = "Required";
+            if (!examForm.application_end_date) newErrors.application_end_date = "Required";
+            if (!examForm.exam_start_date) newErrors.exam_start_date = "Required";
+            if (!examForm.exam_end_date) newErrors.exam_end_date = "Required";
+
+            if (examForm.application_start_date && examForm.application_end_date && 
+                new Date(examForm.application_end_date) < new Date(examForm.application_start_date)) {
+                newErrors.application_end_date = "Must be after start date";
+            }
+
+            if (examForm.exam_start_date && examForm.exam_end_date && 
+                new Date(examForm.exam_end_date) < new Date(examForm.exam_start_date)) {
+                newErrors.exam_end_date = "Must be after start date";
+            }
+        }
+        else if (step === 2) {
+            if (!examForm.no_of_papers || examForm.no_of_papers < 1) {
+                newErrors.no_of_papers = "Must have at least 1 paper";
+            }
+            examForm.papers?.forEach((paper, idx) => {
+                if (!paper.name?.trim()) newErrors[`paper_${idx}_name`] = "Required";
+                if (paper.maxMarks < 1) newErrors[`paper_${idx}_marks`] = "Required";
+            });
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const nextStep = () => {
+        if (validateStep(activeStep)) {
+            setActiveStep(prev => Math.min(prev + 1, steps.length - 1));
+        }
+    };
+    
+    const prevStep = () => {
+        setErrors({});
+        setActiveStep(prev => Math.max(prev - 1, 0));
+    };
+
+    const onFormSubmit = (e) => {
+        e.preventDefault();
+        // Since we are at the last step, we can just save
+        if (isEditing) {
+            handleUpdateExam(e);
+        } else {
+            handleCreateExam(e);
+        }
+    };
 
     return (
         <div className="grid md:grid-cols-2 gap-8 items-start">
@@ -93,7 +152,7 @@ const ExamManager = ({
                     ))}
                 </div>
 
-                <form onSubmit={isEditing ? handleUpdateExam : handleCreateExam} className="min-h-[400px] flex flex-col">
+                <form onSubmit={onFormSubmit} className="min-h-[400px] flex flex-col">
                     <div className="flex-1">
                         <AnimatePresence mode="wait">
                             <motion.div
@@ -112,20 +171,28 @@ const ExamManager = ({
                                                 <input
                                                     required
                                                     placeholder="e.g. PRAVIN_HINDI"
-                                                    className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                                    className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all ${errors.exam_code ? 'border-red-500' : ''}`}
                                                     value={examForm.exam_code || ""}
-                                                    onChange={(e) => setExamForm({ ...examForm, exam_code: e.target.value })}
+                                                    onChange={(e) => {
+                                                        setExamForm({ ...examForm, exam_code: e.target.value });
+                                                        if (errors.exam_code) setErrors({...errors, exam_code: ""});
+                                                    }}
                                                 />
+                                                {errors.exam_code && <p className="text-red-500 text-xs mt-1">{errors.exam_code}</p>}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-semibold text-gray-700 mb-1">Exam Name</label>
                                                 <input
                                                     required
                                                     placeholder="e.g. Hindi Final Exam"
-                                                    className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                                    value={examForm.exam_name}
-                                                    onChange={(e) => setExamForm({ ...examForm, exam_name: e.target.value })}
+                                                    className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all ${errors.exam_name ? 'border-red-500' : ''}`}
+                                                    value={examForm.exam_name || ""}
+                                                    onChange={(e) => {
+                                                        setExamForm({ ...examForm, exam_name: e.target.value });
+                                                        if (errors.exam_name) setErrors({...errors, exam_name: ""});
+                                                    }}
                                                 />
+                                                {errors.exam_name && <p className="text-red-500 text-xs mt-1">{errors.exam_name}</p>}
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
@@ -166,40 +233,56 @@ const ExamManager = ({
                                                 <input
                                                     required
                                                     type="date"
-                                                    className="w-full p-2 border rounded-lg text-sm"
+                                                    className={`w-full p-2 border rounded-lg text-sm ${errors.application_start_date ? 'border-red-500' : ''}`}
                                                     value={examForm.application_start_date || ""}
-                                                    onChange={(e) => setExamForm({ ...examForm, application_start_date: e.target.value })}
+                                                    onChange={(e) => {
+                                                        setExamForm({ ...examForm, application_start_date: e.target.value });
+                                                        if (errors.application_start_date) setErrors({...errors, application_start_date: ""});
+                                                    }}
                                                 />
+                                                {errors.application_start_date && <p className="text-red-500 text-[10px] mt-1">{errors.application_start_date}</p>}
                                             </div>
                                             <div>
                                                 <label className="block text-[10px] uppercase font-bold text-gray-500 mb-1">App End</label>
                                                 <input
                                                     required
                                                     type="date"
-                                                    className="w-full p-2 border rounded-lg text-sm"
+                                                    className={`w-full p-2 border rounded-lg text-sm ${errors.application_end_date ? 'border-red-500' : ''}`}
                                                     value={examForm.application_end_date || ""}
-                                                    onChange={(e) => setExamForm({ ...examForm, application_end_date: e.target.value })}
+                                                    onChange={(e) => {
+                                                        setExamForm({ ...examForm, application_end_date: e.target.value });
+                                                        if (errors.application_end_date) setErrors({...errors, application_end_date: ""});
+                                                    }}
                                                 />
+                                                {errors.application_end_date && <p className="text-red-500 text-[10px] mt-1">{errors.application_end_date}</p>}
                                             </div>
                                             <div>
                                                 <label className="block text-[10px] uppercase font-bold text-gray-500 mb-1">Exam Start</label>
                                                 <input
                                                     required
                                                     type="date"
-                                                    className="w-full p-2 border rounded-lg text-sm"
+                                                    className={`w-full p-2 border rounded-lg text-sm ${errors.exam_start_date ? 'border-red-500' : ''}`}
                                                     value={examForm.exam_start_date || ""}
-                                                    onChange={(e) => setExamForm({ ...examForm, exam_start_date: e.target.value })}
+                                                    onChange={(e) => {
+                                                        setExamForm({ ...examForm, exam_start_date: e.target.value });
+                                                        if (errors.exam_start_date) setErrors({...errors, exam_start_date: ""});
+                                                    }}
                                                 />
+                                                {errors.exam_start_date && <p className="text-red-500 text-[10px] mt-1">{errors.exam_start_date}</p>}
                                             </div>
                                             <div>
                                                 <label className="block text-[10px] uppercase font-bold text-gray-500 mb-1">Exam End</label>
                                                 <input
                                                     required
                                                     type="date"
-                                                    className="w-full p-2 border rounded-lg text-sm"
+                                                    className={`w-full p-2 border rounded-lg text-sm ${errors.exam_end_date ? 'border-red-500' : ''}`}
                                                     value={examForm.exam_end_date || ""}
-                                                    onChange={(e) => setExamForm({ ...examForm, exam_end_date: e.target.value })}
+                                                    onChange={(e) => {
+                                                        setExamForm({ ...examForm, exam_end_date: e.target.value });
+                                                        if (errors.exam_end_date) setErrors({...errors, exam_end_date: ""});
+                                                    }}
                                                 />
+                                                {errors.exam_end_date && <p className="text-red-500 text-[10px] mt-1">{errors.exam_end_date}</p>}
                                             </div>
                                         </div>
                                     </div>
@@ -254,11 +337,11 @@ const ExamManager = ({
                                                 required
                                                 type="number"
                                                 min="1"
-                                                className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                                                value={examForm.no_of_papers}
+                                                className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none ${errors.no_of_papers ? 'border-red-500' : ''}`}
+                                                value={examForm.no_of_papers || ""}
                                                 onChange={(e) => {
                                                     const val = parseInt(e.target.value) || 1;
-                                                    const newPapers = [...examForm.papers];
+                                                    const newPapers = [...(examForm.papers || [])];
                                                     if (val > newPapers.length) {
                                                         for (let i = newPapers.length; i < val; i++) {
                                                             newPapers.push({ name: "", maxMarks: 100 });
@@ -267,23 +350,26 @@ const ExamManager = ({
                                                         newPapers.splice(val);
                                                     }
                                                     setExamForm({ ...examForm, no_of_papers: val, papers: newPapers });
+                                                    if (errors.no_of_papers) setErrors({...errors, no_of_papers: ""});
                                                 }}
                                             />
+                                            {errors.no_of_papers && <p className="text-red-500 text-xs mt-1">{errors.no_of_papers}</p>}
                                         </div>
                                         <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                                            {examForm.papers.map((paper, index) => (
+                                            {(examForm.papers || []).map((paper, index) => (
                                                 <div key={index} className="grid grid-cols-7 gap-2 items-end bg-gray-50 p-2 rounded-lg border border-gray-100">
                                                     <div className="col-span-4">
                                                         <label className="text-[9px] uppercase font-bold text-gray-400 mb-1 block text-indigo-600">Paper {index + 1} Name</label>
                                                         <input
                                                             required
                                                             placeholder="Name"
-                                                            className="w-full p-2 border rounded text-sm outline-none focus:ring-1 focus:ring-indigo-500"
+                                                            className={`w-full p-2 border rounded text-sm outline-none focus:ring-1 focus:ring-indigo-500 ${errors[`paper_${index}_name`] ? 'border-red-500' : ''}`}
                                                             value={paper.name}
                                                             onChange={(e) => {
                                                                 const newPapers = [...examForm.papers];
                                                                 newPapers[index].name = e.target.value;
                                                                 setExamForm({ ...examForm, papers: newPapers });
+                                                                if (errors[`paper_${index}_name`]) setErrors({...errors, [`paper_${index}_name`]: ""});
                                                             }}
                                                         />
                                                     </div>
@@ -292,12 +378,13 @@ const ExamManager = ({
                                                         <input
                                                             required
                                                             type="number"
-                                                            className="w-full p-2 border rounded text-sm outline-none focus:ring-1 focus:ring-indigo-500"
+                                                            className={`w-full p-2 border rounded text-sm outline-none focus:ring-1 focus:ring-indigo-500 ${errors[`paper_${index}_marks`] ? 'border-red-500' : ''}`}
                                                             value={paper.maxMarks}
                                                             onChange={(e) => {
                                                                 const newPapers = [...examForm.papers];
                                                                 newPapers[index].maxMarks = parseInt(e.target.value) || 0;
                                                                 setExamForm({ ...examForm, papers: newPapers });
+                                                                if (errors[`paper_${index}_marks`]) setErrors({...errors, [`paper_${index}_marks`]: ""});
                                                             }}
                                                         />
                                                     </div>

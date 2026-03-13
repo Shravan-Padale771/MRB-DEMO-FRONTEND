@@ -11,11 +11,7 @@ export default defineConfig({
     setupFiles: './src/setupTests.js',
   },
   resolve: {
-    dedupe: ['react', 'react-dom'],
-    alias: {
-      'react': 'C:/Users/SUMIT/Desktop/mrb/MRB-DEMO-FRONTEND/node_modules/react',
-      'react-dom': 'C:/Users/SUMIT/Desktop/mrb/MRB-DEMO-FRONTEND/node_modules/react-dom',
-    },
+    // Removed absolute path aliases that were breaking tests for other users
   },
   server: {
     proxy: {

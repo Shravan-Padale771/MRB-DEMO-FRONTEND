@@ -6,14 +6,17 @@ import { createExamApplication } from "../../api";
 
 const ApplyModal = ({ exam, student, onClose, onSuccess }) => {
   const [agreed, setAgreed] = useState(false);
+  const [error, setError] = useState("");
 
   if (!exam || !student) return null;
 
   const handleSubmit = async () => {
     if (!agreed) {
+      setError("Please accept the declaration before submitting");
       toast.error("Please accept the declaration before submitting");
       return;
     }
+    setError("");
 
     try {
       await createExamApplication({
@@ -100,13 +103,17 @@ const ApplyModal = ({ exam, student, onClose, onSuccess }) => {
                   <input
                     type="checkbox"
                     checked={agreed}
-                    onChange={(e) => setAgreed(e.target.checked)}
-                    className="mt-1 w-4 h-4"
+                    onChange={(e) => {
+                      setAgreed(e.target.checked);
+                      if (e.target.checked) setError("");
+                    }}
+                    className={`mt-1 w-4 h-4 ${error ? 'border-red-500 outline-none ring-2 ring-red-500 rounded' : ''}`}
                   />
                   <span className="font-semibold text-gray-800">
                     I agree to the above declaration and examination rules.
                   </span>
                 </label>
+                {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
               </div>
             </Section>
 

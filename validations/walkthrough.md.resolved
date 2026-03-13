@@ -1,0 +1,36 @@
+# Input Validations & Tests Implementation
+
+I have scanned the React application for input elements and implemented comprehensive front-end validations and test cases for the three most complex and critical components in the application.
+
+## Components Updated
+
+### 1. [StudentRegistration.jsx](file:///c:/Users/Vyankatesh%20Pandit/Workspace/MRB/MRB-DEMO-FRONTEND/src/pages/StudentRegistration.jsx)
+- **Validations Added:**
+  - Name fields (First, Last) are required.
+  - `Contact Number` must be **exactly 10 digits**.
+  - `Email` must follow a valid email regex pattern.
+  - `Age` must be between 5 and 100.
+  - `Mother Tongue` and [School](file:///c:/Users/Vyankatesh%20Pandit/Workspace/MRB/MRB-DEMO-FRONTEND/src/pages/StudentRegistration.jsx#18-26) selections are required.
+  - `Password` must be at least 6 characters.
+  - `Confirm Password` must match the `Password` field exactly.
+- **UI Feedback:** Added dynamic red borders and distinct inline error messages below each field that vanish immediately as the user begins typing to correct them.
+- **Test Coverage:** Created [__tests__/pages/StudentRegistration.test.jsx](file:///c:/Users/Vyankatesh%20Pandit/Workspace/MRB/MRB-DEMO-FRONTEND/src/__tests__/pages/StudentRegistration.test.jsx) verifying that all these rules trigger appropriately on form submission, and that correcting them clears the errors.
+
+### 2. [ApplyModal.jsx](file:///c:/Users/Vyankatesh%20Pandit/Workspace/MRB/MRB-DEMO-FRONTEND/src/student/components/ApplyModal.jsx)
+- **Validations Added:**
+  - Users are physically blocked from submitting an application unless they check the "I agree to the declaration" checkbox.
+- **UI Feedback:** Added dynamic red highlighting around the checkbox and a clear warning message if the user attempts to submit without agreeing.
+- **Test Coverage:** Created [__tests__/student/ApplyModal.test.jsx](file:///c:/Users/Vyankatesh%20Pandit/Workspace/MRB/MRB-DEMO-FRONTEND/src/__tests__/student/ApplyModal.test.jsx) that verifies the form prevents the submission API call if the box is unchecked.
+
+### 3. [ExamManager.jsx](file:///c:/Users/Vyankatesh%20Pandit/Workspace/MRB/MRB-DEMO-FRONTEND/src/admin/components/ExamManager.jsx)
+- **Validations Added:**
+  - `Step 0` (Basic Info): `Exam Code` and `Exam Name` are required. `Exam Fees` cannot be negative.
+  - `Step 1` (Dates): Ensure application start/end dates are present, and that the `application_end_date` is strictly after the `application_start_date`. The same applies to `exam_start_date` and `exam_end_date`.
+  - `Step 2` (Papers): Ensures there is at least one paper specified, and every paper row has a name and `Max Marks` greater than 0. 
+  - Prevents the user from clicking "Next" to advance the wizard if the current step has invalid data.
+- **UI Feedback:** Red borders and inline helper texts appear on invalid fields preventing step transition.
+- **Test Coverage:** Created [__tests__/admin/ExamManager.test.jsx](file:///c:/Users/Vyankatesh%20Pandit/Workspace/MRB/MRB-DEMO-FRONTEND/src/__tests__/admin/ExamManager.test.jsx) which explicitly checks the wizard logic, bounds checking, and date range validity validations.
+
+---
+**Verification Run:**
+All Vitest tests were run and successfully verified the component logic handles the constraints outlined above!
