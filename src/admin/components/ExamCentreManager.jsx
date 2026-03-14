@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Pagination from '../../common/components/Pagination';
 import { createExamCentre, getExamCentres, getRegions } from '../../api';
+import ExamCentreDetailView from './ExamCentreDetailView';
 
 const ExamCentreManager = () => {
     const queryClient = useQueryClient();
@@ -15,6 +16,7 @@ const ExamCentreManager = () => {
     const [filterRegion, setFilterRegion] = useState("");
     const [page, setPage] = useState(0);
     const [size] = useState(10);
+    const [selectedCentre, setSelectedCentre] = useState(null);
 
     // Metadata Queries
     const { data: regionsPage, isLoading: isLoadingRegions } = useQuery({
@@ -40,7 +42,7 @@ const ExamCentreManager = () => {
 
     // Mutation
     const addCentreMutation = useMutation({
-        mutationFn: ({ regionId, payload }) => createExamCentre({ ...payload, region: { regionId } }),
+        mutationFn: ({ regionId, payload }) => createExamCentre(payload, regionId),
         onSuccess: () => {
             toast.success("Exam Centre added!");
             setFormData({ centreCode: "", centreName: "", regionId: "" });
@@ -72,6 +74,10 @@ const ExamCentreManager = () => {
     const handleRefresh = () => {
         refetchCentres();
     };
+
+    if (selectedCentre) {
+        return <ExamCentreDetailView centre={selectedCentre} onBack={() => setSelectedCentre(null)} />;
+    }
 
     return (
         <div className="space-y-6">
@@ -166,6 +172,7 @@ const ExamCentreManager = () => {
                                 <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Code</th>
                                 <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Centre Name</th>
                                 <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider">Region</th>
+                                <th className="p-4 text-[11px] font-black text-gray-400 uppercase tracking-wider text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -187,6 +194,14 @@ const ExamCentreManager = () => {
                                                 <span className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[10px] font-black uppercase tracking-tighter shadow-sm">
                                                     {centre.regionName || "City Area"}
                                                 </span>
+                                            </td>
+                                            <td className="p-4 text-right">
+                                                <button 
+                                                    onClick={() => setSelectedCentre(centre)}
+                                                    className="text-[10px] font-black bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white px-3 py-1.5 rounded-lg uppercase tracking-widest transition-all shadow-sm"
+                                                >
+                                                    Details
+                                                </button>
                                             </td>
                                         </tr>
                                     )

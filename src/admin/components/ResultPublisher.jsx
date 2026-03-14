@@ -166,11 +166,10 @@ const ResultPublisher = ({
         const percentage = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
 
         const payload = {
-            application: { applicationId: appId },
             totalMarks: parseFloat(totalMax.toFixed(2)),
-            percentage: parseFloat(percentage.toFixed(2)),
+            percentage: parseFloat(percentageNumeric.toFixed(2)),
             resultData: JSON.stringify({
-                score: `${percentage.toFixed(2)}%`,
+                score: `${percentageNumeric.toFixed(2)}%`,
                 remarks: data.remarks || 'Pass',
                 totalObtained,
                 totalMax,
@@ -179,7 +178,7 @@ const ResultPublisher = ({
             publishedAt: new Date().toISOString(),
         };
 
-        handlePublishResult({ preventDefault: () => { }, target: {} }, payload); // Modified Dashboard handler needed or direct call
+        handlePublishResult(null, payload, appId);
     };
 
     return (

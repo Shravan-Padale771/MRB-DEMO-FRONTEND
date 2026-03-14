@@ -12,5 +12,117 @@
         "centreName": "SPPA Exam Centre Shivajinagar",
         "regionId": 2,
         "regionName": "Mumbai"
+    },
+    {
+        "centreId": 3,
+        "centreCode": "YUGTDYE",
+        "centreName": "D.PBhosale College",
+        "regionId": 6,
+        "regionName": "Satara"
+    },
+    {
+        "centreId": 4,
+        "centreCode": "EC-MUM128",
+        "centreName": "Mumbai Central Examination Hall",
+        "regionId": 2,
+        "regionName": "Mumbai"
+    },
+    {
+        "centreId": 5,
+        "centreCode": "EC-MUM237",
+        "centreName": "Mumbai Prabhat Road Exam Centre",
+        "regionId": 2,
+        "regionName": "Mumbai"
+    },
+    {
+        "centreId": 6,
+        "centreCode": "EC-MUM369",
+        "centreName": "Mumbai Model High School Centre",
+        "regionId": 2,
+        "regionName": "Mumbai"
+    },
+    {
+        "centreId": 7,
+        "centreCode": "EC-NAS126",
+        "centreName": "Nashik Central Examination Hall",
+        "regionId": 3,
+        "regionName": "Nashik"
+    },
+    {
+        "centreId": 8,
+        "centreCode": "EC-NAS270",
+        "centreName": "Nashik Prabhat Road Exam Centre",
+        "regionId": 3,
+        "regionName": "Nashik"
+    },
+    {
+        "centreId": 9,
+        "centreCode": "EC-NAS346",
+        "centreName": "Nashik Model High School Centre",
+        "regionId": 3,
+        "regionName": "Nashik"
+    },
+    {
+        "centreId": 10,
+        "centreCode": "EC-PUN111",
+        "centreName": "Pune Central Examination Hall",
+        "regionId": 1,
+        "regionName": "Pune"
+    },
+    {
+        "centreId": 11,
+        "centreCode": "EC-PUN288",
+        "centreName": "Pune Prabhat Road Exam Centre",
+        "regionId": 1,
+        "regionName": "Pune"
+    },
+    {
+        "centreId": 12,
+        "centreCode": "EC-PUN358",
+        "centreName": "Pune Model High School Centre",
+        "regionId": 1,
+        "regionName": "Pune"
+    },
+    {
+        "centreId": 13,
+        "centreCode": "EC-SAT158",
+        "centreName": "Satara Central Examination Hall",
+        "regionId": 6,
+        "regionName": "Satara"
+    },
+    {
+        "centreId": 14,
+        "centreCode": "EC-SAT248",
+        "centreName": "Satara Prabhat Road Exam Centre",
+        "regionId": 6,
+        "regionName": "Satara"
+    },
+    {
+        "centreId": 15,
+        "centreCode": "EC-SAT338",
+        "centreName": "Satara Model High School Centre",
+        "regionId": 6,
+        "regionName": "Satara"
+    },
+    {
+        "centreId": 16,
+        "centreCode": "EC-THA110",
+        "centreName": "Thane Central Examination Hall",
+        "regionId": 4,
+        "regionName": "Thane"
+    },
+    {
+        "centreId": 17,
+        "centreCode": "EC-THA255",
+        "centreName": "Thane Prabhat Road Exam Centre",
+        "regionId": 4,
+        "regionName": "Thane"
+    },
+    {
+        "centreId": 18,
+        "centreCode": "EC-THA317",
+        "centreName": "Thane Model High School Centre",
+        "regionId": 4,
+        "regionName": "Thane"
     }
 ]

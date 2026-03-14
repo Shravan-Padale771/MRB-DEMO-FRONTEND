@@ -49,7 +49,7 @@ const SchoolManager = () => {
 
     // Mutation
     const addSchoolMutation = useMutation({
-        mutationFn: ({ centreId, schoolData }) => createSchool({ ...schoolData, examCentre: { centreId } }),
+        mutationFn: ({ centreId, schoolData }) => createSchool(schoolData, centreId),
         onSuccess: () => {
             toast.success("School Added!");
             setFormData({ schoolName: "", centreId: "" });

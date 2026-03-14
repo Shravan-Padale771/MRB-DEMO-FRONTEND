@@ -23,12 +23,15 @@ import {
 import MyResults from "../student/components/MyResults";
 import ApplyModal from "../student/components/ApplyModal";
 
+import StudentProfileSection from "../student/components/StudentProfileSection";
+
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
   const [students, setStudents] = useState([]);
   const [exams, setExams] = useState([]);
   const [myResults, setMyResults] = useState([]);
+  const [activeTab, setActiveTab] = useState("exams");
 
   const [selectedExam, setSelectedExam] = useState(null);
   const [applicationForm, setApplicationForm] = useState({
@@ -37,9 +40,6 @@ const StudentDashboard = () => {
     address: "",
     gender: "Male",
   });
-
-
-
 
   useEffect(() => {
     const loadData = async () => {
@@ -61,6 +61,11 @@ const StudentDashboard = () => {
   useEffect(() => {
     if (currentUser) {
       fetchMyResults();
+      if (!currentUser.hasProfile) {
+        setActiveTab("profile");
+      } else {
+        setActiveTab("exams");
+      }
     }
   }, [currentUser]);
 
@@ -76,35 +81,20 @@ const StudentDashboard = () => {
 
   const openApplyModal = (exam) => {
     if (!currentUser) return toast.error("Please select a user first");
+    if (!currentUser.hasProfile) {
+      setActiveTab("profile");
+      return toast.error("Please complete your profile first before applying.");
+    }
     setSelectedExam(exam);
   };
 
-  const handleFormSubmit = async (e) => {
-    if (!currentUser?.studentId || !selectedExam?.examNo) {
-      return toast.error("Incomplete selection data");
-    }
-    const payload = {
-      student: { studentId: currentUser.studentId },
-      exam: { examNo: selectedExam.examNo },
-      formData: JSON.stringify(applicationForm),
-      status: "APPLIED",
-    };
-
-    try {
-      await createExamApplication(payload);
-      toast.success("Application Submitted Successfully!");
-      setSelectedExam(null);
-      setApplicationForm({
-        fullName: "",
-        phone: "",
-        address: "",
-        gender: "Male",
-      });
-    } catch (error) {
-      toast.error("Application Failed");
-    }
+  const handleProfileUpdated = async () => {
+    // Optionally refetch current user or update state to reflect profile completion
+    setCurrentUser(prev => ({ ...prev, hasProfile: true }));
+    setActiveTab("exams");
   };
 
+  // Skip down to rendering for brevity...
   if (!currentUser) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 p-4">
@@ -209,71 +199,97 @@ const StudentDashboard = () => {
               </div>
             </div>
           </div>
-          <button
-            onClick={() => setCurrentUser(null)}
-            className="flex items-center gap-2 text-gray-400 hover:text-red-500 hover:bg-red-50/50 px-4 py-2 rounded-xl transition-all duration-300 font-bold text-sm border border-transparent hover:border-red-100"
-          >
-            <LogOut size={18} /> Logout
-          </button>
+          <div className="flex items-center gap-4">
+            <div className="flex bg-gray-100 p-1 rounded-xl">
+              <button
+                onClick={() => setActiveTab("profile")}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "profile" ? "bg-white text-indigo-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+              >
+                Profile Setup
+              </button>
+              <button
+                onClick={() => setActiveTab("exams")}
+                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "exams" ? "bg-white text-[#4c84ff] shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+              >
+                Available Exams
+              </button>
+            </div>
+            <button
+              onClick={() => setCurrentUser(null)}
+              className="flex items-center gap-2 text-gray-400 hover:text-red-500 hover:bg-red-50/50 px-4 py-2 rounded-xl transition-all duration-300 font-bold text-sm border border-transparent hover:border-red-100"
+            >
+              <LogOut size={18} /> Logout
+            </button>
+          </div>
         </header>
-
 
         <div className="grid lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2 space-y-8">
-            <h2 className="text-2xl font-black text-gray-900 border-l-4 border-[#4c84ff] pl-5 py-1 flex items-center gap-3 tracking-tight uppercase text-sm">
-              <BookOpen size={20} className="text-[#4c84ff]" /> Available Exams
-            </h2>
-            {exams.length === 0 ? (
-              <div className="text-center p-12 bg-white rounded-xl border-2 border-dashed">
-                <BookOpen className="mx-auto text-gray-400 mb-3" size={40} />
-                <p className="text-gray-500 font-medium">No exams available</p>
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-6">
-                {exams.map((exam) => (
-                  <motion.div
-                    key={exam.examNo}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ translateY: -8, shadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
-                    className="bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:border-blue-100/50 transition-all duration-500 flex flex-col justify-between group"
-                  >
-                    <div className="mb-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <h3 className="text-xl font-bold text-gray-900 flex-1">
-                          {exam.exam_name}
-                        </h3>
-                        <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
-                          Exam #{exam.examNo}
-                        </span>
-                      </div>
-                      <div className="space-y-2 text-sm text-gray-600">
-                        <div className="flex items-center gap-2">
-                          <FileText size={16} className="text-gray-400" />
-                          <span>
-                            <strong>{exam.no_of_papers}</strong> Papers
-                          </span>
+            {activeTab === "profile" && (
+              <StudentProfileSection 
+                student={currentUser} 
+                onProfileUpdated={handleProfileUpdated} 
+              />
+            )}
+            
+            {activeTab === "exams" && (
+              <>
+                <h2 className="text-2xl font-black text-gray-900 border-l-4 border-[#4c84ff] pl-5 py-1 flex items-center gap-3 tracking-tight uppercase text-sm">
+                  <BookOpen size={20} className="text-[#4c84ff]" /> Available Exams
+                </h2>
+                {exams.length === 0 ? (
+                  <div className="text-center p-12 bg-white rounded-xl border-2 border-dashed">
+                    <BookOpen className="mx-auto text-gray-400 mb-3" size={40} />
+                    <p className="text-gray-500 font-medium">No exams available</p>
+                  </div>
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {exams.map((exam) => (
+                      <motion.div
+                        key={exam.examNo}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        whileHover={{ translateY: -8, shadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
+                        className="bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:border-blue-100/50 transition-all duration-500 flex flex-col justify-between group"
+                      >
+                        <div className="mb-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <h3 className="text-xl font-bold text-gray-900 flex-1">
+                              {exam.exam_name}
+                            </h3>
+                            <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
+                              Exam #{exam.examNo}
+                            </span>
+                          </div>
+                          <div className="space-y-2 text-sm text-gray-600">
+                            <div className="flex items-center gap-2">
+                              <FileText size={16} className="text-gray-400" />
+                              <span>
+                                <strong>{exam.no_of_papers}</strong> Papers
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <DollarSign size={16} className="text-green-500" />
+                              <span className="font-semibold text-green-600">
+                                ${exam.exam_fees}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <DollarSign size={16} className="text-green-500" />
-                          <span className="font-semibold text-green-600">
-                            ${exam.exam_fees}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Apply field which opens exam form  */}
-                    <motion.button
-                      whileHover={{ scale: 1.02, translateY: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => openApplyModal(exam)}
-                      className="w-full bg-[#4c84ff] text-white py-3.5 rounded-xl hover:shadow-[0_10px_20px_-5px_rgba(76,132,255,0.4)] font-bold transition-all duration-300 uppercase tracking-wider text-sm shadow-md shadow-blue-500/10"
-                    >
-                      Apply Now
-                    </motion.button>
-                  </motion.div>
-                ))}
-              </div>
+                        {/* Apply field which opens exam form  */}
+                        <motion.button
+                          whileHover={{ scale: 1.02, translateY: -2 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => openApplyModal(exam)}
+                          className="w-full bg-[#4c84ff] text-white py-3.5 rounded-xl hover:shadow-[0_10px_20px_-5px_rgba(76,132,255,0.4)] font-bold transition-all duration-300 uppercase tracking-wider text-sm shadow-md shadow-blue-500/10"
+                        >
+                          Apply Now
+                        </motion.button>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
 

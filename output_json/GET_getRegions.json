@@ -15,6 +15,11 @@
         "no_exam_centres": 0
     },
     {
+        "regionId": 6,
+        "regionName": "Satara",
+        "no_exam_centres": 0
+    },
+    {
         "regionId": 4,
         "regionName": "Thane",
         "no_exam_centres": 0

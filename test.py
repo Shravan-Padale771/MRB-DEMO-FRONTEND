@@ -3,7 +3,9 @@ import time
 import json
 import os
 
-BASE_URL = "http://100.53.20.30:8080"
+BASE_URL2 = "http://100.53.20.30:8080"
+
+BASE_URL = "http://localhost:8080"
 
 def log_performance(endpoint, method, status, duration):
     with open("performance.txt", "a") as f:

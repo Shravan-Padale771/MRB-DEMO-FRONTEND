@@ -10,5 +10,281 @@
         "schoolName": "SOP School of Varada",
         "centreId": 2,
         "centreName": "SPPA Exam Centre Shivajinagar"
+    },
+    {
+        "schoolId": 3,
+        "schoolName": "KBP School Koregaon",
+        "centreId": 3,
+        "centreName": "D.PBhosale College"
+    },
+    {
+        "schoolId": 4,
+        "schoolName": "Saraswati Vidyamandir - Mumbai",
+        "centreId": 4,
+        "centreName": "Mumbai Central Examination Hall"
+    },
+    {
+        "schoolId": 5,
+        "schoolName": "Mount Saint Mary School - Mumbai",
+        "centreId": 4,
+        "centreName": "Mumbai Central Examination Hall"
+    },
+    {
+        "schoolId": 6,
+        "schoolName": "New English School - Mumbai",
+        "centreId": 4,
+        "centreName": "Mumbai Central Examination Hall"
+    },
+    {
+        "schoolId": 7,
+        "schoolName": "Saraswati Vidyamandir - Mumbai",
+        "centreId": 5,
+        "centreName": "Mumbai Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 8,
+        "schoolName": "Mount Saint Mary School - Mumbai",
+        "centreId": 5,
+        "centreName": "Mumbai Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 9,
+        "schoolName": "New English School - Mumbai",
+        "centreId": 5,
+        "centreName": "Mumbai Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 10,
+        "schoolName": "Saraswati Vidyamandir - Mumbai",
+        "centreId": 6,
+        "centreName": "Mumbai Model High School Centre"
+    },
+    {
+        "schoolId": 11,
+        "schoolName": "Mount Saint Mary School - Mumbai",
+        "centreId": 6,
+        "centreName": "Mumbai Model High School Centre"
+    },
+    {
+        "schoolId": 12,
+        "schoolName": "New English School - Mumbai",
+        "centreId": 6,
+        "centreName": "Mumbai Model High School Centre"
+    },
+    {
+        "schoolId": 13,
+        "schoolName": "Saraswati Vidyamandir - Nashik",
+        "centreId": 7,
+        "centreName": "Nashik Central Examination Hall"
+    },
+    {
+        "schoolId": 14,
+        "schoolName": "Mount Saint Mary School - Nashik",
+        "centreId": 7,
+        "centreName": "Nashik Central Examination Hall"
+    },
+    {
+        "schoolId": 15,
+        "schoolName": "New English School - Nashik",
+        "centreId": 7,
+        "centreName": "Nashik Central Examination Hall"
+    },
+    {
+        "schoolId": 16,
+        "schoolName": "Saraswati Vidyamandir - Nashik",
+        "centreId": 8,
+        "centreName": "Nashik Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 17,
+        "schoolName": "Mount Saint Mary School - Nashik",
+        "centreId": 8,
+        "centreName": "Nashik Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 18,
+        "schoolName": "New English School - Nashik",
+        "centreId": 8,
+        "centreName": "Nashik Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 19,
+        "schoolName": "Saraswati Vidyamandir - Nashik",
+        "centreId": 9,
+        "centreName": "Nashik Model High School Centre"
+    },
+    {
+        "schoolId": 20,
+        "schoolName": "Mount Saint Mary School - Nashik",
+        "centreId": 9,
+        "centreName": "Nashik Model High School Centre"
+    },
+    {
+        "schoolId": 21,
+        "schoolName": "New English School - Nashik",
+        "centreId": 9,
+        "centreName": "Nashik Model High School Centre"
+    },
+    {
+        "schoolId": 22,
+        "schoolName": "Saraswati Vidyamandir - Pune",
+        "centreId": 10,
+        "centreName": "Pune Central Examination Hall"
+    },
+    {
+        "schoolId": 23,
+        "schoolName": "Mount Saint Mary School - Pune",
+        "centreId": 10,
+        "centreName": "Pune Central Examination Hall"
+    },
+    {
+        "schoolId": 24,
+        "schoolName": "New English School - Pune",
+        "centreId": 10,
+        "centreName": "Pune Central Examination Hall"
+    },
+    {
+        "schoolId": 25,
+        "schoolName": "Saraswati Vidyamandir - Pune",
+        "centreId": 11,
+        "centreName": "Pune Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 26,
+        "schoolName": "Mount Saint Mary School - Pune",
+        "centreId": 11,
+        "centreName": "Pune Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 27,
+        "schoolName": "New English School - Pune",
+        "centreId": 11,
+        "centreName": "Pune Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 28,
+        "schoolName": "Saraswati Vidyamandir - Pune",
+        "centreId": 12,
+        "centreName": "Pune Model High School Centre"
+    },
+    {
+        "schoolId": 29,
+        "schoolName": "Mount Saint Mary School - Pune",
+        "centreId": 12,
+        "centreName": "Pune Model High School Centre"
+    },
+    {
+        "schoolId": 30,
+        "schoolName": "New English School - Pune",
+        "centreId": 12,
+        "centreName": "Pune Model High School Centre"
+    },
+    {
+        "schoolId": 31,
+        "schoolName": "Saraswati Vidyamandir - Satara",
+        "centreId": 13,
+        "centreName": "Satara Central Examination Hall"
+    },
+    {
+        "schoolId": 32,
+        "schoolName": "Mount Saint Mary School - Satara",
+        "centreId": 13,
+        "centreName": "Satara Central Examination Hall"
+    },
+    {
+        "schoolId": 33,
+        "schoolName": "New English School - Satara",
+        "centreId": 13,
+        "centreName": "Satara Central Examination Hall"
+    },
+    {
+        "schoolId": 34,
+        "schoolName": "Saraswati Vidyamandir - Satara",
+        "centreId": 14,
+        "centreName": "Satara Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 35,
+        "schoolName": "Mount Saint Mary School - Satara",
+        "centreId": 14,
+        "centreName": "Satara Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 36,
+        "schoolName": "New English School - Satara",
+        "centreId": 14,
+        "centreName": "Satara Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 37,
+        "schoolName": "Saraswati Vidyamandir - Satara",
+        "centreId": 15,
+        "centreName": "Satara Model High School Centre"
+    },
+    {
+        "schoolId": 38,
+        "schoolName": "Mount Saint Mary School - Satara",
+        "centreId": 15,
+        "centreName": "Satara Model High School Centre"
+    },
+    {
+        "schoolId": 39,
+        "schoolName": "New English School - Satara",
+        "centreId": 15,
+        "centreName": "Satara Model High School Centre"
+    },
+    {
+        "schoolId": 40,
+        "schoolName": "Saraswati Vidyamandir - Thane",
+        "centreId": 16,
+        "centreName": "Thane Central Examination Hall"
+    },
+    {
+        "schoolId": 41,
+        "schoolName": "Mount Saint Mary School - Thane",
+        "centreId": 16,
+        "centreName": "Thane Central Examination Hall"
+    },
+    {
+        "schoolId": 42,
+        "schoolName": "New English School - Thane",
+        "centreId": 16,
+        "centreName": "Thane Central Examination Hall"
+    },
+    {
+        "schoolId": 43,
+        "schoolName": "Saraswati Vidyamandir - Thane",
+        "centreId": 17,
+        "centreName": "Thane Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 44,
+        "schoolName": "Mount Saint Mary School - Thane",
+        "centreId": 17,
+        "centreName": "Thane Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 45,
+        "schoolName": "New English School - Thane",
+        "centreId": 17,
+        "centreName": "Thane Prabhat Road Exam Centre"
+    },
+    {
+        "schoolId": 46,
+        "schoolName": "Saraswati Vidyamandir - Thane",
+        "centreId": 18,
+        "centreName": "Thane Model High School Centre"
+    },
+    {
+        "schoolId": 47,
+        "schoolName": "Mount Saint Mary School - Thane",
+        "centreId": 18,
+        "centreName": "Thane Model High School Centre"
+    },
+    {
+        "schoolId": 48,
+        "schoolName": "New English School - Thane",
+        "centreId": 18,
+        "centreName": "Thane Model High School Centre"
     }
 ]

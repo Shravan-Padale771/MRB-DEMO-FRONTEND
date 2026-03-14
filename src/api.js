@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_URL = "http://100.53.20.30:8080";
+const API_URL2 = "http://100.53.20.30:8080";
+
+const API_URL = "http://localhost:8080";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -38,8 +40,8 @@ export const getStudents = async ({
 /**
  * POST /students
  */
-export const createStudent = async (studentData) => {
-  const response = await api.post("/students", studentData);
+export const createStudent = async (studentData, schoolId) => {
+  const response = await api.post(`/students?schoolId=${schoolId}`, studentData);
   return response.data;
 };
 
@@ -138,8 +140,8 @@ export const getExamApplications = async ({
 /**
  * POST /exam-applications
  */
-export const createExamApplication = async (applicationData) => {
-  const response = await api.post("/exam-applications", applicationData);
+export const createExamApplication = async (applicationData, studentId, examId) => {
+  const response = await api.post(`/exam-applications?studentId=${studentId}&examId=${examId}`, applicationData);
   return response.data;
 };
 
@@ -226,8 +228,8 @@ export const getExamCentres = async ({
 /**
  * POST /exam-centres
  */
-export const createExamCentre = async (centreData) => {
-  const response = await api.post("/exam-centres", centreData);
+export const createExamCentre = async (centreData, regionId) => {
+  const response = await api.post(`/exam-centres?regionId=${regionId}`, centreData);
   return response.data;
 };
 
@@ -272,14 +274,30 @@ export const getSchools = async ({
 /**
  * POST /schools
  */
-export const createSchool = async (schoolData) => {
-  const response = await api.post("/schools", schoolData);
+export const createSchool = async (schoolData, examCentreId) => {
+  const response = await api.post(`/schools?centreId=${examCentreId}`, schoolData);
+  return response.data;
+};
+
+/**
+ * PUT /schools/{id}
+ */
+export const updateSchool = async (id, schoolData) => {
+  const response = await api.put(`/schools/${id}`, schoolData);
+  return response.data;
+};
+
+/**
+ * DELETE /schools/{id}
+ */
+export const deleteSchool = async (id) => {
+  const response = await api.delete(`/schools/${id}`);
   return response.data;
 };
 
 // --- RESULT ENDPOINTS ---
-export const createExamResult = async (resultData) => {
-  const response = await api.post("/exam-results", resultData);
+export const createExamResult = async (resultData, applicationId) => {
+  const response = await api.post(`/exam-results?applicationId=${applicationId}`, resultData);
   return response.data;
 };
 
@@ -302,6 +320,90 @@ export const getExamResults = async ({
   if (sort) params.append("sort", sort);
 
   const response = await api.get(`/exam-results?${params.toString()}`);
+  return response.data;
+};
+
+// --- ANALYTICS ENDPOINTS ---
+export const getAnalyticsSummary = async () => {
+  const response = await api.get('/summary');
+  return response.data;
+};
+
+export const getStudentCountBySchool = async (schoolId) => {
+  const response = await api.get(`/counts/school/${schoolId}/students`);
+  return response.data;
+};
+
+export const getExamCentreCountByRegion = async (regionId) => {
+  const response = await api.get(`/counts/region/${regionId}/exam-centres`);
+  return response.data;
+};
+
+export const getSchoolCountByExamCentre = async (centreId) => {
+  const response = await api.get(`/counts/exam-centre/${centreId}/schools`);
+  return response.data;
+};
+
+export const getStudentCountByRegion = async (regionId) => {
+  const response = await api.get(`/counts/region/${regionId}/students`);
+  return response.data;
+};
+
+export const getSchoolCountByRegion = async (regionId) => {
+  const response = await api.get(`/counts/region/${regionId}/schools`);
+  return response.data;
+};
+
+export const getStudentCountByExamCentre = async (centreId) => {
+  const response = await api.get(`/counts/exam-centre/${centreId}/students`);
+  return response.data;
+};
+
+// --- STUDENT PROFILE ENDPOINTS ---
+export const getStudentProfile = async (id) => {
+  const response = await api.get(`/getStudentProfile?id=${id}`);
+  return response.data;
+};
+
+export const getAllStudentProfiles = async () => {
+  const response = await api.get("/getAllStudentProfiles");
+  return response.data;
+};
+
+export const addStudentProfile = async (studentId, profileData) => {
+  const response = await api.post(`/addStudentProfile?studentId=${studentId}`, profileData);
+  return response.data;
+};
+
+export const createStudentProfileAPI = async (studentId, profileData) => {
+  const response = await api.post(`/studentProfiles?studentId=${studentId}`, profileData);
+  return response.data;
+};
+
+export const getStudentProfileById = async (id) => {
+  const response = await api.get(`/getStudentProfileById?id=${id}`);
+  return response.data;
+};
+
+export const searchStudentProfiles = async ({
+  page = 0,
+  size = 20,
+  sort,
+} = {}) => {
+  const params = new URLSearchParams({ page, size });
+  if (sort) params.append("sort", sort);
+
+  const response = await api.get(`/studentProfiles?${params.toString()}`);
+  return response.data;
+};
+
+export const updateStudentProfile = async (id, profileData) => {
+  const response = await api.put(`/studentProfiles/${id}`, profileData);
+  return response.data;
+};
+
+export const deleteStudentProfile = async (id) => {
+  const response = await api.delete(`/studentProfiles/${id}`);
   return response.data;
 };
 

@@ -3,10 +3,12 @@ import { MapPin, Plus, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createRegion, getRegions, getSchools } from '../../api';
+import RegionDetailView from './RegionDetailView';
 
 const RegionManager = () => {
     const queryClient = useQueryClient();
     const [regionName, setRegionName] = useState("");
+    const [selectedRegion, setSelectedRegion] = useState(null);
 
     // Queries
     const { data: regionsPage, isLoading: isLoadingRegions, refetch: refetchRegions } = useQuery({
@@ -15,6 +17,7 @@ const RegionManager = () => {
     });
     const regions = regionsPage?.content || [];
 
+    // We keep this for the summary counts in the list view, but it's secondary now
     const { data: schoolsPage, isLoading: isLoadingSchools } = useQuery({
         queryKey: ['schools'],
         queryFn: () => getSchools({ size: 1000 }),
@@ -42,6 +45,15 @@ const RegionManager = () => {
     };
 
     const loading = isLoadingRegions || isLoadingSchools || addRegionMutation.isPending;
+
+    if (selectedRegion) {
+        return (
+            <RegionDetailView 
+                region={selectedRegion} 
+                onBack={() => setSelectedRegion(null)} 
+            />
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -94,11 +106,7 @@ const RegionManager = () => {
                     ) : (
                         regions.map((region) => {
                             const regionCentres = Array.isArray(region.examCentres) ? region.examCentres : [];
-                            const regionSchools = schools.filter(s =>
-                                s.examCentre?.region?.regionId === region.regionId ||
-                                (typeof s.examCentre?.region === 'string' && s.examCentre.region === region.regionName)
-                            );
-
+                            
                             return (
                                 <div
                                     key={region.regionId}
@@ -137,7 +145,10 @@ const RegionManager = () => {
                                     )}
 
                                     <div className="mt-auto pt-4 border-t border-dashed border-gray-200">
-                                        <button className="w-full py-2 bg-white border border-indigo-100 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
+                                        <button 
+                                            onClick={() => setSelectedRegion(region)}
+                                            className="w-full py-2 bg-white border border-indigo-100 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                                        >
                                             Manage Region Data
                                         </button>
                                     </div>

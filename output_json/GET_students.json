@@ -11,6 +11,7 @@
             "motherTongue": "Hindi",
             "schoolId": 1,
             "schoolName": "The Modern School of Science",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -24,6 +25,7 @@
             "motherTongue": "Hindi",
             "schoolId": 1,
             "schoolName": "The Modern School of Science",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -37,6 +39,7 @@
             "motherTongue": "Marathi",
             "schoolId": 1,
             "schoolName": "The Modern School of Science",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -50,6 +53,7 @@
             "motherTongue": "Marathi",
             "schoolId": 1,
             "schoolName": "The Modern School of Science",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -63,6 +67,7 @@
             "motherTongue": "Marathi",
             "schoolId": 1,
             "schoolName": "The Modern School of Science",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -76,6 +81,7 @@
             "motherTongue": "Hindi",
             "schoolId": 1,
             "schoolName": "The Modern School of Science",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -89,6 +95,7 @@
             "motherTongue": "Marathi",
             "schoolId": 1,
             "schoolName": "The Modern School of Science",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -102,6 +109,7 @@
             "motherTongue": "Hindi",
             "schoolId": 1,
             "schoolName": "The Modern School of Science",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -115,6 +123,7 @@
             "motherTongue": "Hindi",
             "schoolId": 1,
             "schoolName": "The Modern School of Science",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -128,6 +137,7 @@
             "motherTongue": "Hindi",
             "schoolId": 1,
             "schoolName": "The Modern School of Science",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -141,6 +151,7 @@
             "motherTongue": "Marathi",
             "schoolId": 1,
             "schoolName": "The Modern School of Science",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -154,6 +165,7 @@
             "motherTongue": "Hindi",
             "schoolId": 2,
             "schoolName": "SOP School of Varada",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -167,6 +179,7 @@
             "motherTongue": "Marathi",
             "schoolId": 2,
             "schoolName": "SOP School of Varada",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -180,6 +193,7 @@
             "motherTongue": "Marathi",
             "schoolId": 2,
             "schoolName": "SOP School of Varada",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -193,6 +207,7 @@
             "motherTongue": "Marathi",
             "schoolId": 2,
             "schoolName": "SOP School of Varada",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -206,6 +221,7 @@
             "motherTongue": "Hindi",
             "schoolId": 2,
             "schoolName": "SOP School of Varada",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -219,6 +235,7 @@
             "motherTongue": "Marathi",
             "schoolId": 2,
             "schoolName": "SOP School of Varada",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -232,6 +249,7 @@
             "motherTongue": "Marathi",
             "schoolId": 2,
             "schoolName": "SOP School of Varada",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -245,6 +263,7 @@
             "motherTongue": "Marathi",
             "schoolId": 2,
             "schoolName": "SOP School of Varada",
+            "hasProfile": false,
             "examApplications": null
         },
         {
@@ -258,10 +277,11 @@
             "motherTongue": "Marathi",
             "schoolId": 2,
             "schoolName": "SOP School of Varada",
+            "hasProfile": false,
             "examApplications": null
         }
     ],
     "number": 0,
     "size": 20,
-    "totalElements": 43
+    "totalElements": 943
 }

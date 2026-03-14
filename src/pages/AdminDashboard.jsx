@@ -43,6 +43,7 @@ import {
   getExamResults,
   getSchools,
   getRegions,
+  getAnalyticsSummary,
 } from "../api";
 
 
@@ -169,7 +170,12 @@ const AdminDashboard = () => {
   });
   const regions = regionsPage?.content || [];
 
-  const loading = isLoadingStudents || isLoadingExams || isLoadingApplications || isLoadingResults || isLoadingSchools || isLoadingRegions;
+  const { data: analyticsSummary, isLoading: isLoadingAnalytics } = useQuery({
+    queryKey: ["analyticsSummary"],
+    queryFn: () => getAnalyticsSummary(),
+  });
+
+  const loading = isLoadingStudents || isLoadingExams || isLoadingApplications || isLoadingResults || isLoadingSchools || isLoadingRegions || isLoadingAnalytics;
 
   // Auto-calculate percentage
   useEffect(() => {
@@ -300,7 +306,7 @@ const AdminDashboard = () => {
 
 
   const publishResultMutation = useMutation({
-    mutationFn: (payload) => createExamResult(payload),
+    mutationFn: ({ payload, applicationId }) => createExamResult(payload, applicationId),
     onSuccess: () => {
       toast.success("Result Published!");
       setResultForm({
@@ -356,13 +362,20 @@ const AdminDashboard = () => {
   };
 
 
-  const handlePublishResult = (e, directPayload = null) => {
-    if (e) e.preventDefault();
+    const handlePublishResult = (e, directPayload = null, directAppId = null) => {
+        if (e) e.preventDefault();
 
-    if (directPayload) {
-      publishResultMutation.mutate(directPayload);
-      return;
-    }
+        if (directPayload) {
+            // If we have a direct appId, use it. Otherwise try to extract from payload (legacy/bulk)
+            const appId = directAppId || directPayload.application?.applicationId;
+            const { application, ...restPayload } = directPayload;
+            
+            publishResultMutation.mutate({ 
+                payload: restPayload, 
+                applicationId: appId 
+            });
+            return;
+        }
 
     if (!resultForm.applicationId || !resultForm.score) {
       return toast.error("Please fill all fields");
@@ -389,7 +402,6 @@ const AdminDashboard = () => {
     const percentageNumeric = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
 
     const payload = {
-      application: { applicationId: parseInt(resultForm.applicationId) },
       totalMarks: parseFloat(totalMax.toFixed(2)),
       percentage: parseFloat(percentageNumeric.toFixed(2)),
       resultData: JSON.stringify({
@@ -404,7 +416,7 @@ const AdminDashboard = () => {
       publishedAt: new Date().toISOString(),
     };
 
-    publishResultMutation.mutate(payload);
+    publishResultMutation.mutate({ payload, applicationId: parseInt(resultForm.applicationId) });
   };
 
   const selectApplication = (appId) => {
@@ -504,22 +516,22 @@ const AdminDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <MetricCard
               label="Total Students"
-              value={students.length.toLocaleString()}
+              value={(analyticsSummary?.totalStudents || analyticsSummary?.studentCount || students.length).toLocaleString()}
               color="#4c84ff"
             />
             <MetricCard
               label="Total Exams"
-              value={exams.length.toLocaleString()}
+              value={(analyticsSummary?.totalExams || analyticsSummary?.examCount || exams.length).toLocaleString()}
               color="#fbc02d"
             />
             <MetricCard
               label="Active Applications"
-              value={applications.length.toLocaleString()}
+              value={(analyticsSummary?.totalApplications || analyticsSummary?.applicationCount || applications.length).toLocaleString()}
               color="#10b981"
             />
             <MetricCard
               label="Total Results"
-              value={results.length.toLocaleString()}
+              value={(analyticsSummary?.totalResults || analyticsSummary?.resultCount || results.length).toLocaleString()}
               color="#8b5cf6"
             />
           </div>

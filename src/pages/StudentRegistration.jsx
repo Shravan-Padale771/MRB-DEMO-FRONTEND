@@ -68,7 +68,7 @@ const StudentRegistration = () => {
       }
 
       // Call backend API
-      const response = await createStudent({ ...studentData, school: { schoolId } });
+      const response = await createStudent(studentData, schoolId);
 
       toast.success("Registration Successful! Redirecting to login...");
       console.log("Registered Student:", response);

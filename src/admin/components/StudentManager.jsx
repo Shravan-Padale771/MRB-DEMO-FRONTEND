@@ -84,10 +84,6 @@ const StudentManager = ({ isDashboard = false }) => {
         setPage(0);
     };
 
-    if (isLoading && !studentsData) {
-        return <div className="p-8 text-center text-gray-500 font-bold animate-pulse uppercase tracking-widest text-xs">Loading Student Directory...</div>;
-    }
-
     return (
         <div className={`space-y-6 ${isDashboard ? '' : 'animate-in fade-in duration-500'}`}>
             {!isDashboard ? (
@@ -218,7 +214,9 @@ const StudentManager = ({ isDashboard = false }) => {
                     </div>
 
                     <div className="mt-8 border-t border-gray-100 pt-8">
-                        {students.length === 0 ? (
+                        {isLoading && !studentsData ? (
+                            <div className="p-16 text-center text-gray-400 font-bold animate-pulse uppercase tracking-widest text-xs border-2 border-dashed border-gray-200 rounded-3xl bg-gray-50">Loading Student Directory...</div>
+                        ) : students.length === 0 ? (
                             <div className="text-center p-16 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
                                 <Users className="mx-auto text-gray-200 mb-4" size={64} />
                                 <p className="text-gray-400 font-bold italic text-lg">No students found matching filters</p>

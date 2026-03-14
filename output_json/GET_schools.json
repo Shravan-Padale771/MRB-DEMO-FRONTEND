@@ -11,9 +11,117 @@
             "schoolName": "SOP School of Varada",
             "centreId": 2,
             "centreName": "SPPA Exam Centre Shivajinagar"
+        },
+        {
+            "schoolId": 3,
+            "schoolName": "KBP School Koregaon",
+            "centreId": 3,
+            "centreName": "D.PBhosale College"
+        },
+        {
+            "schoolId": 4,
+            "schoolName": "Saraswati Vidyamandir - Mumbai",
+            "centreId": 4,
+            "centreName": "Mumbai Central Examination Hall"
+        },
+        {
+            "schoolId": 5,
+            "schoolName": "Mount Saint Mary School - Mumbai",
+            "centreId": 4,
+            "centreName": "Mumbai Central Examination Hall"
+        },
+        {
+            "schoolId": 6,
+            "schoolName": "New English School - Mumbai",
+            "centreId": 4,
+            "centreName": "Mumbai Central Examination Hall"
+        },
+        {
+            "schoolId": 7,
+            "schoolName": "Saraswati Vidyamandir - Mumbai",
+            "centreId": 5,
+            "centreName": "Mumbai Prabhat Road Exam Centre"
+        },
+        {
+            "schoolId": 8,
+            "schoolName": "Mount Saint Mary School - Mumbai",
+            "centreId": 5,
+            "centreName": "Mumbai Prabhat Road Exam Centre"
+        },
+        {
+            "schoolId": 9,
+            "schoolName": "New English School - Mumbai",
+            "centreId": 5,
+            "centreName": "Mumbai Prabhat Road Exam Centre"
+        },
+        {
+            "schoolId": 10,
+            "schoolName": "Saraswati Vidyamandir - Mumbai",
+            "centreId": 6,
+            "centreName": "Mumbai Model High School Centre"
+        },
+        {
+            "schoolId": 11,
+            "schoolName": "Mount Saint Mary School - Mumbai",
+            "centreId": 6,
+            "centreName": "Mumbai Model High School Centre"
+        },
+        {
+            "schoolId": 12,
+            "schoolName": "New English School - Mumbai",
+            "centreId": 6,
+            "centreName": "Mumbai Model High School Centre"
+        },
+        {
+            "schoolId": 13,
+            "schoolName": "Saraswati Vidyamandir - Nashik",
+            "centreId": 7,
+            "centreName": "Nashik Central Examination Hall"
+        },
+        {
+            "schoolId": 14,
+            "schoolName": "Mount Saint Mary School - Nashik",
+            "centreId": 7,
+            "centreName": "Nashik Central Examination Hall"
+        },
+        {
+            "schoolId": 15,
+            "schoolName": "New English School - Nashik",
+            "centreId": 7,
+            "centreName": "Nashik Central Examination Hall"
+        },
+        {
+            "schoolId": 16,
+            "schoolName": "Saraswati Vidyamandir - Nashik",
+            "centreId": 8,
+            "centreName": "Nashik Prabhat Road Exam Centre"
+        },
+        {
+            "schoolId": 17,
+            "schoolName": "Mount Saint Mary School - Nashik",
+            "centreId": 8,
+            "centreName": "Nashik Prabhat Road Exam Centre"
+        },
+        {
+            "schoolId": 18,
+            "schoolName": "New English School - Nashik",
+            "centreId": 8,
+            "centreName": "Nashik Prabhat Road Exam Centre"
+        },
+        {
+            "schoolId": 19,
+            "schoolName": "Saraswati Vidyamandir - Nashik",
+            "centreId": 9,
+            "centreName": "Nashik Model High School Centre"
+        },
+        {
+            "schoolId": 20,
+            "schoolName": "Mount Saint Mary School - Nashik",
+            "centreId": 9,
+            "centreName": "Nashik Model High School Centre"
         }
     ],
     "number": 0,
     "size": 20,
-    "totalElements": 2
+    "totalElements": 48
 }

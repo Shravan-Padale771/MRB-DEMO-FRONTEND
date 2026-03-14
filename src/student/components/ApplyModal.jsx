@@ -17,17 +17,8 @@ const ApplyModal = ({ exam, student, onClose, onSuccess }) => {
 
     try {
       await createExamApplication({
-        student: { studentId: student.studentId },
-        exam: { examNo: exam.examNo },
         status: "APPLIED",
-
-        /*
-          NOTE:
-          Signature, photo, and document uploads are NOT included
-          in payload intentionally.
-          These will require DB + API changes later.
-        */
-      });
+      }, student.studentId, exam.examNo);
 
       toast.success("Application Submitted Successfully");
       onClose();

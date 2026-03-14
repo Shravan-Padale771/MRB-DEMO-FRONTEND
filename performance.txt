@@ -134,3 +134,34 @@ second attempt[2026-03-12 00:11:39] GET /getAllStudents | Status: 200 | Duration
 [2026-03-12 00:11:54] GET /exam-applications | Status: 200 | Duration: 0.8076s
 [2026-03-12 00:11:56] GET /getAllResults | Status: 200 | Duration: 1.3050s
 [2026-03-12 00:11:57] GET /exam-results | Status: 200 | Duration: 0.8203s
+checking without cache + indexing[2026-03-13 16:00:37] GET /getAllStudents | Status: 200 | Duration: 16.2876s
+[2026-03-13 16:00:40] GET /students | Status: 200 | Duration: 2.6676s
+[2026-03-13 16:00:42] GET /getAllExams | Status: 200 | Duration: 1.7026s
+[2026-03-13 16:00:44] GET /exams | Status: 200 | Duration: 1.5336s
+[2026-03-13 16:00:46] GET /getRegions | Status: 200 | Duration: 1.5820s
+[2026-03-13 16:00:48] GET /regions | Status: 200 | Duration: 1.5497s
+[2026-03-13 16:00:52] GET /getAllExamCentres | Status: 200 | Duration: 2.6807s
+[2026-03-13 16:00:55] GET /exam-centres | Status: 200 | Duration: 2.7059s
+[2026-03-13 16:01:02] GET /getAllSchools | Status: 200 | Duration: 6.8231s
+[2026-03-13 16:01:07] GET /schools | Status: 200 | Duration: 3.8523s
+[2026-03-13 16:01:19] GET /getAllApplications | Status: 200 | Duration: 12.0087s
+[2026-03-13 16:01:26] GET /exam-applications | Status: 200 | Duration: 6.5203s
+[2026-03-13 16:01:37] GET /getAllResults | Status: 200 | Duration: 10.3270s
+[2026-03-13 16:01:44] GET /exam-results | Status: 200 | Duration: 6.6518s
+indexing + cache
+[2026-03-13 16:02:01] GET /getAllStudents | Status: 200 | Duration: 0.4902s
+[2026-03-13 16:02:01] GET /students | Status: 200 | Duration: 0.0579s
+[2026-03-13 16:02:02] GET /getAllExams | Status: 200 | Duration: 0.0736s
+[2026-03-13 16:02:02] GET /exams | Status: 200 | Duration: 0.0432s
+[2026-03-13 16:02:04] GET /getRegions | Status: 200 | Duration: 1.5905s
+[2026-03-13 16:02:05] GET /regions | Status: 200 | Duration: 0.0314s
+[2026-03-13 16:02:05] GET /getAllExamCentres | Status: 200 | Duration: 0.0223s
+[2026-03-13 16:02:06] GET /exam-centres | Status: 200 | Duration: 0.0183s
+[2026-03-13 16:02:07] GET /getAllSchools | Status: 200 | Duration: 0.0264s
+[2026-03-13 16:02:07] GET /schools | Status: 200 | Duration: 0.0311s
+[2026-03-13 16:02:08] GET /getAllApplications | Status: 200 | Duration: 0.0207s
+[2026-03-13 16:02:08] GET /exam-applications | Status: 200 | Duration: 0.0499s
+[2026-03-13 16:02:09] GET /getAllResults | Status: 200 | Duration: 0.0388s
+[2026-03-13 16:02:09] GET /exam-results | Status: 200 | Duration: 0.0249s
+[2026-03-13 18:04:35] GET /students | Status: 200 | Duration: 6.9454s
+[2026-03-13 18:24:57] GET /getAllStudents | Status: 200 | Duration: 145.2279s
