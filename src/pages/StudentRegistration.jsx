@@ -12,6 +12,8 @@ const StudentRegistration = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [schools, setSchools] = useState([]);
 
+  const [errors, setErrors] = useState({});
+
   useEffect(() => {
     const fetchSchools = async () => {
       try {
@@ -42,19 +44,59 @@ const StudentRegistration = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    // Clear error when user types
+    if (errors[e.target.name]) {
+      setErrors({
+        ...errors,
+        [e.target.name]: "",
+      });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Basic required fields
+    if (!formData.firstName.trim()) newErrors.firstName = "First Name is required";
+    if (!formData.lastName.trim()) newErrors.lastName = "Last Name is required";
+    
+    // Contact: exactly 10 digits
+    if (!/^\d{10}$/.test(formData.contact)) {
+      newErrors.contact = "Contact number must be exactly 10 digits";
+    }
+    
+    // Email regex
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+    
+    // Age
+    const ageNum = parseInt(formData.age, 10);
+    if (!ageNum || ageNum < 5 || ageNum > 100) {
+      newErrors.age = "Age must be between 5 and 100";
+    }
+
+    if (!formData.motherTongue) newErrors.motherTongue = "Please select mother tongue";
+    if (!formData.schoolId) newErrors.schoolId = "Please select a school";
+
+    // Passwords
+    if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validation
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match!");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters!");
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form");
       return;
     }
 
@@ -144,10 +186,11 @@ const StudentRegistration = () => {
                     name="firstName"
                     required
                     placeholder="Enter first name"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition ${errors.firstName ? 'border-red-500' : 'border-gray-300'}`}
                     value={formData.firstName}
                     onChange={handleChange}
                   />
+                  {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -171,10 +214,11 @@ const StudentRegistration = () => {
                     name="lastName"
                     required
                     placeholder="Enter last name"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition ${errors.lastName ? 'border-red-500' : 'border-gray-300'}`}
                     value={formData.lastName}
                     onChange={handleChange}
                   />
+                  {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                 </div>
               </div>
 
@@ -190,11 +234,15 @@ const StudentRegistration = () => {
                     required
                     placeholder="Enter contact number"
                     pattern="[0-9]{10}"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition ${errors.contact ? 'border-red-500' : 'border-gray-300'}`}
                     value={formData.contact}
                     onChange={handleChange}
                   />
-                  <p className="text-xs text-gray-500 mt-1">10 digit number</p>
+                  {errors.contact ? (
+                    <p className="text-red-500 text-xs mt-1">{errors.contact}</p>
+                  ) : (
+                    <p className="text-xs text-gray-500 mt-1">10 digit number</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -205,10 +253,11 @@ const StudentRegistration = () => {
                     name="email"
                     required
                     placeholder="Enter email address"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
                     value={formData.email}
                     onChange={handleChange}
                   />
+                  {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                 </div>
               </div>
 
@@ -225,10 +274,11 @@ const StudentRegistration = () => {
                     min="5"
                     max="100"
                     placeholder="Enter age"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition ${errors.age ? 'border-red-500' : 'border-gray-300'}`}
                     value={formData.age}
                     onChange={handleChange}
                   />
+                  {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -237,7 +287,7 @@ const StudentRegistration = () => {
                   <select
                     name="motherTongue"
                     required
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition bg-white"
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition bg-white ${errors.motherTongue ? 'border-red-500' : 'border-gray-300'}`}
                     value={formData.motherTongue}
                     onChange={handleChange}
                   >
@@ -245,6 +295,7 @@ const StudentRegistration = () => {
                     <option value="Hindi">Hindi</option>
                     <option value="Marathi">Marathi</option>
                   </select>
+                  {errors.motherTongue && <p className="text-red-500 text-xs mt-1">{errors.motherTongue}</p>}
                 </div>
               </div>
 
@@ -256,7 +307,7 @@ const StudentRegistration = () => {
                 <select
                   name="schoolId"
                   required
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition bg-white font-medium"
+                  className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition bg-white font-medium ${errors.schoolId ? 'border-red-500' : 'border-gray-300'}`}
                   value={formData.schoolId}
                   onChange={handleChange}
                 >
@@ -267,9 +318,13 @@ const StudentRegistration = () => {
                     </option>
                   ))}
                 </select>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 ml-1">
-                  Registration is tied to your specific school
-                </p>
+                {errors.schoolId ? (
+                  <p className="text-red-500 text-xs mt-1">{errors.schoolId}</p>
+                ) : (
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 ml-1">
+                    Registration is tied to your specific school
+                  </p>
+                )}
               </div>
 
               {/* Password Fields */}
@@ -285,7 +340,7 @@ const StudentRegistration = () => {
                       required
                       minLength="6"
                       placeholder="Enter password"
-                      className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
+                      className={`w-full p-3 pr-12 border rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
                       value={formData.password}
                       onChange={handleChange}
                     />
@@ -297,9 +352,13 @@ const StudentRegistration = () => {
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Minimum 6 characters
-                  </p>
+                  {errors.password ? (
+                    <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+                  ) : (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Minimum 6 characters
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -312,7 +371,7 @@ const StudentRegistration = () => {
                       required
                       minLength="6"
                       placeholder="Re-enter password"
-                      className="w-full p-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
+                      className={`w-full p-3 pr-12 border rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'}`}
                       value={formData.confirmPassword}
                       onChange={handleChange}
                     />
@@ -330,6 +389,9 @@ const StudentRegistration = () => {
                       )}
                     </button>
                   </div>
+                  {errors.confirmPassword && (
+                    <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
+                  )}
                 </div>
               </div>
 
