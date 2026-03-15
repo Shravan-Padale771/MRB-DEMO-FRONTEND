@@ -60,8 +60,8 @@ const ExamManager = ({
         if (step === 0) {
             if (!examForm.exam_code?.trim()) newErrors.exam_code = "Exam Code is required";
             if (!examForm.exam_name?.trim()) newErrors.exam_name = "Exam Name is required";
-            if (examForm.exam_fees < 0 || examForm.exam_fees === "" || examForm.exam_fees === null) {
-                newErrors.exam_fees = "Exam Fees cannot be negative";
+            if (examForm.exam_fees === "" || examForm.exam_fees === null || examForm.exam_fees === undefined || examForm.exam_fees < 0) {
+                newErrors.exam_fees = "Exam Fees is required and cannot be negative";
             }
         } 
         else if (step === 1) {
@@ -69,6 +69,23 @@ const ExamManager = ({
             if (!examForm.application_end_date) newErrors.application_end_date = "Required";
             if (!examForm.exam_start_date) newErrors.exam_start_date = "Required";
             if (!examForm.exam_end_date) newErrors.exam_end_date = "Required";
+
+            const now = new Date();
+            now.setHours(0,0,0,0);
+            const oneYearFromNow = new Date();
+            oneYearFromNow.setFullYear(now.getFullYear() + 1);
+
+            const checkDate = (dateStr, fieldName) => {
+                if (!dateStr) return;
+                const d = new Date(dateStr);
+                if (d < now) newErrors[fieldName] = "Date cannot be in the past";
+                if (d > oneYearFromNow) newErrors[fieldName] = "Date cannot be more than 1 year in future";
+            };
+
+            checkDate(examForm.application_start_date, 'application_start_date');
+            checkDate(examForm.application_end_date, 'application_end_date');
+            checkDate(examForm.exam_start_date, 'exam_start_date');
+            checkDate(examForm.exam_end_date, 'exam_end_date');
 
             if (examForm.application_start_date && examForm.application_end_date && 
                 new Date(examForm.application_end_date) < new Date(examForm.application_start_date)) {
@@ -79,8 +96,14 @@ const ExamManager = ({
                 new Date(examForm.exam_end_date) < new Date(examForm.exam_start_date)) {
                 newErrors.exam_end_date = "Must be after start date";
             }
+
+            if (examForm.application_end_date && examForm.exam_start_date &&
+                new Date(examForm.exam_start_date) < new Date(examForm.application_end_date)) {
+                newErrors.exam_start_date = "Must be after application end date";
+            }
         }
         else if (step === 2) {
+            const struct = examForm.exam_details?.structure || {};
             if (!examForm.no_of_papers || examForm.no_of_papers < 1) {
                 newErrors.no_of_papers = "Must have at least 1 paper";
             }
@@ -88,6 +111,38 @@ const ExamManager = ({
                 if (!paper.name?.trim()) newErrors[`paper_${idx}_name`] = "Required";
                 if (paper.maxMarks < 1) newErrors[`paper_${idx}_marks`] = "Required";
             });
+            if (struct.hasOral && (!struct.oralMarks || struct.oralMarks < 1)) {
+                newErrors.oralMarks = "Oral Marks is required";
+            }
+            if (struct.hasProject && (!struct.projectMarks || struct.projectMarks < 1)) {
+                newErrors.projectMarks = "Project Marks is required";
+            }
+        }
+        else if (step === 3) {
+            const iden = examForm.exam_details?.identity || {};
+            if (!iden.examFullTitle?.trim()) newErrors.examFullTitle = "Full Title is required";
+            if (!iden.conductingBody?.trim()) newErrors.conductingBody = "Body is required";
+            if (!iden.board?.trim()) newErrors.board = "Board is required";
+            if (!iden.examLevel?.trim()) newErrors.examLevel = "Level is required";
+            if (!iden.language?.trim()) newErrors.language = "Language is required";
+        }
+        else if (step === 4) {
+            const rules = examForm.exam_details?.rules || {};
+            const gs = rules.gradingScheme || {};
+            if (!rules.eligibility?.trim()) newErrors.eligibility = "Eligibility is required";
+            if (!rules.passingCriteria?.trim()) newErrors.passingCriteria = "Passing Criteria is required";
+            if (!gs.firstClass) newErrors.firstClass = "Required";
+            if (!gs.secondClass) newErrors.secondClass = "Required";
+            if (!gs.thirdClass) newErrors.thirdClass = "Required";
+            if (!gs.fail) newErrors.failThreshold = "Required";
+        }
+        else if (step === 5) {
+            const admin = examForm.exam_details?.administrative || {};
+            if (!admin.signatoryName?.trim()) newErrors.signatoryName = "Signatory Name is required";
+            if (!admin.signatoryDesignation?.trim()) newErrors.signatoryDesignation = "Designation is required";
+            if (!admin.departmentName?.trim()) newErrors.departmentName = "Department is required";
+            if (!admin.syllabusYear?.trim()) newErrors.syllabusYear = "Syllabus Year is required";
+            if (!admin.instructions?.trim()) newErrors.instructions = "Instructions are required";
         }
 
         setErrors(newErrors);
@@ -107,11 +162,20 @@ const ExamManager = ({
 
     const onFormSubmit = (e) => {
         e.preventDefault();
-        // Since we are at the last step, we can just save
-        if (isEditing) {
-            handleUpdateExam(e);
-        } else {
-            handleCreateExam(e);
+        
+        // If not on the last step, handle Enter key by attempting to advance
+        if (activeStep < steps.length - 1) {
+            nextStep();
+            return;
+        }
+
+        // On the last step, validate and then submit
+        if (validateStep(activeStep)) {
+            if (isEditing) {
+                handleUpdateExam(e);
+            } else {
+                handleCreateExam(e);
+            }
         }
     };
 
@@ -135,7 +199,7 @@ const ExamManager = ({
                                 <X size={14} /> Cancel Edit
                             </button>
                         )}
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                        <span data-testid="step-indicator" className="text-xs font-bold text-gray-400 uppercase tracking-wider">
                             Step {activeStep + 1} of {steps.length}
                         </span>
                     </div>
@@ -167,9 +231,10 @@ const ExamManager = ({
                                         <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Basic Information</h3>
                                         <div className="grid grid-cols-1 gap-4">
                                             <div>
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Exam Code</label>
+                                                <label htmlFor="exam_code" className="block text-sm font-semibold text-gray-700 mb-1">Exam Code</label>
                                                 <input
                                                     required
+                                                    id="exam_code"
                                                     placeholder="e.g. PRAVIN_HINDI"
                                                     className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all ${errors.exam_code ? 'border-red-500' : ''}`}
                                                     value={examForm.exam_code || ""}
@@ -178,12 +243,13 @@ const ExamManager = ({
                                                         if (errors.exam_code) setErrors({...errors, exam_code: ""});
                                                     }}
                                                 />
-                                                {errors.exam_code && <p className="text-red-500 text-xs mt-1">{errors.exam_code}</p>}
+                                                {errors.exam_code && <p data-testid="error-exam_code" className="text-red-500 text-xs mt-1">{errors.exam_code}</p>}
                                             </div>
-                                            <div>
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Exam Name</label>
+                                             <div>
+                                                <label htmlFor="exam_name" className="block text-sm font-semibold text-gray-700 mb-1">Exam Name</label>
                                                 <input
                                                     required
+                                                    id="exam_name"
                                                     placeholder="e.g. Hindi Final Exam"
                                                     className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all ${errors.exam_name ? 'border-red-500' : ''}`}
                                                     value={examForm.exam_name || ""}
@@ -192,13 +258,14 @@ const ExamManager = ({
                                                         if (errors.exam_name) setErrors({...errors, exam_name: ""});
                                                     }}
                                                 />
-                                                {errors.exam_name && <p className="text-red-500 text-xs mt-1">{errors.exam_name}</p>}
+                                                {errors.exam_name && <p data-testid="error-exam_name" className="text-red-500 text-xs mt-1">{errors.exam_name}</p>}
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Status</label>
+                                                    <label htmlFor="status" className="block text-sm font-semibold text-gray-700 mb-1">Status</label>
                                                     <select
                                                         required
+                                                        id="status"
                                                         className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                                                         value={examForm.status || "DRAFT"}
                                                         onChange={(e) => setExamForm({ ...examForm, status: e.target.value })}
@@ -210,29 +277,35 @@ const ExamManager = ({
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Exam Fees</label>
-                                                    <input
-                                                        required
-                                                        type="number"
-                                                        className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                                        value={examForm.exam_fees}
-                                                        onChange={(e) => setExamForm({ ...examForm, exam_fees: parseFloat(e.target.value) || 0 })}
-                                                    />
-                                                </div>
+                                                    <label htmlFor="exam_fees" className="block text-sm font-semibold text-gray-700 mb-1">Exam Fees</label>
+                                                        <input
+                                                    required
+                                                    type="number"
+                                                    id="exam_fees"
+                                                    className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all ${errors.exam_fees ? 'border-red-500' : ''}`}
+                                                    value={examForm.exam_fees}
+                                                    onChange={(e) => {
+                                                        setExamForm({ ...examForm, exam_fees: parseFloat(e.target.value) || 0 });
+                                                        if (errors.exam_fees) setErrors({...errors, exam_fees: ""});
+                                                    }}
+                                                />
+                                                {errors.exam_fees && <p data-testid="error-exam_fees" className="text-red-500 text-xs mt-1">{errors.exam_fees}</p>}
                                             </div>
                                         </div>
                                     </div>
-                                )}
+                                </div>
+                            )}
 
                                 {activeStep === 1 && (
                                     <div className="space-y-4">
                                         <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Dates & Schedule</h3>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block text-[10px] uppercase font-bold text-gray-500 mb-1">App Start</label>
+                                                <label htmlFor="application_start_date" className="block text-[10px] uppercase font-bold text-gray-500 mb-1">App Start</label>
                                                 <input
                                                     required
                                                     type="date"
+                                                    id="application_start_date"
                                                     className={`w-full p-2 border rounded-lg text-sm ${errors.application_start_date ? 'border-red-500' : ''}`}
                                                     value={examForm.application_start_date || ""}
                                                     onChange={(e) => {
@@ -240,27 +313,29 @@ const ExamManager = ({
                                                         if (errors.application_start_date) setErrors({...errors, application_start_date: ""});
                                                     }}
                                                 />
-                                                {errors.application_start_date && <p className="text-red-500 text-[10px] mt-1">{errors.application_start_date}</p>}
+                                                {errors.application_start_date && <p data-testid="error-application_start_date" className="text-red-500 text-[10px] mt-1">{errors.application_start_date}</p>}
                                             </div>
+                                             <div>
+                                                 <label htmlFor="application_end_date" className="block text-[10px] uppercase font-bold text-gray-500 mb-1">App End</label>
+                                                 <input
+                                                     required
+                                                     type="date"
+                                                     id="application_end_date"
+                                                     className={`w-full p-2 border rounded-lg text-sm ${errors.application_end_date ? 'border-red-500' : ''}`}
+                                                     value={examForm.application_end_date || ""}
+                                                     onChange={(e) => {
+                                                         setExamForm({ ...examForm, application_end_date: e.target.value });
+                                                         if (errors.application_end_date) setErrors({...errors, application_end_date: ""});
+                                                     }}
+                                                 />
+                                                 {errors.application_end_date && <p data-testid="error-application_end_date" className="text-red-500 text-[10px] mt-1">{errors.application_end_date}</p>}
+                                             </div>
                                             <div>
-                                                <label className="block text-[10px] uppercase font-bold text-gray-500 mb-1">App End</label>
+                                                <label htmlFor="exam_start_date" className="block text-[10px] uppercase font-bold text-gray-500 mb-1">Exam Start</label>
                                                 <input
                                                     required
                                                     type="date"
-                                                    className={`w-full p-2 border rounded-lg text-sm ${errors.application_end_date ? 'border-red-500' : ''}`}
-                                                    value={examForm.application_end_date || ""}
-                                                    onChange={(e) => {
-                                                        setExamForm({ ...examForm, application_end_date: e.target.value });
-                                                        if (errors.application_end_date) setErrors({...errors, application_end_date: ""});
-                                                    }}
-                                                />
-                                                {errors.application_end_date && <p className="text-red-500 text-[10px] mt-1">{errors.application_end_date}</p>}
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] uppercase font-bold text-gray-500 mb-1">Exam Start</label>
-                                                <input
-                                                    required
-                                                    type="date"
+                                                    id="exam_start_date"
                                                     className={`w-full p-2 border rounded-lg text-sm ${errors.exam_start_date ? 'border-red-500' : ''}`}
                                                     value={examForm.exam_start_date || ""}
                                                     onChange={(e) => {
@@ -268,13 +343,14 @@ const ExamManager = ({
                                                         if (errors.exam_start_date) setErrors({...errors, exam_start_date: ""});
                                                     }}
                                                 />
-                                                {errors.exam_start_date && <p className="text-red-500 text-[10px] mt-1">{errors.exam_start_date}</p>}
+                                                {errors.exam_start_date && <p data-testid="error-exam_start_date" className="text-red-500 text-[10px] mt-1">{errors.exam_start_date}</p>}
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] uppercase font-bold text-gray-500 mb-1">Exam End</label>
+                                                <label htmlFor="exam_end_date" className="block text-[10px] uppercase font-bold text-gray-500 mb-1">Exam End</label>
                                                 <input
                                                     required
                                                     type="date"
+                                                    id="exam_end_date"
                                                     className={`w-full p-2 border rounded-lg text-sm ${errors.exam_end_date ? 'border-red-500' : ''}`}
                                                     value={examForm.exam_end_date || ""}
                                                     onChange={(e) => {
@@ -282,7 +358,7 @@ const ExamManager = ({
                                                         if (errors.exam_end_date) setErrors({...errors, exam_end_date: ""});
                                                     }}
                                                 />
-                                                {errors.exam_end_date && <p className="text-red-500 text-[10px] mt-1">{errors.exam_end_date}</p>}
+                                                {errors.exam_end_date && <p data-testid="error-exam_end_date" className="text-red-500 text-[10px] mt-1">{errors.exam_end_date}</p>}
                                             </div>
                                         </div>
                                     </div>
@@ -293,49 +369,106 @@ const ExamManager = ({
                                         <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Papers Configuration</h3>
 
                                         <div className="flex gap-4 p-3 bg-indigo-50/50 rounded-lg border border-indigo-100 mb-4">
-                                            <label className="flex items-center gap-2 cursor-pointer group">
-                                                <input
-                                                    type="checkbox"
-                                                    className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                                    checked={examForm.exam_details?.structure?.hasOral}
-                                                    onChange={(e) => setExamForm({
-                                                        ...examForm,
-                                                        exam_details: {
-                                                            ...examForm.exam_details,
-                                                            structure: {
-                                                                ...examForm.exam_details?.structure,
-                                                                hasOral: e.target.checked
+                                            <div className="flex-1 space-y-2">
+                                                <label className="flex items-center gap-2 cursor-pointer group">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                        checked={examForm.exam_details?.structure?.hasOral}
+                                                        onChange={(e) => setExamForm({
+                                                            ...examForm,
+                                                            exam_details: {
+                                                                ...examForm.exam_details,
+                                                                structure: {
+                                                                    ...examForm.exam_details?.structure,
+                                                                    hasOral: e.target.checked
+                                                                }
                                                             }
-                                                        }
-                                                    })}
-                                                />
-                                                <span className="text-sm font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">Include Oral Exam</span>
-                                            </label>
-                                            <label className="flex items-center gap-2 cursor-pointer group">
-                                                <input
-                                                    type="checkbox"
-                                                    className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                                    checked={examForm.exam_details?.structure?.hasProject}
-                                                    onChange={(e) => setExamForm({
-                                                        ...examForm,
-                                                        exam_details: {
-                                                            ...examForm.exam_details,
-                                                            structure: {
-                                                                ...examForm.exam_details?.structure,
-                                                                hasProject: e.target.checked
+                                                        })}
+                                                    />
+                                                    <span className="text-sm font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">Include Oral Exam</span>
+                                                </label>
+                                                {examForm.exam_details?.structure?.hasOral && (
+                                                    <div>
+                                                        <input
+                                                            required
+                                                            type="number"
+                                                            placeholder="Oral Max Marks"
+                                                            id="oralMarks"
+                                                            className={`w-full p-2 border rounded text-xs outline-none focus:ring-1 focus:ring-indigo-500 ${errors.oralMarks ? 'border-red-500' : ''}`}
+                                                            value={examForm.exam_details?.structure?.oralMarks || ""}
+                                                            onChange={(e) => {
+                                                                setExamForm({
+                                                                    ...examForm,
+                                                                    exam_details: {
+                                                                        ...examForm.exam_details,
+                                                                        structure: {
+                                                                            ...examForm.exam_details?.structure,
+                                                                            oralMarks: parseInt(e.target.value) || 0
+                                                                        }
+                                                                    }
+                                                                });
+                                                                if (errors.oralMarks) setErrors({...errors, oralMarks: ""});
+                                                            }}
+                                                        />
+                                                        {errors.oralMarks && <p data-testid="error-oralMarks" className="text-red-500 text-[9px] mt-1">{errors.oralMarks}</p>}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 space-y-2">
+                                                <label className="flex items-center gap-2 cursor-pointer group">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                        checked={examForm.exam_details?.structure?.hasProject}
+                                                        onChange={(e) => setExamForm({
+                                                            ...examForm,
+                                                            exam_details: {
+                                                                ...examForm.exam_details,
+                                                                structure: {
+                                                                    ...examForm.exam_details?.structure,
+                                                                    hasProject: e.target.checked
+                                                                }
                                                             }
-                                                        }
-                                                    })}
-                                                />
-                                                <span className="text-sm font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">Include Project Work</span>
-                                            </label>
+                                                        })}
+                                                    />
+                                                    <span className="text-sm font-bold text-gray-700 group-hover:text-indigo-600 transition-colors">Include Project Work</span>
+                                                </label>
+                                                {examForm.exam_details?.structure?.hasProject && (
+                                                    <div>
+                                                        <input
+                                                            required
+                                                            type="number"
+                                                            placeholder="Project Max Marks"
+                                                            id="projectMarks"
+                                                            className={`w-full p-2 border rounded text-xs outline-none focus:ring-1 focus:ring-indigo-500 ${errors.projectMarks ? 'border-red-500' : ''}`}
+                                                            value={examForm.exam_details?.structure?.projectMarks || ""}
+                                                            onChange={(e) => {
+                                                                setExamForm({
+                                                                    ...examForm,
+                                                                    exam_details: {
+                                                                        ...examForm.exam_details,
+                                                                        structure: {
+                                                                            ...examForm.exam_details?.structure,
+                                                                            projectMarks: parseInt(e.target.value) || 0
+                                                                        }
+                                                                    }
+                                                                });
+                                                                if (errors.projectMarks) setErrors({...errors, projectMarks: ""});
+                                                            }}
+                                                        />
+                                                        {errors.projectMarks && <p data-testid="error-projectMarks" className="text-red-500 text-[9px] mt-1">{errors.projectMarks}</p>}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-1">Number of Written Papers</label>
+                                            <label htmlFor="no_of_papers" className="block text-sm font-semibold text-gray-700 mb-1">Number of Written Papers</label>
                                             <input
                                                 required
                                                 type="number"
+                                                id="no_of_papers"
                                                 min="1"
                                                 className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none ${errors.no_of_papers ? 'border-red-500' : ''}`}
                                                 value={examForm.no_of_papers || ""}
@@ -353,15 +486,16 @@ const ExamManager = ({
                                                     if (errors.no_of_papers) setErrors({...errors, no_of_papers: ""});
                                                 }}
                                             />
-                                            {errors.no_of_papers && <p className="text-red-500 text-xs mt-1">{errors.no_of_papers}</p>}
+                                            {errors.no_of_papers && <p data-testid="error-no_of_papers" className="text-red-500 text-xs mt-1">{errors.no_of_papers}</p>}
                                         </div>
                                         <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                                             {(examForm.papers || []).map((paper, index) => (
                                                 <div key={index} className="grid grid-cols-7 gap-2 items-end bg-gray-50 p-2 rounded-lg border border-gray-100">
                                                     <div className="col-span-4">
-                                                        <label className="text-[9px] uppercase font-bold text-gray-400 mb-1 block text-indigo-600">Paper {index + 1} Name</label>
+                                                        <label htmlFor={`paper_${index}_name`} className="text-[9px] uppercase font-bold text-gray-400 mb-1 block text-indigo-600">Paper {index + 1} Name</label>
                                                         <input
                                                             required
+                                                            id={`paper_${index}_name`}
                                                             placeholder="Name"
                                                             className={`w-full p-2 border rounded text-sm outline-none focus:ring-1 focus:ring-indigo-500 ${errors[`paper_${index}_name`] ? 'border-red-500' : ''}`}
                                                             value={paper.name}
@@ -372,12 +506,14 @@ const ExamManager = ({
                                                                 if (errors[`paper_${index}_name`]) setErrors({...errors, [`paper_${index}_name`]: ""});
                                                             }}
                                                         />
+                                                        {errors[`paper_${index}_name`] && <p data-testid={`error-paper_${index}_name`} className="text-red-500 text-[10px] mt-1">{errors[`paper_${index}_name`]}</p>}
                                                     </div>
                                                     <div className="col-span-3">
-                                                        <label className="text-[9px] uppercase font-bold text-gray-400 mb-1 block">Max Marks</label>
+                                                        <label htmlFor={`paper_${index}_marks`} className="text-[9px] uppercase font-bold text-gray-400 mb-1 block">Max Marks</label>
                                                         <input
                                                             required
                                                             type="number"
+                                                            id={`paper_${index}_marks`}
                                                             className={`w-full p-2 border rounded text-sm outline-none focus:ring-1 focus:ring-indigo-500 ${errors[`paper_${index}_marks`] ? 'border-red-500' : ''}`}
                                                             value={paper.maxMarks}
                                                             onChange={(e) => {
@@ -387,6 +523,7 @@ const ExamManager = ({
                                                                 if (errors[`paper_${index}_marks`]) setErrors({...errors, [`paper_${index}_marks`]: ""});
                                                             }}
                                                         />
+                                                        {errors[`paper_${index}_marks`] && <p data-testid={`error-paper_${index}_marks`} className="text-red-500 text-[10px] mt-1">{errors[`paper_${index}_marks`]}</p>}
                                                     </div>
                                                 </div>
                                             ))}
@@ -399,57 +536,87 @@ const ExamManager = ({
                                         <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Exam Identity</h3>
                                         <div className="grid grid-cols-1 gap-4">
                                             <div>
-                                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Full Title</label>
-                                                <input
-                                                    className="w-full p-2.5 border rounded-lg text-sm"
-                                                    value={details.identity.examFullTitle}
-                                                    onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, identity: { ...details.identity, examFullTitle: e.target.value } } })}
-                                                />
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Body</label>
-                                                    <input
-                                                        className="w-full p-2.5 border rounded-lg text-sm"
-                                                        value={details.identity.conductingBody}
-                                                        onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, identity: { ...details.identity, conductingBody: e.target.value } } })}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Board</label>
-                                                    <input
-                                                        className="w-full p-2.5 border rounded-lg text-sm"
-                                                        value={details.identity.board}
-                                                        onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, identity: { ...details.identity, board: e.target.value } } })}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Level</label>
-                                                    <input
-                                                        className="w-full p-2.5 border rounded-lg text-sm"
-                                                        value={details.identity.examLevel}
-                                                        onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, identity: { ...details.identity, examLevel: e.target.value } } })}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Language</label>
-                                                    <input
-                                                        className="w-full p-2.5 border rounded-lg text-sm"
-                                                        value={details.identity.language}
-                                                        onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, identity: { ...details.identity, language: e.target.value } } })}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Recognition Text</label>
-                                                <textarea
-                                                    className="w-full p-2.5 border rounded-lg text-sm h-16"
-                                                    value={details.identity.recognitionText}
-                                                    onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, identity: { ...details.identity, recognitionText: e.target.value } } })}
-                                                />
-                                            </div>
+                                                 <label htmlFor="examFullTitle" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Full Title</label>
+                                                 <input
+                                                     id="examFullTitle"
+                                                     className={`w-full p-2.5 border rounded-lg text-sm ${errors.examFullTitle ? 'border-red-500' : ''}`}
+                                                     value={details.identity.examFullTitle}
+                                                     onChange={(e) => {
+                                                         setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, identity: { ...details.identity, examFullTitle: e.target.value } } });
+                                                         if (errors.examFullTitle) setErrors({...errors, examFullTitle: ""});
+                                                     }}
+                                                 />
+                                                 {errors.examFullTitle && <p data-testid="error-examFullTitle" className="text-red-500 text-[10px] mt-1">{errors.examFullTitle}</p>}
+                                             </div>
+                                             <div className="grid grid-cols-2 gap-4">
+                                                 <div>
+                                                     <label htmlFor="conductingBody" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Body</label>
+                                                     <input
+                                                         id="conductingBody"
+                                                         className={`w-full p-2.5 border rounded-lg text-sm ${errors.conductingBody ? 'border-red-500' : ''}`}
+                                                         value={details.identity.conductingBody}
+                                                         onChange={(e) => {
+                                                             setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, identity: { ...details.identity, conductingBody: e.target.value } } });
+                                                             if (errors.conductingBody) setErrors({...errors, conductingBody: ""});
+                                                         }}
+                                                     />
+                                                     {errors.conductingBody && <p data-testid="error-conductingBody" className="text-red-500 text-[10px] mt-1">{errors.conductingBody}</p>}
+                                                 </div>
+                                                 <div>
+                                                     <label htmlFor="board" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Board</label>
+                                                     <input
+                                                         id="board"
+                                                         className={`w-full p-2.5 border rounded-lg text-sm ${errors.board ? 'border-red-500' : ''}`}
+                                                         value={details.identity.board}
+                                                         onChange={(e) => {
+                                                             setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, identity: { ...details.identity, board: e.target.value } } });
+                                                             if (errors.board) setErrors({...errors, board: ""});
+                                                         }}
+                                                     />
+                                                     {errors.board && <p data-testid="error-board" className="text-red-500 text-[10px] mt-1">{errors.board}</p>}
+                                                 </div>
+                                             </div>
+                                             <div className="grid grid-cols-2 gap-4">
+                                                 <div>
+                                                     <label htmlFor="examLevel" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Level</label>
+                                                     <input
+                                                         id="examLevel"
+                                                         className={`w-full p-2.5 border rounded-lg text-sm ${errors.examLevel ? 'border-red-500' : ''}`}
+                                                         value={details.identity.examLevel}
+                                                         onChange={(e) => {
+                                                             setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, identity: { ...details.identity, examLevel: e.target.value } } });
+                                                             if (errors.examLevel) setErrors({...errors, examLevel: ""});
+                                                         }}
+                                                     />
+                                                     {errors.examLevel && <p data-testid="error-examLevel" className="text-red-500 text-[10px] mt-1">{errors.examLevel}</p>}
+                                                 </div>
+                                                 <div>
+                                                     <label htmlFor="language" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Language</label>
+                                                     <input
+                                                         id="language"
+                                                         className={`w-full p-2.5 border rounded-lg text-sm ${errors.language ? 'border-red-500' : ''}`}
+                                                         value={details.identity.language}
+                                                         onChange={(e) => {
+                                                             setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, identity: { ...details.identity, language: e.target.value } } });
+                                                             if (errors.language) setErrors({...errors, language: ""});
+                                                         }}
+                                                     />
+                                                     {errors.language && <p data-testid="error-language" className="text-red-500 text-[10px] mt-1">{errors.language}</p>}
+                                                 </div>
+                                             </div>
+                                             <div>
+                                                 <label htmlFor="recognitionText" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Recognition Text</label>
+                                                 <textarea
+                                                     id="recognitionText"
+                                                     className={`w-full p-2.5 border rounded-lg text-sm h-16 ${errors.recognitionText ? 'border-red-500' : ''}`}
+                                                     value={details.identity.recognitionText}
+                                                     onChange={(e) => {
+                                                         setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, identity: { ...details.identity, recognitionText: e.target.value } } });
+                                                         if (errors.recognitionText) setErrors({...errors, recognitionText: ""});
+                                                     }}
+                                                 />
+                                                 {errors.recognitionText && <p data-testid="error-recognitionText" className="text-red-500 text-[10px] mt-1">{errors.recognitionText}</p>}
+                                             </div>
                                         </div>
                                     </div>
                                 )}
@@ -457,61 +624,91 @@ const ExamManager = ({
                                 {activeStep === 4 && (
                                     <div className="space-y-4">
                                         <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Rules & Criteria</h3>
-                                        <div className="space-y-4">
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Eligibility</label>
-                                                <input
-                                                    className="w-full p-2.5 border rounded-lg text-sm"
-                                                    value={details.rules.eligibility}
-                                                    onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, rules: { ...details.rules, eligibility: e.target.value } } })}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Passing Criteria</label>
-                                                <textarea
-                                                    className="w-full p-2.5 border rounded-lg text-sm h-16"
-                                                    value={details.rules.passingCriteria}
-                                                    onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, rules: { ...details.rules, passingCriteria: e.target.value } } })}
-                                                />
-                                            </div>
-                                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-3">
-                                                <p className="text-[10px] font-bold text-indigo-600 uppercase">Grading Thresholds</p>
-                                                <div className="grid grid-cols-2 gap-3">
-                                                    <div>
-                                                        <label className="text-[9px] text-gray-400 font-bold block mb-1">1st Class</label>
-                                                        <input
-                                                            className="w-full p-2 border rounded-lg text-xs"
-                                                            value={details.rules.gradingScheme.firstClass}
-                                                            onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, rules: { ...details.rules, gradingScheme: { ...details.rules.gradingScheme, firstClass: e.target.value } } } })}
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-[9px] text-gray-400 font-bold block mb-1">2nd Class</label>
-                                                        <input
-                                                            className="w-full p-2 border rounded-lg text-xs"
-                                                            value={details.rules.gradingScheme.secondClass}
-                                                            onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, rules: { ...details.rules, gradingScheme: { ...details.rules.gradingScheme, secondClass: e.target.value } } } })}
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-[9px] text-gray-400 font-bold block mb-1">3rd Class</label>
-                                                        <input
-                                                            className="w-full p-2 border rounded-lg text-xs"
-                                                            value={details.rules.gradingScheme.thirdClass}
-                                                            onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, rules: { ...details.rules, gradingScheme: { ...details.rules.gradingScheme, thirdClass: e.target.value } } } })}
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-[9px] text-gray-400 font-bold block mb-1">Fail Below</label>
-                                                        <input
-                                                            className="w-full p-2 border rounded-lg text-xs"
-                                                            value={details.rules.gradingScheme.fail}
-                                                            onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, rules: { ...details.rules, gradingScheme: { ...details.rules.gradingScheme, fail: e.target.value } } } })}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                         <div className="space-y-4">
+                                             <div>
+                                                 <label htmlFor="eligibility" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Eligibility</label>
+                                                 <input
+                                                     id="eligibility"
+                                                     className={`w-full p-2.5 border rounded-lg text-sm ${errors.eligibility ? 'border-red-500' : ''}`}
+                                                     value={details.rules.eligibility}
+                                                     onChange={(e) => {
+                                                         setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, rules: { ...details.rules, eligibility: e.target.value } } });
+                                                         if (errors.eligibility) setErrors({...errors, eligibility: ""});
+                                                     }}
+                                                 />
+                                                 {errors.eligibility && <p data-testid="error-eligibility" className="text-red-500 text-[10px] mt-1">{errors.eligibility}</p>}
+                                             </div>
+                                             <div>
+                                                 <label htmlFor="passingCriteria" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Passing Criteria</label>
+                                                 <textarea
+                                                     id="passingCriteria"
+                                                     className={`w-full p-2.5 border rounded-lg text-sm h-16 ${errors.passingCriteria ? 'border-red-500' : ''}`}
+                                                     value={details.rules.passingCriteria}
+                                                     onChange={(e) => {
+                                                         setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, rules: { ...details.rules, passingCriteria: e.target.value } } });
+                                                         if (errors.passingCriteria) setErrors({...errors, passingCriteria: ""});
+                                                     }}
+                                                 />
+                                                 {errors.passingCriteria && <p data-testid="error-passingCriteria" className="text-red-500 text-[10px] mt-1">{errors.passingCriteria}</p>}
+                                             </div>
+                                             <div className="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-3">
+                                                 <p className="text-[10px] font-bold text-indigo-600 uppercase">Grading Thresholds</p>
+                                                 <div className="grid grid-cols-2 gap-3">
+                                                     <div>
+                                                         <label htmlFor="firstClass" className="text-[9px] text-gray-400 font-bold block mb-1">1st Class</label>
+                                                         <input
+                                                             id="firstClass"
+                                                             className={`w-full p-2 border rounded-lg text-xs ${errors.firstClass ? 'border-red-500' : ''}`}
+                                                             value={details.rules.gradingScheme.firstClass}
+                                                             onChange={(e) => {
+                                                                 setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, rules: { ...details.rules, gradingScheme: { ...details.rules.gradingScheme, firstClass: e.target.value } } } });
+                                                                 if (errors.firstClass) setErrors({...errors, firstClass: ""});
+                                                             }}
+                                                         />
+                                                         {errors.firstClass && <p data-testid="error-firstClass" className="text-red-500 text-[9px] mt-1">{errors.firstClass}</p>}
+                                                     </div>
+                                                     <div>
+                                                         <label htmlFor="secondClass" className="text-[9px] text-gray-400 font-bold block mb-1">2nd Class</label>
+                                                         <input
+                                                             id="secondClass"
+                                                             className={`w-full p-2 border rounded-lg text-xs ${errors.secondClass ? 'border-red-500' : ''}`}
+                                                             value={details.rules.gradingScheme.secondClass}
+                                                             onChange={(e) => {
+                                                                 setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, rules: { ...details.rules, gradingScheme: { ...details.rules.gradingScheme, secondClass: e.target.value } } } });
+                                                                 if (errors.secondClass) setErrors({...errors, secondClass: ""});
+                                                             }}
+                                                         />
+                                                         {errors.secondClass && <p data-testid="error-secondClass" className="text-red-500 text-[9px] mt-1">{errors.secondClass}</p>}
+                                                     </div>
+                                                     <div>
+                                                         <label htmlFor="thirdClass" className="text-[9px] text-gray-400 font-bold block mb-1">3rd Class</label>
+                                                         <input
+                                                             id="thirdClass"
+                                                             className={`w-full p-2 border rounded-lg text-xs ${errors.thirdClass ? 'border-red-500' : ''}`}
+                                                             value={details.rules.gradingScheme.thirdClass}
+                                                             onChange={(e) => {
+                                                                 setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, rules: { ...details.rules, gradingScheme: { ...details.rules.gradingScheme, thirdClass: e.target.value } } } });
+                                                                 if (errors.thirdClass) setErrors({...errors, thirdClass: ""});
+                                                             }}
+                                                         />
+                                                         {errors.thirdClass && <p data-testid="error-thirdClass" className="text-red-500 text-[9px] mt-1">{errors.thirdClass}</p>}
+                                                     </div>
+                                                     <div>
+                                                         <label htmlFor="failThreshold" className="text-[9px] text-gray-400 font-bold block mb-1">Fail Below</label>
+                                                         <input
+                                                             id="failThreshold"
+                                                             className={`w-full p-2 border rounded-lg text-xs ${errors.failThreshold ? 'border-red-500' : ''}`}
+                                                             value={details.rules.gradingScheme.fail}
+                                                             onChange={(e) => {
+                                                                 setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, rules: { ...details.rules, gradingScheme: { ...details.rules.gradingScheme, fail: e.target.value } } } });
+                                                                 if (errors.failThreshold) setErrors({...errors, failThreshold: ""});
+                                                             }}
+                                                         />
+                                                         {errors.failThreshold && <p data-testid="error-failThreshold" className="text-red-500 text-[9px] mt-1">{errors.failThreshold}</p>}
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         </div>
                                     </div>
                                 )}
 
@@ -519,48 +716,73 @@ const ExamManager = ({
                                     <div className="space-y-4">
                                         <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Administrative Info</h3>
                                         <div className="grid grid-cols-1 gap-4">
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Signatory</label>
-                                                    <input
-                                                        className="w-full p-2.5 border rounded-lg text-sm"
-                                                        value={details.administrative.signatoryName}
-                                                        onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, administrative: { ...details.administrative, signatoryName: e.target.value } } })}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Designation</label>
-                                                    <input
-                                                        className="w-full p-2.5 border rounded-lg text-sm"
-                                                        value={details.administrative.signatoryDesignation}
-                                                        onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, administrative: { ...details.administrative, signatoryDesignation: e.target.value } } })}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Department</label>
-                                                <input
-                                                    className="w-full p-2.5 border rounded-lg text-sm"
-                                                    value={details.administrative.departmentName}
-                                                    onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, administrative: { ...details.administrative, departmentName: e.target.value } } })}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Syllabus Year</label>
-                                                <input
-                                                    className="w-full p-2.5 border rounded-lg text-sm"
-                                                    value={details.administrative.syllabusYear}
-                                                    onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, administrative: { ...details.administrative, syllabusYear: e.target.value } } })}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Instructions Summary</label>
-                                                <textarea
-                                                    className="w-full p-2.5 border rounded-lg text-sm h-20"
-                                                    value={details.administrative.instructions}
-                                                    onChange={(e) => setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, administrative: { ...details.administrative, instructions: e.target.value } } })}
-                                                />
-                                            </div>
+                                             <div className="grid grid-cols-2 gap-4">
+                                                 <div>
+                                                     <label htmlFor="signatoryName" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Signatory</label>
+                                                     <input
+                                                         id="signatoryName"
+                                                         className={`w-full p-2.5 border rounded-lg text-sm ${errors.signatoryName ? 'border-red-500' : ''}`}
+                                                         value={details.administrative.signatoryName}
+                                                         onChange={(e) => {
+                                                             setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, administrative: { ...details.administrative, signatoryName: e.target.value } } });
+                                                             if (errors.signatoryName) setErrors({...errors, signatoryName: ""});
+                                                         }}
+                                                     />
+                                                     {errors.signatoryName && <p data-testid="error-signatoryName" className="text-red-500 text-[10px] mt-1">{errors.signatoryName}</p>}
+                                                 </div>
+                                                 <div>
+                                                     <label htmlFor="signatoryDesignation" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Designation</label>
+                                                     <input
+                                                         id="signatoryDesignation"
+                                                         className={`w-full p-2.5 border rounded-lg text-sm ${errors.signatoryDesignation ? 'border-red-500' : ''}`}
+                                                         value={details.administrative.signatoryDesignation}
+                                                         onChange={(e) => {
+                                                             setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, administrative: { ...details.administrative, signatoryDesignation: e.target.value } } });
+                                                             if (errors.signatoryDesignation) setErrors({...errors, signatoryDesignation: ""});
+                                                         }}
+                                                     />
+                                                     {errors.signatoryDesignation && <p data-testid="error-signatoryDesignation" className="text-red-500 text-[10px] mt-1">{errors.signatoryDesignation}</p>}
+                                                 </div>
+                                             </div>
+                                             <div>
+                                                 <label htmlFor="departmentName" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Department</label>
+                                                 <input
+                                                     id="departmentName"
+                                                     className={`w-full p-2.5 border rounded-lg text-sm ${errors.departmentName ? 'border-red-500' : ''}`}
+                                                     value={details.administrative.departmentName}
+                                                     onChange={(e) => {
+                                                         setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, administrative: { ...details.administrative, departmentName: e.target.value } } });
+                                                         if (errors.departmentName) setErrors({...errors, departmentName: ""});
+                                                     }}
+                                                 />
+                                                 {errors.departmentName && <p data-testid="error-departmentName" className="text-red-500 text-[10px] mt-1">{errors.departmentName}</p>}
+                                             </div>
+                                             <div>
+                                                 <label htmlFor="syllabusYear" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Syllabus Year</label>
+                                                 <input
+                                                     id="syllabusYear"
+                                                     className={`w-full p-2.5 border rounded-lg text-sm ${errors.syllabusYear ? 'border-red-500' : ''}`}
+                                                     value={details.administrative.syllabusYear}
+                                                     onChange={(e) => {
+                                                         setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, administrative: { ...details.administrative, syllabusYear: e.target.value } } });
+                                                         if (errors.syllabusYear) setErrors({...errors, syllabusYear: ""});
+                                                     }}
+                                                 />
+                                                 {errors.syllabusYear && <p data-testid="error-syllabusYear" className="text-red-500 text-[10px] mt-1">{errors.syllabusYear}</p>}
+                                             </div>
+                                             <div>
+                                                 <label htmlFor="instructions" className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Instructions Summary</label>
+                                                 <textarea
+                                                     id="instructions"
+                                                     className={`w-full p-2.5 border rounded-lg text-sm h-20 ${errors.instructions ? 'border-red-500' : ''}`}
+                                                     value={details.administrative.instructions}
+                                                     onChange={(e) => {
+                                                         setExamForm({ ...examForm, exam_details: { ...examForm.exam_details, administrative: { ...details.administrative, instructions: e.target.value } } });
+                                                         if (errors.instructions) setErrors({...errors, instructions: ""});
+                                                     }}
+                                                 />
+                                                 {errors.instructions && <p data-testid="error-instructions" className="text-red-500 text-[10px] mt-1">{errors.instructions}</p>}
+                                             </div>
                                         </div>
                                     </div>
                                 )}
@@ -574,6 +796,7 @@ const ExamManager = ({
                             type="button"
                             onClick={prevStep}
                             disabled={activeStep === 0}
+                            data-testid="prev-wizard-button"
                             className={`flex items-center gap-1 px-4 py-2 rounded-lg font-bold transition-all ${activeStep === 0
                                 ? 'text-gray-300 cursor-not-allowed'
                                 : 'text-gray-600 hover:bg-gray-100'
@@ -581,26 +804,27 @@ const ExamManager = ({
                         >
                             <ChevronLeft size={20} /> Previous
                         </button>
-
-                        {activeStep < steps.length - 1 ? (
-                            <button
-                                type="button"
-                                onClick={nextStep}
-                                className="flex items-center gap-1 bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100"
-                            >
-                                Next <ChevronRight size={20} />
-                            </button>
-                        ) : (
-                            <button
-                                type="submit"
-                                className={`flex items-center gap-2 px-8 py-2 rounded-lg font-bold transition-all shadow-md ${isEditing
-                                    ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-100 text-white'
-                                    : 'bg-green-600 hover:bg-green-700 shadow-green-100 text-white'
-                                    }`}
-                            >
-                                <Check size={20} /> {isEditing ? 'Finish & Save' : 'Finish & Create'}
-                            </button>
-                        )}
+                        <div className="flex gap-3">
+                            {activeStep < steps.length - 1 ? (
+                                <button
+                                    type="button"
+                                    onClick={nextStep}
+                                    data-testid="next-wizard-button"
+                                    className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all"
+                                >
+                                    Next <ChevronRight size={20} />
+                                </button>
+                            ) : (
+                                <button
+                                    type="submit"
+                                    data-testid="next-wizard-button"
+                                    className="flex items-center gap-2 bg-green-600 text-white px-8 py-2.5 rounded-lg font-bold hover:bg-green-700 shadow-lg shadow-green-200 transition-all animate-pulse"
+                                >
+                                    {isEditing ? 'Update Exam' : 'Create Exam'}
+                                </button>
+                            )
+                            }
+                        </div>
                     </div>
                 </form>
             </div>

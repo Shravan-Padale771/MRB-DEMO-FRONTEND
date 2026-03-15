@@ -96,11 +96,12 @@ describe("StudentRegistration Form Validations", () => {
     const passwordInput = screen.getByLabelText(/^Password/i);
     fireEvent.change(passwordInput, { target: { value: "123", name: "password" } });
     
-    // Submit to trigger error
+    // Clear other fields to ensure we don't hit other errors first, 
+    // or just assume JS validation runs because of noValidate
     fireEvent.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("Password must be at least 6 characters")).toBeInTheDocument();
+      expect(screen.getByTestId("error-password")).toHaveTextContent(/at least 6 characters/i);
     });
 
     // Fix the password
@@ -108,7 +109,7 @@ describe("StudentRegistration Form Validations", () => {
 
     // The error should disappear immediately
     await waitFor(() => {
-      expect(screen.queryByText("Password must be at least 6 characters")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("error-password")).not.toBeInTheDocument();
     });
   });
 });

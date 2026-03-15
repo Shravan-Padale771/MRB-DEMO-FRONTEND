@@ -19,11 +19,15 @@ import {
   FileText,
   Calendar,
   DollarSign,
+  Bell,
+  Download,
+  FileCheck,
 } from "lucide-react";
 import MyResults from "../student/components/MyResults";
 import ApplyModal from "../student/components/ApplyModal";
 
 import StudentProfileSection from "../student/components/StudentProfileSection";
+import StudentLayout from "../student/components/StudentLayout";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -31,7 +35,9 @@ const StudentDashboard = () => {
   const [students, setStudents] = useState([]);
   const [exams, setExams] = useState([]);
   const [myResults, setMyResults] = useState([]);
-  const [activeTab, setActiveTab] = useState("exams");
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [loginId, setLoginId] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const [selectedExam, setSelectedExam] = useState(null);
   const [applicationForm, setApplicationForm] = useState({
@@ -42,20 +48,15 @@ const StudentDashboard = () => {
   });
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadExams = async () => {
       try {
-        const [studentPage, examPage] = await Promise.all([
-          getStudents({ size: 1000 }),
-          getExams({ size: 1000 })
-        ]);
-        setStudents(studentPage?.content || []);
+        const examPage = await getExams({ size: 1000 });
         setExams(examPage?.content || []);
-        console.log("This is fetched data of students and exams");
       } catch (error) {
-        console.error("Failed to load data", error);
+        console.error("Failed to load exams", error);
       }
     };
-    loadData();
+    loadExams();
   }, []);
 
   useEffect(() => {
@@ -68,6 +69,29 @@ const StudentDashboard = () => {
       }
     }
   }, [currentUser]);
+
+  const handleLogin = async (e) => {
+    if (e) e.preventDefault();
+    if (!loginId.trim()) return toast.error("Please enter a Student ID");
+
+    setIsLoggingIn(true);
+    try {
+      const studentPage = await getStudents({ studentId: loginId.trim(), size: 1 });
+      const student = studentPage?.content?.[0];
+      
+      if (student) {
+        setCurrentUser(student);
+        toast.success(`Welcome back, ${student.firstName || student.username}!`);
+      } else {
+        toast.error("Invalid Student ID. Please try again.");
+      }
+    } catch (error) {
+      console.error("Login failed", error);
+      toast.error("Something went wrong. Please try again later.");
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
 
   const fetchMyResults = async () => {
     if (!currentUser?.studentId) return;
@@ -107,196 +131,234 @@ const StudentDashboard = () => {
             </p>
           </div>
 
-          <div className="space-y-4">
-            {/* Login Button */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                Student ID Number
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  <User size={18} />
+                </div>
+                <input
+                  type="text"
+                  value={loginId}
+                  onChange={(e) => setLoginId(e.target.value)}
+                  placeholder="e.g. 101"
+                  className="w-full pl-11 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl transition-all duration-300 outline-none font-bold text-gray-700"
+                  required
+                />
+              </div>
+            </div>
+
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => {
-                // For now, show student selection for login
-                // You can replace this with actual login form later
-              }}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 rounded-xl hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
+              type="submit"
+              disabled={isLoggingIn}
+              className={`w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 transition-all duration-300 flex items-center justify-center gap-2 ${
+                isLoggingIn ? "opacity-70 cursor-not-allowed" : "hover:shadow-indigo-300"
+              }`}
             >
-              <User size={20} />
-              Login to Existing Account
+              {isLoggingIn ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <LogOut size={20} className="rotate-180" />
+              )}
+              {isLoggingIn ? "Authenticating..." : "Login to Portal"}
             </motion.button>
 
-            {/* Register Button */}
+            <div className="flex items-center gap-4 py-2">
+              <div className="h-px flex-1 bg-gray-100" />
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">OR</span>
+              <div className="h-px flex-1 bg-gray-100" />
+            </div>
+
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => navigate("/student/register")}
-              className="w-full bg-white border-2 border-indigo-600 text-indigo-600 font-bold py-4 rounded-xl hover:bg-indigo-50 transition-all duration-300 flex items-center justify-center gap-2"
+              type="button"
+              className="w-full bg-white border-2 border-indigo-100 text-indigo-600 font-bold py-4 rounded-xl hover:bg-indigo-50 hover:border-indigo-200 transition-all duration-300 flex items-center justify-center gap-2"
             >
               <UserPlus size={20} />
               Create New Account
             </motion.button>
-          </div>
+          </form>
 
-          {/* Temporary: Student Selection for Demo */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center mb-3">
-              Demo: Select existing student
+          <div className="mt-8 pt-6 border-t border-gray-100">
+            <p className="text-[10px] text-gray-400 text-center uppercase tracking-widest leading-relaxed">
+              If you don't have an ID, please register or contact your school administrator.
             </p>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {students.length === 0 ? (
-                <div className="text-center p-4 text-gray-400 text-sm">
-                  <p>No students available</p>
-                </div>
-              ) : (
-                students.map((s) => (
-                  <motion.button
-                    key={s.studentId}
-                    whileHover={{ scale: 1.02 }}
-                    onClick={() => setCurrentUser(s)}
-                    className="w-full flex justify-between items-center p-3 bg-gray-50 hover:bg-indigo-50 border border-transparent hover:border-indigo-200 rounded-lg transition-all duration-200 text-sm"
-                  >
-                    <div className="flex flex-col items-start text-left">
-                      <span className="font-bold text-gray-700">
-                        {s.firstName ? `${s.firstName} ${s.middleName || ''} ${s.lastName || ''}`.trim() : s.username}
-                      </span>
-                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">
-                        {s.schoolName || s.school?.schoolName || "No School"}
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-black bg-white border px-2 py-1 rounded text-indigo-600 shadow-sm">
-                      ID: #{s.studentId}
-                    </span>
-                  </motion.button>
-                ))
-              )}
-            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-[#f8f9fe] relative overflow-hidden transition-all duration-500">
-      {/* Decorative background elements for consistency with Admin UI */}
-      <div className="absolute top-[-5%] right-[-5%] w-[35%] h-[35%] rounded-full bg-blue-500/5 blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-[-5%] left-[10%] w-[25%] h-[25%] rounded-full bg-purple-500/5 blur-[90px] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 relative z-10">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/40">
-          <div className="flex items-center gap-4">
-            <div className="h-14 w-14 bg-[#4c84ff] rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/20">
-              {currentUser?.firstName ? currentUser.firstName.charAt(0).toUpperCase() : (currentUser?.username?.charAt(0).toUpperCase() || "?")}
+  const renderContent = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return (
+          <div className="space-y-8">
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-500/20 mb-8">
+              <h2 className="text-3xl font-black mb-2">Welcome back, {currentUser?.firstName || 'Student'}!</h2>
+              <p className="text-indigo-100 opacity-80">You have {exams.length} available exams and {myResults.length} published results.</p>
             </div>
-            <div>
-              <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-                Welcome, <span className="text-[#4c84ff]">{currentUser?.firstName ? `${currentUser.firstName} ${currentUser.lastName || ''}` : (currentUser?.username || "Student")}</span>
-              </h1>
-              <div className="flex items-center gap-3 mt-2">
-                <span className="text-[11px] font-black text-[#4c84ff] bg-blue-50/50 px-2 py-0.5 rounded uppercase tracking-wider border border-blue-100/50">
-                  Student ID: #{currentUser?.studentId || "N/A"}
-                </span>
-                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest border-l border-gray-200 pl-3">
-                  {currentUser?.schoolName || currentUser?.school?.schoolName || "No School"}
-                </span>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => setActiveTab('exams')}>
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4">
+                  <BookOpen size={24} />
+                </div>
+                <h3 className="font-bold text-lg mb-1">Available Exams</h3>
+                <p className="text-sm text-gray-500">View and apply for upcoming examinations.</p>
+              </div>
+              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => setActiveTab('results_view')}>
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 mb-4">
+                  <Award size={24} />
+                </div>
+                <h3 className="font-bold text-lg mb-1">My Results</h3>
+                <p className="text-sm text-gray-500">Check your latest performance and marks.</p>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex bg-gray-100 p-1 rounded-xl">
-              <button
-                onClick={() => setActiveTab("profile")}
-                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "profile" ? "bg-white text-indigo-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-              >
-                Profile Setup
-              </button>
-              <button
-                onClick={() => setActiveTab("exams")}
-                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "exams" ? "bg-white text-[#4c84ff] shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-              >
-                Available Exams
-              </button>
+        );
+      case "profile":
+        return (
+          <StudentProfileSection 
+            student={currentUser} 
+            onProfileUpdated={handleProfileUpdated} 
+          />
+        );
+      case "exams":
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-black text-gray-900 border-l-4 border-indigo-600 pl-5 py-1 flex items-center gap-3 tracking-tight uppercase text-sm">
+              <BookOpen size={20} className="text-indigo-600" /> Available Exams
+            </h2>
+            {exams.length === 0 ? (
+              <div className="text-center p-12 bg-white rounded-xl border-2 border-dashed">
+                <BookOpen className="mx-auto text-gray-400 mb-3" size={40} />
+                <p className="text-gray-500 font-medium">No exams available</p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-6">
+                {exams.map((exam) => (
+                  <motion.div
+                    key={exam.examNo}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ translateY: -8, shadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
+                    className="bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:border-blue-100/50 transition-all duration-500 flex flex-col justify-between group"
+                  >
+                    <div className="mb-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="text-xl font-bold text-gray-900 flex-1">
+                          {exam.exam_name}
+                        </h3>
+                        <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
+                          Exam #{exam.examNo}
+                        </span>
+                      </div>
+                      <div className="space-y-2 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <FileText size={16} className="text-gray-400" />
+                          <span>
+                            <strong>{exam.no_of_papers}</strong> Papers
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <DollarSign size={16} className="text-green-500" />
+                          <span className="font-semibold text-green-600">
+                            ${exam.exam_fees}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.02, translateY: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => openApplyModal(exam)}
+                      className="w-full bg-[#4c84ff] text-white py-3.5 rounded-xl hover:shadow-[0_10px_20px_-5px_rgba(76,132,255,0.4)] font-bold transition-all duration-300 uppercase tracking-wider text-sm shadow-md shadow-blue-500/10"
+                    >
+                      Apply Now
+                    </motion.button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      case "notices":
+        return (
+          <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center shadow-xl shadow-black/5 animate-in fade-in duration-500">
+            <div className="w-24 h-24 bg-yellow-50 rounded-2xl flex items-center justify-center text-yellow-600 mx-auto mb-8 rotate-3 shadow-inner">
+              <Bell size={48} />
             </div>
-            <button
-              onClick={() => setCurrentUser(null)}
-              className="flex items-center gap-2 text-gray-400 hover:text-red-500 hover:bg-red-50/50 px-4 py-2 rounded-xl transition-all duration-300 font-bold text-sm border border-transparent hover:border-red-100"
-            >
-              <LogOut size={18} /> Logout
+            <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">No Active Notices</h2>
+            <p className="text-gray-500 max-w-sm mx-auto leading-relaxed">
+              When the MRB Board publishes official notifications, dates, or circulars, they will appear right here for your convenience.
+            </p>
+            <div className="mt-8 pt-8 border-t border-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              Last checked: {new Date().toLocaleTimeString()}
+            </div>
+          </div>
+        );
+      case "hall_ticket":
+        return (
+          <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center shadow-xl shadow-black/5 animate-in fade-in duration-500">
+            <div className="w-24 h-24 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mx-auto mb-8 -rotate-3 shadow-inner">
+              <Download size={48} />
+            </div>
+            <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Hall Ticket Pending</h2>
+            <p className="text-gray-500 max-w-sm mx-auto leading-relaxed">
+              Your hall tickets are generated after application verification. Please check back 10-15 days before the examination date.
+            </p>
+            <button className="mt-8 px-6 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-sm hover:bg-blue-100 transition-colors">
+              Refresh Status
             </button>
           </div>
-        </header>
-
-        <div className="grid lg:grid-cols-3 gap-10">
-          <div className="lg:col-span-2 space-y-8">
-            {activeTab === "profile" && (
-              <StudentProfileSection 
-                student={currentUser} 
-                onProfileUpdated={handleProfileUpdated} 
-              />
-            )}
-            
-            {activeTab === "exams" && (
-              <>
-                <h2 className="text-2xl font-black text-gray-900 border-l-4 border-[#4c84ff] pl-5 py-1 flex items-center gap-3 tracking-tight uppercase text-sm">
-                  <BookOpen size={20} className="text-[#4c84ff]" /> Available Exams
-                </h2>
-                {exams.length === 0 ? (
-                  <div className="text-center p-12 bg-white rounded-xl border-2 border-dashed">
-                    <BookOpen className="mx-auto text-gray-400 mb-3" size={40} />
-                    <p className="text-gray-500 font-medium">No exams available</p>
-                  </div>
-                ) : (
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {exams.map((exam) => (
-                      <motion.div
-                        key={exam.examNo}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        whileHover={{ translateY: -8, shadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
-                        className="bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:border-blue-100/50 transition-all duration-500 flex flex-col justify-between group"
-                      >
-                        <div className="mb-4">
-                          <div className="flex items-start justify-between mb-3">
-                            <h3 className="text-xl font-bold text-gray-900 flex-1">
-                              {exam.exam_name}
-                            </h3>
-                            <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
-                              Exam #{exam.examNo}
-                            </span>
-                          </div>
-                          <div className="space-y-2 text-sm text-gray-600">
-                            <div className="flex items-center gap-2">
-                              <FileText size={16} className="text-gray-400" />
-                              <span>
-                                <strong>{exam.no_of_papers}</strong> Papers
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <DollarSign size={16} className="text-green-500" />
-                              <span className="font-semibold text-green-600">
-                                ${exam.exam_fees}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        {/* Apply field which opens exam form  */}
-                        <motion.button
-                          whileHover={{ scale: 1.02, translateY: -2 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => openApplyModal(exam)}
-                          className="w-full bg-[#4c84ff] text-white py-3.5 rounded-xl hover:shadow-[0_10px_20px_-5px_rgba(76,132,255,0.4)] font-bold transition-all duration-300 uppercase tracking-wider text-sm shadow-md shadow-blue-500/10"
-                        >
-                          Apply Now
-                        </motion.button>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
+        );
+      case "certificates":
+        return (
+          <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center shadow-xl shadow-black/5 animate-in fade-in duration-500">
+            <div className="w-24 h-24 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-8 shadow-inner">
+              <Award size={48} />
+            </div>
+            <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Digital Certificates</h2>
+            <p className="text-gray-500 max-w-sm mx-auto leading-relaxed">
+              Complete your examinations and achieve qualifying marks to unlock your verifiable digital certificates here.
+            </p>
+            <div className="mt-10 flex justify-center gap-4">
+               <div className="w-3 h-3 rounded-full bg-indigo-100" />
+               <div className="w-3 h-3 rounded-full bg-indigo-200" />
+               <div className="w-3 h-3 rounded-full bg-indigo-300" />
+            </div>
           </div>
-
-          <div>
+        );
+      case "results_view":
+        return (
+          <div className="space-y-8">
+            <h2 className="text-2xl font-black text-gray-900 border-l-4 border-green-600 pl-5 py-1 flex items-center gap-3 tracking-tight uppercase text-sm">
+              <FileCheck size={20} className="text-green-600" /> Results & Marksheets
+            </h2>
             <MyResults myResults={myResults} student={currentUser} />
           </div>
-        </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <StudentLayout 
+      activeTab={activeTab} 
+      setActiveTab={setActiveTab} 
+      currentUser={currentUser}
+      onLogout={() => setCurrentUser(null)}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {renderContent()}
 
         <AnimatePresence>
           {selectedExam && (
@@ -307,7 +369,7 @@ const StudentDashboard = () => {
                 exit={{ scale: 0.95, opacity: 0 }}
                 className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden"
               >
-                <div className="bg-[#4c84ff] p-6 flex justify-between items-center text-white">
+                <div className="bg-indigo-600 p-6 flex justify-between items-center text-white">
                   <h3 className="font-bold text-lg uppercase tracking-tight">
                     Apply for {selectedExam.exam_name}
                   </h3>
@@ -321,41 +383,19 @@ const StudentDashboard = () => {
                   </motion.button>
                 </div>
                 <div className="p-8">
-
-
-
-
-
-                  {/* this is exam form containing student and exam details used ApplyModal.jsx  */}
                   <ApplyModal
                     exam={selectedExam}
                     student={currentUser}
                     onClose={() => setSelectedExam(null)}
                     onSuccess={fetchMyResults}
                   />
-
-
-
-
                 </div>
               </motion.div>
             </div>
           )}
         </AnimatePresence>
-        <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(0, 0, 0, 0.08);
-          border-radius: 10px;
-        }
-      `}</style>
       </div>
-    </div>
+    </StudentLayout>
   );
 };
 

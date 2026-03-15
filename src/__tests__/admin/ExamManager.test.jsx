@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ExamManager from "../../../src/admin/components/ExamManager";
@@ -49,15 +49,14 @@ describe("ExamManager Validations", () => {
     renderComponent();
 
     // Try to click Next on Step 0 without filling data
-    const nextBtn = screen.getByRole("button", { name: /next/i });
+    const nextBtn = screen.getByTestId("next-wizard-button");
     fireEvent.click(nextBtn);
 
     expect(screen.getByText("Exam Code is required")).toBeInTheDocument();
     expect(screen.getByText("Exam Name is required")).toBeInTheDocument();
   });
 
-  test("Step 1: Validates date logic (end dates after start dates)", () => {
-    // Render directly on Step 1 by injecting state (simulate step 0 passed)
+  test("Step 1: Validates date logic (end dates after start dates)", async () => {
     renderComponent({
       examForm: {
         ...commonProps.examForm,
@@ -71,15 +70,36 @@ describe("ExamManager Validations", () => {
     });
 
     // Move to step 1
-    const nextBtn = screen.getByRole("button", { name: /next/i });
-    fireEvent.click(nextBtn); // To Step 1
+    fireEvent.click(screen.getByTestId("next-wizard-button")); 
 
     // Click next again to validate Step 1
-    const nextBtnStep1 = screen.getByRole("button", { name: /next/i });
-    fireEvent.click(nextBtnStep1);
+    fireEvent.click(screen.getByTestId("next-wizard-button"));
 
-    const errors = screen.getAllByText("Must be after start date");
-    expect(errors).toHaveLength(2); // One for app dates, one for exam dates
+    await waitFor(() => {
+      const errors = screen.getAllByText(/Must be after start date/i);
+      expect(errors).toHaveLength(2);
+    });
+  });
+
+  test("Step 1: Validates Exam Start after Application End", async () => {
+    renderComponent({
+      examForm: {
+        ...commonProps.examForm,
+        exam_code: "TEST2",
+        exam_name: "Test Exam 2",
+        application_start_date: "2024-05-01",
+        application_end_date: "2024-05-10",
+        exam_start_date: "2024-05-05", // Invalid: before app end
+        exam_end_date: "2024-05-15",
+      }
+    });
+
+    fireEvent.click(screen.getByTestId("next-wizard-button")); // To Step 1
+    fireEvent.click(screen.getByTestId("next-wizard-button")); // Validate Step 1
+
+    await waitFor(() => {
+      expect(screen.getByText(/Must be after application end date/i)).toBeInTheDocument();
+    });
   });
 
   test("Step 2: Validates number of papers and individual paper rules", () => {
@@ -98,12 +118,12 @@ describe("ExamManager Validations", () => {
     });
 
     // Move to step 1
-    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    fireEvent.click(screen.getByTestId("next-wizard-button"));
     // Move to step 2
-    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    fireEvent.click(screen.getByTestId("next-wizard-button"));
 
     // Validate step 2
-    fireEvent.click(screen.getByRole("button", { name: /next/i }));
+    fireEvent.click(screen.getByTestId("next-wizard-button"));
 
     expect(screen.getAllByText("Required")).toHaveLength(2); // One for name, one for marks
   });

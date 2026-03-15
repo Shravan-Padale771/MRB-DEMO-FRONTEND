@@ -13,13 +13,13 @@ def log_performance(endpoint, method, status, duration):
         f.write(f"[{timestamp}] {method} {endpoint} | Status: {status} | Duration: {duration:.4f}s\n")
 
 def save_output(data, method, path):
-    os.makedirs("output_json", exist_ok=True)
+    os.makedirs("output", exist_ok=True)
     # Sanitize path: remove leading slash, replace remaining slashes/special chars
     clean_path = path.strip("/").replace("/", "_").replace("?", "_").replace("&", "_").replace("=", "_")
     if not clean_path: clean_path = "root"
     
     filename = f"{method}_{clean_path}.json"
-    filepath = os.path.join("output_json", filename)
+    filepath = os.path.join("output", filename)
     
     with open(filepath, "w") as f:
         json.dump(data, f, indent=4)
@@ -59,7 +59,7 @@ def make_request(method, path, params=None, body=None):
         except:
             print("Response is not JSON")
             clean_path = path.strip("/").replace("/", "_")
-            filepath = os.path.join("output_json", f"{method}_{clean_path}.txt")
+            filepath = os.path.join("output", f"{method}_{clean_path}.txt")
             with open(filepath, "w") as f:
                 f.write(response.text)
             print(f"Result saved to {filepath}")
@@ -236,6 +236,63 @@ def test_application_endpoints():
         params["studentId"] = get_input("Student ID Filter (optional)")
         make_request("GET", "/exam-applications", params={k: v for k, v in params.items() if v})
 
+def test_student_profile_endpoints():
+    print("\n--- Student Profile Endpoints ---")
+    print("Legacy/Explicit:")
+    print("  1. Get All Student Profiles (/getAllStudentProfiles)")
+    print("  2. Get Student Profile (/getStudentProfile)")
+    print("  3. Get Student Profile By ID (/getStudentProfileById)")
+    print("  4. Add Student Profile (/addStudentProfile)")
+    print("New/RESTful:")
+    print("  5. Get Student Profiles (Paginated) (/studentProfiles)")
+    print("  6. Update Student Profile (/studentProfiles/{id})")
+    print("  7. Delete Student Profile (/studentProfiles/{id})")
+    print("  8. Create Student Profile (/studentProfiles)")
+    choice = input("Select: ")
+
+    if choice == "1":
+        make_request("GET", "/getAllStudentProfiles")
+    elif choice == "2":
+        s_id = get_input("Student Profile ID")
+        make_request("GET", "/getStudentProfile", params={"id": s_id})
+    elif choice == "3":
+        s_id = get_input("Student Profile ID")
+        make_request("GET", "/getStudentProfileById", params={"id": s_id})
+    elif choice == "4":
+        s_id = get_input("Student ID")
+        profile_data = {
+            "fatherName": get_input("Father Name"),
+            "motherName": get_input("Mother Name"),
+            "guardianContact": get_input("Guardian Contact"),
+            "previousExamYear": get_input("Previous Exam Year (e.g. 2024)"),
+            "previousExamRollNo": get_input("Previous Exam Roll No")
+        }
+        make_request("POST", "/addStudentProfile", params={"studentId": s_id}, body=profile_data)
+    elif choice == "5":
+        params = get_pagination_params()
+        make_request("GET", "/studentProfiles", params={k: v for k, v in params.items() if v})
+    elif choice == "6":
+        p_id = get_input("Profile ID to update")
+        profile_data = {
+            "fatherName": get_input("New Father Name"),
+            "motherName": get_input("New Mother Name"),
+            "previousExamYear": get_input("New Previous Exam Year"),
+            "previousExamRollNo": get_input("New Previous Exam Roll No")
+        }
+        make_request("PUT", f"/studentProfiles/{p_id}", body=profile_data)
+    elif choice == "7":
+        p_id = get_input("Profile ID to delete")
+        make_request("DELETE", f"/studentProfiles/{p_id}")
+    elif choice == "8":
+        s_id = get_input("Student ID")
+        profile_data = {
+            "fatherName": get_input("Father Name"),
+            "motherName": get_input("Mother Name"),
+            "previousExamYear": get_input("Previous Exam Year"),
+            "previousExamRollNo": get_input("Previous Exam Roll No")
+        }
+        make_request("POST", "/studentProfiles", params={"studentId": s_id}, body=profile_data)
+
 def test_result_endpoints():
     print("\n--- Result Endpoints ---")
     print("Legacy/Explicit:")
@@ -286,6 +343,8 @@ def test_all_endpoints():
         ("GET", "/exam-applications"),
         ("GET", "/getAllResults"),
         ("GET", "/exam-results"),
+        ("GET", "/getAllStudentProfiles"),
+        ("GET", "/studentProfiles"),
     ]
     
     # Use default pagination for New/RESTful endpoints
@@ -309,6 +368,7 @@ def main():
         print("5. School Endpoints")
         print("6. Application Endpoints")
         print("7. Result Endpoints")
+        print("8. Student Profile Endpoints")
         print("0. Test All (List Endpoints)")
         print("q. Quit")
         
@@ -330,6 +390,8 @@ def main():
             test_application_endpoints()
         elif main_choice == "7":
             test_result_endpoints()
+        elif main_choice == "8":
+            test_student_profile_endpoints()
         elif main_choice == "q":
             break
         else:

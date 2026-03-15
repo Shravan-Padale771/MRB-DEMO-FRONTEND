@@ -1,0 +1,60 @@
+[
+    {
+        "profileId": 1,
+        "dateOfBirth": "2026-03-12",
+        "gender": "Male",
+        "category": "General",
+        "previousExamName": "Pravin",
+        "previousExamMarks": 87.0,
+        "previousExamRollNO": null,
+        "previousExamYear": null,
+        "fatherName": "Prabodh",
+        "motherName": "Meera",
+        "guardianContact": "1234567891",
+        "qualification": "6",
+        "profilePhotoUrl": "",
+        "signatureUrl": "",
+        "idProofNumber": "123456678",
+        "idProofDocumentUrl": "",
+        "profileCompletionStatus": "Complete",
+        "address": {
+            "line1": "Pune, SHivajunagar",
+            "line2": "Navin Colony",
+            "villageOrCity": "Pune",
+            "taluka": "Pune",
+            "district": "Pune",
+            "state": "Maharastra",
+            "pincode": "411059"
+        },
+        "studentId": 1
+    },
+    {
+        "profileId": 2,
+        "dateOfBirth": "2026-03-03",
+        "gender": "Male",
+        "category": "General",
+        "previousExamName": "Pravin",
+        "previousExamMarks": 67.0,
+        "previousExamRollNO": null,
+        "previousExamYear": 2025,
+        "fatherName": "Prabodh",
+        "motherName": "Meera",
+        "guardianContact": "1234567891",
+        "qualification": "6",
+        "profilePhotoUrl": "http://100.53.20.30:9000/student-documents/f097eb25-04c8-4123-ae7b-050f07d1f9f8_photo_WhatsApp%20Image%202025-03-12%20at%2018.10.11_1a26b35a.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=sumit%2F20260315%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260315T191037Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=67d2299b909313afce27acb9067ba90b4dd21f1b977af9938358f457c862783d",
+        "signatureUrl": "http://100.53.20.30:9000/student-documents/db5a6624-6eb3-4e20-bcb2-98f9e516995b_signature_WhatsApp%20Image%202025-03-12%20at%2018.10.11_1a26b35a.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=sumit%2F20260315%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260315T191037Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=94ae351e53687332f17a1ac1aeff1cb7d52a3d09ce259d06cfa13e1ec22505e0",
+        "idProofNumber": "45353535",
+        "idProofDocumentUrl": "http://100.53.20.30:9000/student-documents/6573a173-6463-4df1-bd80-69437aae6961_idproof_Exam%20Application%20Form%20-%20Reference.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=sumit%2F20260315%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260315T191038Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=00b48c7a8f3b2beb1627c894aa05758f1205bad83be9b5f62e6f8e5a76f5dd2e",
+        "profileCompletionStatus": "Complete",
+        "address": {
+            "line1": "Sambhaji Nagar Koregaon",
+            "line2": "",
+            "villageOrCity": "Koregaon",
+            "taluka": "Pune",
+            "district": "Pune",
+            "state": "Maharashtra",
+            "pincode": "415501"
+        },
+        "studentId": 2
+    }
+]

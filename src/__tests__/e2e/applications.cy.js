@@ -1,12 +1,21 @@
 // E2E tests for Applications page
 describe('Applications Page - Admin', () => {
   beforeEach(() => {
+    cy.intercept('GET', '**/exam-applications*').as('getApplications');
     cy.visit('/admin');
     cy.contains('Applications').click();
+  });
+
+  it('renders the Student Applications UI', () => {
     cy.contains('Student Applications', { timeout: 10000 }).should('be.visible');
   });
 
+  it('receives a successful response from the backend API', () => {
+    cy.wait('@getApplications', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
+  });
+
   it('loads the Applications page with data', () => {
+    cy.wait('@getApplications');
     cy.get('table tbody tr', { timeout: 10000 }).should('have.length.greaterThan', 0);
   });
 

@@ -3,14 +3,24 @@
 
 describe('Students Page - Admin', () => {
   beforeEach(() => {
+    cy.intercept('GET', '**/students*').as('getStudents');
     cy.visit('/admin');
     // Navigate to Students tab via Sidebar
     cy.contains('Students').click();
+  });
+
+  it('renders the Student Directory UI', () => {
     // Wait for the Directory heading
     cy.contains('Student Directory', { timeout: 10000 }).should('be.visible');
   });
 
+  it('receives a successful response from the backend API', () => {
+    cy.wait('@getStudents', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
+  });
+
   it('loads the Students page and displays a list', () => {
+    // Ensure API returns before checking table
+    cy.wait('@getStudents');
     // Table rows should appear after API call
     cy.get('table tbody tr', { timeout: 10000 }).should('have.length.greaterThan', 0);
   });

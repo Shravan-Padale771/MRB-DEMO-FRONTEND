@@ -1,12 +1,21 @@
 // E2E tests for Exams page
 describe('Exams Page - Admin', () => {
   beforeEach(() => {
+    cy.intercept('GET', '**/exams*').as('getExams');
     cy.visit('/admin');
     cy.contains('Exams').click();
+  });
+
+  it('renders the Existing Exams UI', () => {
     cy.contains('Existing Exams', { timeout: 10000 }).should('be.visible');
   });
 
+  it('receives a successful response from the backend API', () => {
+    cy.wait('@getExams', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
+  });
+
   it('loads the Exams page and shows items', () => {
+    cy.wait('@getExams');
     // ExamManager uses motion.div items for the list
     cy.get('.custom-scrollbar', { timeout: 10000 }).should('be.visible');
   });

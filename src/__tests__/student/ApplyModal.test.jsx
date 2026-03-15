@@ -95,11 +95,11 @@ describe("ApplyModal Validations", () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(createExamApplication).toHaveBeenCalledWith({
-        student: { studentId: "STU123" },
-        exam: { examNo: "EXAM123" },
-        status: "APPLIED",
-      });
+      expect(createExamApplication).toHaveBeenCalledWith(
+        { status: "APPLIED" },
+        "STU123",
+        "EXAM123"
+      );
     });
   });
 });

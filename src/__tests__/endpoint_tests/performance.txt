@@ -1,0 +1,3 @@
+[2026-03-15 21:18:03] GET /getStudentProfileById | Status: 200 | Duration: 2.6801s
+[2026-03-15 21:19:21] GET /getStudentProfile | Status: 200 | Duration: 2.1713s
+[2026-03-15 21:19:44] GET /getAllStudentProfiles | Status: 200 | Duration: 2.2889s

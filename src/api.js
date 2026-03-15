@@ -407,4 +407,35 @@ export const deleteStudentProfile = async (id) => {
   return response.data;
 };
 
+// --- FILE ENDPOINTS ---
+/**
+ * POST /upload
+ * Supports single or multiple files
+ */
+export const uploadFiles = async (files) => {
+  const formData = new FormData();
+  if (Array.isArray(files)) {
+    files.forEach((file) => formData.append("files", file));
+  } else {
+    formData.append("files", files);
+  }
+
+  const response = await api.post("/files/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
+/**
+ * DELETE /upload
+ */
+export const deleteFile = async (objectName) => {
+  const response = await api.delete(`/files/upload`, {
+    params: { objectName }
+  });
+  return response.data;
+};
+
 export default api;

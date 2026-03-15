@@ -1,12 +1,21 @@
 // E2E tests for Results pages (View Results + Publish Results)
 describe('Results - View Results Page', () => {
   beforeEach(() => {
+    cy.intercept('GET', '**/exam-results*').as('getExamResults');
     cy.visit('/admin');
     cy.contains('View Results').click();
+  });
+
+  it('renders the Published Results UI', () => {
     cy.contains('Published Results', { timeout: 10000 }).should('be.visible');
   });
 
+  it('receives a successful response from the backend API', () => {
+    cy.wait('@getExamResults', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
+  });
+
   it('loads the View Results page', () => {
+    cy.wait('@getExamResults');
     // The result viewer should render
     cy.contains(/result|score|marks/i, { timeout: 10000 }).should('be.visible');
   });

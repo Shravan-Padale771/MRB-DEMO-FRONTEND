@@ -165,3 +165,8 @@ indexing + cache
 [2026-03-13 16:02:09] GET /exam-results | Status: 200 | Duration: 0.0249s
 [2026-03-13 18:04:35] GET /students | Status: 200 | Duration: 6.9454s
 [2026-03-13 18:24:57] GET /getAllStudents | Status: 200 | Duration: 145.2279s
+[2026-03-16 00:31:45] GET /getStudentProfileById | Status: 200 | Duration: 2.3294s
+[2026-03-16 00:33:36] GET /studentProfiles | Status: 200 | Duration: 2.2527s
+[2026-03-16 00:34:18] GET /getAllStudentProfiles | Status: 200 | Duration: 1.8739s
+[2026-03-16 00:34:41] GET /getAllStudentProfiles | Status: 200 | Duration: 2.1844s
+[2026-03-16 00:41:49] GET /getAllStudentProfiles | Status: 200 | Duration: 1.5802s

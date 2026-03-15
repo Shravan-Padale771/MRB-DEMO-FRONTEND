@@ -1,12 +1,21 @@
 // E2E tests for Exam Centres page
 describe('Exam Centres Page - Admin', () => {
   beforeEach(() => {
+    cy.intercept('GET', '**/exam-centres*').as('getExamCentres');
     cy.visit('/admin');
     cy.contains('Exam Centres').click();
+  });
+
+  it('renders the Exam Centre Management UI', () => {
     cy.contains('Exam Centre Management', { timeout: 10000 }).should('be.visible');
   });
 
+  it('receives a successful response from the backend API', () => {
+    cy.wait('@getExamCentres', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
+  });
+
   it('loads with data', () => {
+    cy.wait('@getExamCentres');
     cy.get('table tbody tr', { timeout: 10000 }).should('have.length.greaterThan', 0);
   });
 

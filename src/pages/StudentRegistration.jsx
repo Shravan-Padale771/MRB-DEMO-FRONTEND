@@ -173,16 +173,17 @@ const StudentRegistration = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-8">
+          <form onSubmit={handleSubmit} className="p-8" noValidate>
             <div className="space-y-6">
               {/* Name Fields */}
               <div className="grid md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="firstName" className="block text-sm font-semibold text-gray-700 mb-2">
                     First Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
+                    id="firstName"
                     name="firstName"
                     required
                     placeholder="Enter first name"
@@ -190,14 +191,15 @@ const StudentRegistration = () => {
                     value={formData.firstName}
                     onChange={handleChange}
                   />
-                  {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+                   {errors.firstName && <p data-testid="error-firstName" className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="middleName" className="block text-sm font-semibold text-gray-700 mb-2">
                     Middle Name
                   </label>
                   <input
                     type="text"
+                    id="middleName"
                     name="middleName"
                     placeholder="Enter middle name"
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition"
@@ -206,11 +208,12 @@ const StudentRegistration = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="lastName" className="block text-sm font-semibold text-gray-700 mb-2">
                     Last Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
+                    id="lastName"
                     name="lastName"
                     required
                     placeholder="Enter last name"
@@ -218,18 +221,19 @@ const StudentRegistration = () => {
                     value={formData.lastName}
                     onChange={handleChange}
                   />
-                  {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+                   {errors.lastName && <p data-testid="error-lastName" className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                 </div>
               </div>
 
               {/* Contact & Email */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="contact" className="block text-sm font-semibold text-gray-700 mb-2">
                     Contact Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="tel"
+                    id="contact"
                     name="contact"
                     required
                     placeholder="Enter contact number"
@@ -238,18 +242,19 @@ const StudentRegistration = () => {
                     value={formData.contact}
                     onChange={handleChange}
                   />
-                  {errors.contact ? (
-                    <p className="text-red-500 text-xs mt-1">{errors.contact}</p>
+                   {errors.contact ? (
+                    <p data-testid="error-contact" className="text-red-500 text-xs mt-1">{errors.contact}</p>
                   ) : (
                     <p className="text-xs text-gray-500 mt-1">10 digit number</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
                     Email ID <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
+                    id="email"
                     name="email"
                     required
                     placeholder="Enter email address"
@@ -257,18 +262,19 @@ const StudentRegistration = () => {
                     value={formData.email}
                     onChange={handleChange}
                   />
-                  {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                   {errors.email && <p data-testid="error-email" className="text-red-500 text-xs mt-1">{errors.email}</p>}
                 </div>
               </div>
 
               {/* Age & Mother Tongue */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="age" className="block text-sm font-semibold text-gray-700 mb-2">
                     Age <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
+                    id="age"
                     name="age"
                     required
                     min="5"
@@ -278,13 +284,14 @@ const StudentRegistration = () => {
                     value={formData.age}
                     onChange={handleChange}
                   />
-                  {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age}</p>}
+                   {errors.age && <p data-testid="error-age" className="text-red-500 text-xs mt-1">{errors.age}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="motherTongue" className="block text-sm font-semibold text-gray-700 mb-2">
                     Mother Tongue <span className="text-red-500">*</span>
                   </label>
                   <select
+                    id="motherTongue"
                     name="motherTongue"
                     required
                     className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition bg-white ${errors.motherTongue ? 'border-red-500' : 'border-gray-300'}`}
@@ -295,16 +302,17 @@ const StudentRegistration = () => {
                     <option value="Hindi">Hindi</option>
                     <option value="Marathi">Marathi</option>
                   </select>
-                  {errors.motherTongue && <p className="text-red-500 text-xs mt-1">{errors.motherTongue}</p>}
+                   {errors.motherTongue && <p data-testid="error-motherTongue" className="text-red-500 text-xs mt-1">{errors.motherTongue}</p>}
                 </div>
               </div>
 
               {/* School Selection */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="schoolId" className="block text-sm font-semibold text-gray-700 mb-2">
                   Select Registered School <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="schoolId"
                   name="schoolId"
                   required
                   className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#4c84ff] focus:border-transparent outline-none transition bg-white font-medium ${errors.schoolId ? 'border-red-500' : 'border-gray-300'}`}
@@ -318,8 +326,8 @@ const StudentRegistration = () => {
                     </option>
                   ))}
                 </select>
-                {errors.schoolId ? (
-                  <p className="text-red-500 text-xs mt-1">{errors.schoolId}</p>
+                 {errors.schoolId ? (
+                  <p data-testid="error-schoolId" className="text-red-500 text-xs mt-1">{errors.schoolId}</p>
                 ) : (
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 ml-1">
                     Registration is tied to your specific school
@@ -330,12 +338,13 @@ const StudentRegistration = () => {
               {/* Password Fields */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
                     Password <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
+                      id="password"
                       name="password"
                       required
                       minLength="6"
@@ -352,8 +361,8 @@ const StudentRegistration = () => {
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
-                  {errors.password ? (
-                    <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+                   {errors.password ? (
+                    <p data-testid="error-password" className="text-red-500 text-xs mt-1">{errors.password}</p>
                   ) : (
                     <p className="text-xs text-gray-500 mt-1">
                       Minimum 6 characters
@@ -361,12 +370,13 @@ const StudentRegistration = () => {
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
                     Confirm Password <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? "text" : "password"}
+                      id="confirmPassword"
                       name="confirmPassword"
                       required
                       minLength="6"
@@ -389,8 +399,8 @@ const StudentRegistration = () => {
                       )}
                     </button>
                   </div>
-                  {errors.confirmPassword && (
-                    <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
+                   {errors.confirmPassword && (
+                    <p data-testid="error-confirmPassword" className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
                   )}
                 </div>
               </div>

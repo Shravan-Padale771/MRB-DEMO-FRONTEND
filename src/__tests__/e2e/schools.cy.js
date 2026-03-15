@@ -1,12 +1,21 @@
 // E2E tests for Schools page
 describe('Schools Page - Admin', () => {
   beforeEach(() => {
+    cy.intercept('GET', '**/schools*').as('getSchools');
     cy.visit('/admin');
     cy.contains('Schools').click();
+  });
+
+  it('renders the School Management UI', () => {
     cy.contains('School Management', { timeout: 10000 }).should('be.visible');
   });
 
+  it('receives a successful response from the backend API', () => {
+    cy.wait('@getSchools', { timeout: 10000 }).its('response.statusCode').should('eq', 200);
+  });
+
   it('loads the Schools page and shows a list', () => {
+    cy.wait('@getSchools');
     cy.get('table tbody tr', { timeout: 10000 }).should('have.length.greaterThan', 0);
   });
 

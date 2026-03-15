@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   RefreshCw,
   Users,
@@ -26,6 +26,7 @@ import ResultViewer from "../admin/components/ResultViewer";
 import RegionManager from "../admin/components/RegionManager";
 import ExamCentreManager from "../admin/components/ExamCentreManager";
 import SchoolManager from "../admin/components/SchoolManager";
+import ApplicationDetailView from "../admin/components/ApplicationDetailView";
 import DashboardLayout from "../admin/components/DashboardLayout";
 import MetricCard from "../admin/components/MetricCard";
 import GlobalSearch from "../admin/components/GlobalSearch";
@@ -44,6 +45,7 @@ import {
   getSchools,
   getRegions,
   getAnalyticsSummary,
+  getStudentCountByRegion,
 } from "../api";
 
 
@@ -52,18 +54,19 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditing, setIsEditing] = useState(false);
   const [selectedExamNo, setSelectedExamNo] = useState(null);
+  const [selectedAppForReview, setSelectedAppForReview] = useState(null);
 
   // Forms State (kept as local state)
   const [examForm, setExamForm] = useState({
-    exam_name: "राष्ट्रभाषा प्रवीण परीक्षा (सितंबर 2024)",
-    exam_code: "PRAVIN_SEP_2024",
+    exam_name: "राष्ट्रभाषा प्रवीण परीक्षा (सितंबर 2026)",
+    exam_code: "PRAVIN_SEP_2026",
     status: "DRAFT",
     no_of_papers: 2,
     exam_fees: 700,
-    application_start_date: "2024-06-01",
-    application_end_date: "2024-07-31",
-    exam_start_date: "2024-09-01",
-    exam_end_date: "2024-09-10",
+    application_start_date: "2026-06-01",
+    application_end_date: "2026-07-31",
+    exam_start_date: "2026-09-01",
+    exam_end_date: "2026-09-10",
     papers: [
       { name: "प्रथम प्रश्नपत्र", maxMarks: 100 },
       { name: "द्वितीय प्रश्नपत्र", maxMarks: 100 },
@@ -98,7 +101,7 @@ const AdminDashboard = () => {
       },
       administrative: {
         certificateIssued: "Pravin Certificate",
-        syllabusYear: "2024–2025",
+        syllabusYear: "2026–2027",
         signatoryName: "सौ. सुनीता कुलकर्णी",
         signatoryDesignation: "सचिव, परीक्षा विभाग",
         departmentName: " परीक्षा विभाग",
@@ -108,7 +111,9 @@ const AdminDashboard = () => {
       },
       structure: {
         hasOral: false,
-        hasProject: false
+        oralMarks: 50,
+        hasProject: false,
+        projectMarks: 50
       }
     },
   });
@@ -136,31 +141,31 @@ const AdminDashboard = () => {
   // Queries
   const { data: studentsPage, isLoading: isLoadingStudents } = useQuery({
     queryKey: ["students"],
-    queryFn: () => getStudents({ size: 1000 }),
+    queryFn: () => getStudents({ size: 20 }),
   });
   const students = studentsPage?.content || [];
 
   const { data: examsPage, isLoading: isLoadingExams } = useQuery({
     queryKey: ["exams"],
-    queryFn: () => getExams({ size: 1000 }),
+    queryFn: () => getExams({ size: 20 }),
   });
   const exams = examsPage?.content || [];
 
   const { data: applicationsPage, isLoading: isLoadingApplications } = useQuery({
     queryKey: ["applications"],
-    queryFn: () => getExamApplications({ size: 1000 }),
+    queryFn: () => getExamApplications({ size: 20 }),
   });
   const applications = applicationsPage?.content || [];
 
   const { data: resultsPage, isLoading: isLoadingResults } = useQuery({
     queryKey: ["results"],
-    queryFn: () => getExamResults({ size: 1000 }),
+    queryFn: () => getExamResults({ size: 20 }),
   });
   const results = resultsPage?.content || [];
 
   const { data: schoolsPage, isLoading: isLoadingSchools } = useQuery({
     queryKey: ["schools"],
-    queryFn: () => getSchools({ size: 1000 }),
+    queryFn: () => getSchools({ size: 20 }),
   });
   const schools = schoolsPage?.content || [];
 
@@ -173,6 +178,15 @@ const AdminDashboard = () => {
   const { data: analyticsSummary, isLoading: isLoadingAnalytics } = useQuery({
     queryKey: ["analyticsSummary"],
     queryFn: () => getAnalyticsSummary(),
+  });
+
+  // Fetch counts per region
+  const regionCountQueries = useQueries({
+    queries: regions.map(region => ({
+      queryKey: ['regionStudentCount', region.regionId],
+      queryFn: () => getStudentCountByRegion(region.regionId),
+      enabled: !!region.regionId
+    }))
   });
 
   const loading = isLoadingStudents || isLoadingExams || isLoadingApplications || isLoadingResults || isLoadingSchools || isLoadingRegions || isLoadingAnalytics;
@@ -466,6 +480,11 @@ const AdminDashboard = () => {
     toast.success("Navigating to Publisher with selected filters");
   };
 
+  const handleReviewApplication = (app) => {
+    setSelectedAppForReview(app);
+    setActiveTab("application_detail");
+  };
+
   // Process Application Trends (mocking actual dates if missing, or using real ones if structured)
   const applicationTrends = useMemo(() => {
     // Group applications by date (last 7 days or any structured data)
@@ -481,16 +500,20 @@ const AdminDashboard = () => {
     }));
   }, [applications]);
 
-  // Process Student Distribution by Region
-  const regionData = useMemo(() => {
-    return regions.map(region => ({
-      name: region.regionName,
-      value: students.filter(s => s.regionId === region.regionId).length || Math.floor(Math.random() * 20) + 5, // Fallback for demo
-      color: `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}` // Random colors for regions
-    })).filter(r => r.value > 0);
-  }, [regions, students]);
-
   const COLORS = ['#4c84ff', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+
+  // Process Student Distribution by Region using the analytics endpoint queries
+  const regionData = useMemo(() => {
+    return regions.map((region, index) => {
+      const countData = regionCountQueries[index]?.data;
+      const count = typeof countData === 'number' ? countData : 0;
+      return {
+        name: region.regionName,
+        value: count, 
+        color: COLORS[index % COLORS.length]
+      };
+    }).filter(r => r.value > 0);
+  }, [regions, regionCountQueries]);
 
   const handleSearchResultSelect = (tab, id) => {
     setActiveTab(tab);
@@ -516,22 +539,22 @@ const AdminDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <MetricCard
               label="Total Students"
-              value={(analyticsSummary?.totalStudents || analyticsSummary?.studentCount || students.length).toLocaleString()}
+              value={(analyticsSummary?.totalStudents || analyticsSummary?.studentCount || studentsPage?.totalElements || students.length).toLocaleString()}
               color="#4c84ff"
             />
             <MetricCard
               label="Total Exams"
-              value={(analyticsSummary?.totalExams || analyticsSummary?.examCount || exams.length).toLocaleString()}
+              value={(analyticsSummary?.totalExams || analyticsSummary?.examCount || examsPage?.totalElements || exams.length).toLocaleString()}
               color="#fbc02d"
             />
             <MetricCard
               label="Active Applications"
-              value={(analyticsSummary?.totalApplications || analyticsSummary?.applicationCount || applications.length).toLocaleString()}
+              value={(analyticsSummary?.totalApplications || analyticsSummary?.applicationCount || applicationsPage?.totalElements || applications.length).toLocaleString()}
               color="#10b981"
             />
             <MetricCard
               label="Total Results"
-              value={(analyticsSummary?.totalResults || analyticsSummary?.resultCount || results.length).toLocaleString()}
+              value={(analyticsSummary?.totalResults || analyticsSummary?.resultCount || resultsPage?.totalElements || results.length).toLocaleString()}
               color="#8b5cf6"
             />
           </div>
@@ -620,7 +643,11 @@ const AdminDashboard = () => {
                 <h3 className="text-xl font-bold text-gray-800">Recent Applications</h3>
                 <button onClick={() => setActiveTab('applications')} className="text-sm font-semibold text-blue-600 hover:text-blue-700">View All</button>
               </div>
-              <ApplicationManager isDashboard={true} selectApplication={selectApplication} />
+              <ApplicationManager 
+                isDashboard={true} 
+                selectApplication={selectApplication} 
+                reviewApplication={handleReviewApplication}
+              />
             </div>
 
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
@@ -642,8 +669,15 @@ const AdminDashboard = () => {
         {activeTab === "applications" && (
           <ApplicationManager
             selectApplication={selectApplication}
+            reviewApplication={handleReviewApplication}
             onPublishWithFilters={handlePublishWithFilters}
             activeFilters={activeFilters}
+          />
+        )}
+        {activeTab === "application_detail" && (
+          <ApplicationDetailView 
+            application={selectedAppForReview}
+            onBack={() => setActiveTab("applications")}
           />
         )}
         {activeTab === "publish" && (

@@ -7,7 +7,7 @@ import ApplicationLedger from './ApplicationLedger';
 import Pagination from '../../common/components/Pagination';
 import { getExams, getRegions, getExamCentres, getSchools, getExamApplications } from '../../api';
 
-const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectApplication }) => {
+const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectApplication, reviewApplication }) => {
     // Filter State
     const [filterExam, setFilterExam] = useState("");
     const [filterRegion, setFilterRegion] = useState("");
@@ -248,7 +248,7 @@ const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectA
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-50 text-sm">
                                                     {applications.map((app) => (
-                                                        <tr key={app.applicationId} className="hover:bg-blue-50/20 transition-colors group cursor-pointer" onClick={() => selectApplication(app)}>
+                                                        <tr key={app.applicationId} className="hover:bg-blue-50/20 transition-colors group cursor-pointer" onClick={() => reviewApplication(app)}>
                                                             <td className="px-6 py-4 font-black text-xs text-[#4c84ff]">#{app.applicationId}</td>
                                                             <td className="px-6 py-4 font-bold text-gray-400 text-xs">{app.studentId}</td>
                                                             <td className="px-6 py-4 font-bold text-gray-900 truncate max-w-[200px]">{app.studentName}</td>
@@ -259,7 +259,9 @@ const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectA
                                                                 </span>
                                                             </td>
                                                             <td className="px-6 py-4 text-right">
-                                                                <ArrowRight size={16} className="ml-auto text-gray-200 group-hover:text-[#4c84ff] transition-colors" />
+                                                                <button className="p-2 bg-blue-50 text-[#4c84ff] rounded-lg opacity-0 group-hover:opacity-100 transition-all font-black text-[9px] uppercase tracking-widest flex items-center gap-2">
+                                                                    Review <ArrowRight size={12} />
+                                                                </button>
                                                             </td>
                                                         </tr>
                                                     ))}
@@ -270,7 +272,7 @@ const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectA
                                 ) : (
                                     <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                                         {applications.map((app) => (
-                                            <motion.div key={app.applicationId} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-white rounded-2xl border-2 border-gray-100 hover:border-[#4c84ff] hover:shadow-xl transition-all group cursor-pointer" onClick={() => selectApplication(app)}>
+                                            <motion.div key={app.applicationId} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-white rounded-2xl border-2 border-gray-100 hover:border-[#4c84ff] hover:shadow-xl transition-all group cursor-pointer" onClick={() => reviewApplication(app)}>
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center font-black text-[#4c84ff] shadow-sm border border-blue-100 group-hover:bg-[#4c84ff] group-hover:text-white transition-all">
                                                         {app.studentName?.charAt(0) || "?"}
@@ -316,7 +318,7 @@ const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectA
                                 </thead>
                                 <tbody className="divide-y divide-gray-50 text-sm">
                                     {applications.map((app) => (
-                                        <tr key={app.applicationId} className="hover:bg-blue-50/20 cursor-pointer" onClick={() => selectApplication(app)}>
+                                        <tr key={app.applicationId} className="hover:bg-blue-50/20 cursor-pointer" onClick={() => reviewApplication(app)}>
                                             <td className="px-6 py-4 font-black text-xs text-[#4c84ff]">#{app.applicationId}</td>
                                             <td className="px-6 py-4 font-bold text-gray-900">{app.studentName}</td>
                                             <td className="px-6 py-4 font-bold text-gray-600 text-[10px] uppercase truncate max-w-[150px]">{app.examName}</td>
