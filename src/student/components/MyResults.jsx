@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { Award, CheckCircle, Calendar, FileText } from 'lucide-react';
 import Marksheet from './Marksheet';
 
-import { getExams, getExamApplications } from '../../api';
+import { getExamApplications } from '../../api';
+import { searchExams as getExams } from '../../api/exam-api';
 import { useQuery } from '@tanstack/react-query';
 
 const MyResults = ({ myResults, student }) => {

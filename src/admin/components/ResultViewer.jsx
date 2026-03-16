@@ -4,7 +4,8 @@ import { Award, CheckCircle, Trophy, Filter, XCircle, Search, TrendingUp, Chevro
 import { useQuery } from '@tanstack/react-query';
 import ResultLedger from './ResultLedger';
 import Pagination from '../../common/components/Pagination';
-import { getRegions, getExamCentres, getSchools, getExams, getExamResults } from '../../api';
+import { getRegions, getExamCentres, getSchools, getExamResults } from '../../api';
+import { searchExams as getExams } from '../../api/exam-api';
 
 const ResultViewer = ({ isDashboard = false }) => {
     // Filter State

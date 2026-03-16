@@ -170,3 +170,8 @@ indexing + cache
 [2026-03-16 00:34:18] GET /getAllStudentProfiles | Status: 200 | Duration: 1.8739s
 [2026-03-16 00:34:41] GET /getAllStudentProfiles | Status: 200 | Duration: 2.1844s
 [2026-03-16 00:41:49] GET /getAllStudentProfiles | Status: 200 | Duration: 1.5802s
+[2026-03-16 16:22:32] GET /students | Status: 200 | Duration: 7.1438s
+[2026-03-16 16:25:30] GET /studentProfiles | Status: 200 | Duration: 1.6335s
+[2026-03-16 16:27:30] GET /getAllApplications | Status: 404 | Duration: 0.0565s
+[2026-03-16 16:28:00] GET /exam-applications | Status: 200 | Duration: 0.1086s
+[2026-03-16 16:43:38] GET /exams | Status: 200 | Duration: 1.7518s

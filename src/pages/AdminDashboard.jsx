@@ -33,12 +33,8 @@ import GlobalSearch from "../admin/components/GlobalSearch";
 
 
 import {
-  createExam,
-  updateExam,
-  deleteExam,
   createStudent,
   getStudents,
-  getExams,
   createExamResult,
   getExamApplications,
   getExamResults,
@@ -47,6 +43,7 @@ import {
   getAnalyticsSummary,
   getStudentCountByRegion,
 } from "../api";
+import { createExam, updateExam, deleteExam, searchExams as getExams } from "../api/exam-api";
 
 
 const AdminDashboard = () => {

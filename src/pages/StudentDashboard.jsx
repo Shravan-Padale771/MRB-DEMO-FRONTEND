@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getStudents,
-  getExams,
   createExamApplication,
   getExamResults,
 } from "../api";
+import { searchExams as getExams } from "../api/exam-api";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import {

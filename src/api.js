@@ -61,51 +61,6 @@ export const deleteStudent = async (id) => {
   return response.data;
 };
 
-// --- EXAM ENDPOINTS ---
-/**
- * GET /exams (Paginated)
- */
-export const getExams = async ({
-  page = 0,
-  size = 20,
-  examName,
-  examCode,
-  status,
-  sort,
-} = {}) => {
-  const params = new URLSearchParams({ page, size });
-  if (examName) params.append("examName", examName);
-  if (examCode) params.append("examCode", examCode);
-  if (status) params.append("status", status);
-  if (sort) params.append("sort", sort);
-
-  const response = await api.get(`/exams?${params.toString()}`);
-  return response.data;
-};
-
-/**
- * POST /exams
- */
-export const createExam = async (examData) => {
-  const response = await api.post("/exams", examData);
-  return response.data;
-};
-
-/**
- * PUT /exams/{id}
- */
-export const updateExam = async (id, examData) => {
-  const response = await api.put(`/exams/${id}`, examData);
-  return response.data;
-};
-
-/**
- * DELETE /exams/{id}
- */
-export const deleteExam = async (id) => {
-  const response = await api.delete(`/exams/${id}`);
-  return response.data;
-};
 
 // --- EXAM APPLICATION ENDPOINTS ---
 /**
@@ -137,11 +92,30 @@ export const getExamApplications = async ({
   return response.data;
 };
 
+
+/**
+ * GET application by ID and Exam No
+ */
+export const getExamApplicationByExactId = async (applicationId, examNo) => {
+  const response = await api.get(`/exam-applications-byId?applicationId=${applicationId}&examNo=${examNo}`);
+  return response.data;
+};
+
+/**
+ * GET application by ID using filtered search
+ */
+export const getExamApplicationById = async (id) => {
+  // Use the search endpoint with applicationId filter to get paginated response
+  const response = await api.get(`/exam-applications?applicationId=${id}`);
+  // Return the first item from the content array
+  return response.data.content?.[0] || null;
+};
+
 /**
  * POST /exam-applications
  */
-export const createExamApplication = async (applicationData, studentId, examId) => {
-  const response = await api.post(`/exam-applications?studentId=${studentId}&examId=${examId}`, applicationData);
+export const createExamApplication = async (applicationData) => {
+  const response = await api.post(`/exam-applications`, applicationData);
   return response.data;
 };
 

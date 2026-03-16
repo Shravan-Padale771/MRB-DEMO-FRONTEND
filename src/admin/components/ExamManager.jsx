@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, BookOpen, ChevronRight, ChevronLeft, Check, Edit, Trash2, X, Filter, RefreshCw } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import Pagination from '../../common/components/Pagination';
-import { getExams } from '../../api';
+import { searchExams as getExams } from '../../api/exam-api';
 
 const ExamManager = ({
     examForm,

@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import ApplicationLedger from './ApplicationLedger';
 import Pagination from '../../common/components/Pagination';
-import { getExams, getRegions, getExamCentres, getSchools, getExamApplications } from '../../api';
+import { getRegions, getExamCentres, getSchools, getExamApplications } from '../../api';
+import { searchExams as getExams } from '../../api/exam-api';
 
 const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectApplication, reviewApplication }) => {
     // Filter State

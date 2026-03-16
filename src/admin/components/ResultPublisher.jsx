@@ -2,7 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { Award, Filter, XCircle, Search, Keyboard, FastForward } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useQuery } from '@tanstack/react-query';
-import { getRegions, getExamCentres, getSchools, getStudents, getExams } from '../../api';
+import { getRegions, getExamCentres, getSchools, getStudents } from '../../api';
+import { searchExams as getExams } from '../../api/exam-api';
 
 const ResultPublisher = ({
     resultForm,
