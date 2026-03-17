@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -26,6 +27,7 @@ import ResultViewer from "../admin/components/ResultViewer";
 import RegionManager from "../admin/components/RegionManager";
 import ExamCentreManager from "../admin/components/ExamCentreManager";
 import SchoolManager from "../admin/components/SchoolManager";
+import SchoolDetailView from "../admin/components/SchoolDetailView";
 import ApplicationDetailView from "../admin/components/ApplicationDetailView";
 import DashboardLayout from "../admin/components/DashboardLayout";
 import MetricCard from "../admin/components/MetricCard";
@@ -48,7 +50,17 @@ import { createExam, updateExam, deleteExam, searchExams as getExams } from "../
 
 const AdminDashboard = () => {
   const queryClient = useQueryClient();
+  const { type, id } = useParams();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
+
+  // Reset navigation when switching tabs manually via sidebar
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    if (id || type) {
+      navigate("/admin");
+    }
+  };
   const [isEditing, setIsEditing] = useState(false);
   const [selectedExamNo, setSelectedExamNo] = useState(null);
   const [selectedAppForReview, setSelectedAppForReview] = useState(null);
@@ -113,6 +125,9 @@ const AdminDashboard = () => {
         projectMarks: 50
       }
     },
+    controllerSignatureUrl: "",
+    boardSealUrl: "",
+    boardLogoUrl: ""
   });
 
 
@@ -134,6 +149,16 @@ const AdminDashboard = () => {
     school: "",
     status: ""
   });
+
+  // Sync activeTab with route type if present
+  useEffect(() => {
+    if (type) {
+      if (type === 'school') setActiveTab('schools');
+      else if (type === 'exam') setActiveTab('exams');
+      else if (type === 'centre') setActiveTab('exam_centres');
+      else if (type === 'region') setActiveTab('regions');
+    }
+  }, [type]);
 
   // Queries
   const { data: studentsPage, isLoading: isLoadingStudents } = useQuery({
@@ -280,6 +305,9 @@ const AdminDashboard = () => {
           hasProject: false
         }
       },
+      controllerSignatureUrl: "",
+      boardSealUrl: "",
+      boardLogoUrl: ""
     });
     setIsEditing(false);
     setSelectedExamNo(null);
@@ -297,7 +325,7 @@ const AdminDashboard = () => {
   });
 
   const updateExamMutation = useMutation({
-    mutationFn: ({ id, payload }) => updateExam(id, payload),
+    mutationFn: (payload) => updateExam(payload),
     onSuccess: () => {
       toast.success("Exam Updated!");
       resetExamForm();
@@ -349,7 +377,7 @@ const AdminDashboard = () => {
       papers: JSON.stringify(examForm.papers),
       exam_details: JSON.stringify(examForm.exam_details),
     };
-    updateExamMutation.mutate({ id: selectedExamNo, payload });
+    updateExamMutation.mutate({ ...payload, examNo: selectedExamNo });
   };
 
   const handleDeleteExam = (id) => {
@@ -521,7 +549,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+    <DashboardLayout activeTab={activeTab} setActiveTab={handleTabChange}>
       <GlobalSearch
         students={students}
         exams={exams}
@@ -530,7 +558,8 @@ const AdminDashboard = () => {
         onSelect={handleSearchResultSelect}
       />
 
-      {activeTab === "dashboard" && (
+      {/* Main Content Area */}
+      {activeTab === "dashboard" && !id && (
         <div className="space-y-8">
           {/* Metric Cards Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -657,12 +686,22 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+      
+      {/* Exclusive Detail Views (via URL) */}
+      {type === "school" && id && (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <SchoolDetailView 
+            schoolId={id} 
+            onBack={() => navigate("/admin")}
+          />
+        </div>
+      )}
 
-      {/* Render Sub-managers based on activeTab */}
-      <div className={activeTab === 'dashboard' ? 'hidden' : 'block'}>
+      {/* Render Sub-managers based on activeTab (hidden when detail view is active) */}
+      <div className={(activeTab === 'dashboard' || id) ? 'hidden' : 'block'}>
         {activeTab === "regions" && <RegionManager />}
         {activeTab === "exam_centres" && <ExamCentreManager />}
-        {activeTab === "schools" && <SchoolManager />}
+        {activeTab === "schools" && !id && <SchoolManager />}
         {activeTab === "applications" && (
           <ApplicationManager
             selectApplication={selectApplication}

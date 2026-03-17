@@ -1,0 +1,16 @@
+[
+    {
+        "studentId": 1,
+        "firstName": "Sumit",
+        "middleName": "Sanjay",
+        "lastName": "Hatekar",
+        "contact": "1234567890",
+        "email": "test@gmail.com",
+        "age": 15,
+        "motherTongue": "Marathi",
+        "schoolId": 49,
+        "schoolName": "The Modern English School Koregaon",
+        "hasProfile": true,
+        "examApplications": null
+    }
+]

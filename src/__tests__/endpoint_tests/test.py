@@ -79,6 +79,38 @@ def get_pagination_params():
         "sort": get_input("Sort (e.g. id,desc) (optional)")
     }
 
+def handle_file_upload(file_path):
+    if not os.path.exists(file_path):
+        print(f"File not found: {file_path}")
+        return None
+    
+    url = f"{BASE_URL}/files/upload"
+    original_filename = os.path.basename(file_path)
+    # Add unique prefix to avoid duplicate upload failure in MinIO
+    prefix = int(time.time())
+    unique_filename = f"{prefix}_{original_filename}"
+    
+    print(f"Uploading {unique_filename}...")
+    try:
+        with open(file_path, 'rb') as f:
+            # Send with the unique filename
+            files = [('files', (unique_filename, f, 'image/jpeg'))]
+            response = requests.post(url, files=files)
+            if response.status_code == 200:
+                result = response.json()
+                # Backend returns Map<OriginalFilename, URL> - the key matches unique_filename sent
+                upload_url = result.get(unique_filename)
+                if not upload_url and isinstance(result, dict):
+                    upload_url = next(iter(result.values())) if result else None
+                
+                if upload_url:
+                    print(f"Uploaded -> {upload_url}")
+                    return upload_url
+            print(f"Upload failed: {response.status_code} - {response.text}")
+    except Exception as e:
+        print(f"Error: {e}")
+    return None
+
 def test_student_endpoints():
     print("\n--- Student Endpoints ---")
     print("Legacy/Explicit:")
@@ -111,38 +143,120 @@ def test_student_endpoints():
 
 def test_exam_endpoints():
     print("\n--- Exam Endpoints ---")
-    print("Legacy/Explicit:")
-    print("  1. Get All Exams (/getAllExams)")
-    print("  2. Add Exam (/addExam)")
-    print("  3. Update Exam (/updateExam)")
-    print("  4. Delete Exam (/deleteExam)")
-    print("New/RESTful:")
-    print("  5. Get Exams (Paginated) (/exams)")
+    print("  1. Get All Exams (/exams/all)")
+    print("  2. Create Exam (POST /exams)")
+    print("  3. Get Exam By ID (GET /exams/{id})")
+    print("  4. Update Exam (PUT /exams/{id})")
+    print("  5. Delete Exam (DELETE /exams/{id})")
+    print("  6. Search Exams (Paginated) (GET /exams)")
+    print("  7. Create English Exam (WITH IMAGES) (POST /exams)")
     choice = input("Select: ")
     
     if choice == "1":
-        make_request("GET", "/getAllExams")
+        make_request("GET", "/exams/all")
     elif choice == "2":
         exam_data = {
-            "examName": get_input("Exam Name"),
-            "examCode": get_input("Exam Code"),
-            "status": get_input("Status (e.g. OPEN)", "OPEN")
+            "exam_name": get_input("Exam Name"),
+            "exam_code": get_input("Exam Code"),
+            "status": get_input("Status (e.g. DRAFT)", "DRAFT"),
+            "exam_fees": float(get_input("Exam Fees", "0")),
+            "no_of_papers": int(get_input("Number of Papers", "2")),
+            "application_start_date": get_input("App Start (YYYY-MM-DD)"),
+            "application_end_date": get_input("App End (YYYY-MM-DD)"),
+            "exam_start_date": get_input("Exam Start (YYYY-MM-DD)"),
+            "exam_end_date": get_input("Exam End (YYYY-MM-DD)"),
+            "papers": json.dumps([
+                {"name": "Paper 1", "maxMarks": 100},
+                {"name": "Paper 2", "maxMarks": 100}
+            ]),
+            "exam_details": json.dumps({
+                "identity": {"examLevel": "PRAVIN", "language": "Hindi"},
+                "rules": {"passingCriteria": "40% in each paper"}
+            }),
+            "controllerSignatureUrl": get_input("Controller Signature URL (if any)"),
+            "boardSealUrl": get_input("Board Seal URL (if any)"),
+            "boardLogoUrl": get_input("Board Logo URL (if any)")
         }
-        make_request("POST", "/addExam", body=exam_data)
+        make_request("POST", "/exams", body=exam_data)
     elif choice == "3":
-        e_no = get_input("Exam No")
-        exam_data = {
-            "examName": get_input("New Exam Name"),
-            "examCode": get_input("New Exam Code")
-        }
-        make_request("PUT", "/updateExam", params={"exam_no": e_no}, body=exam_data)
+        e_id = get_input("Exam ID")
+        make_request("GET", f"/exams/{e_id}")
     elif choice == "4":
-        e_id = get_input("Exam ID to delete")
-        make_request("DELETE", "/deleteExam", params={"id": e_id})
+        e_id = get_input("Exam ID to update")
+        exam_data = {
+            "exam_name": get_input("New Exam Name"),
+            "exam_code": get_input("New Exam Code"),
+            "status": get_input("New Status"),
+            "exam_fees": float(get_input("New Exam Fees")),
+            "no_of_papers": int(get_input("New Number of Papers")),
+            "examNo": int(e_id)
+        }
+        make_request("PUT", "/exams", body=exam_data)
     elif choice == "5":
+        e_id = get_input("Exam ID to delete")
+        make_request("DELETE", f"/exams/{e_id}")
+    elif choice == "6":
         params = get_pagination_params()
-        params["examName"] = get_input("Exam Name Filter (optional)")
+        params["exam_name"] = get_input("Exam Name Filter (optional)")
+        params["exam_code"] = get_input("Exam Code Filter (optional)")
+        params["status"] = get_input("Status Filter (optional)")
         make_request("GET", "/exams", params={k: v for k, v in params.items() if v})
+    elif choice == "7":
+        images_dir = r"C:\Users\SUMIT\Desktop\mrb\MRB-DEMO-FRONTEND\images"
+        logo_url = handle_file_upload(os.path.join(images_dir, "board logo.png"))
+        seal_url = handle_file_upload(os.path.join(images_dir, "board seal.jpg"))
+        sig_url = handle_file_upload(os.path.join(images_dir, "signature.jpg"))
+        
+        exam_data = {
+            "exam_name": "Hindi Pravin Final Exam 2024",
+            "exam_code": f"HIN_PRAVIN_{int(time.time())}",
+            "status": "PUBLISHED",
+            "exam_fees": 1250.0,
+            "no_of_papers": 3,
+            "application_start_date": "2024-05-01",
+            "application_end_date": "2024-06-30",
+            "exam_start_date": "2024-08-10",
+            "exam_end_date": "2024-08-15",
+            "papers": json.dumps([
+                {"name": "Literature & Grammar", "maxMarks": 100},
+                {"name": "Essay & Translation", "maxMarks": 100},
+                {"name": "Oral Communication", "maxMarks": 50}
+            ]),
+            "exam_details": json.dumps({
+                "identity": {
+                    "examFullTitle": "Maharashtra Rajya Bhasha Pravin Examination",
+                    "conductingBody": "Maharashtra Rashtrabhasha Sabha, Pune",
+                    "board": "Central Board of Hindi Education",
+                    "examLevel": "PRAVIN (ADVANCED)",
+                    "language": "Hindi"
+                },
+                "schedule": {
+                    "session": "August 2024",
+                    "timing": "10:00 AM to 01:00 PM"
+                },
+                "rules": {
+                    "eligibility": "Minimum 18 years of age and passed Hindi Madhyama",
+                    "passingCriteria": "40% in each paper and 50% aggregate",
+                    "gradingScheme": {
+                        "firstClass": "60% and above",
+                        "secondClass": "50% to 59%",
+                        "thirdClass": "40% to 49%",
+                        "fail": "Below 40%"
+                    }
+                },
+                "administrative": {
+                    "signatoryName": "Dr. R. K. Sharma",
+                    "signatoryDesignation": "Controller of Examinations",
+                    "departmentName": "Examination Department",
+                    "syllabusYear": "2023-24",
+                    "instructions": "1. Bring original ID. 2. Reach 30 mins before. 3. No electronic gadgets."
+                }
+            }),
+            "boardLogoUrl": logo_url,
+            "boardSealUrl": seal_url,
+            "controllerSignatureUrl": sig_url
+        }
+        make_request("POST", "/exams", body=exam_data)
 
 def test_region_endpoints():
     print("\n--- Region Endpoints ---")
@@ -331,7 +445,7 @@ def test_all_endpoints():
     endpoints = [
         ("GET", "/getAllStudents"),
         ("GET", "/students"),
-        ("GET", "/getAllExams"),
+        ("GET", "/exams/all"),
         ("GET", "/exams"),
         ("GET", "/getRegions"),
         ("GET", "/regions"),

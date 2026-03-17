@@ -12,7 +12,10 @@
             "application_end_date": "2026-08-31",
             "exam_start_date": "2026-10-05",
             "exam_end_date": "2026-10-10",
-            "status": "DRAFT"
+            "status": "DRAFT",
+            "controllerSignatureUrl": null,
+            "boardSealUrl": null,
+            "boardLogoUrl": null
         },
         {
             "examNo": 5,
@@ -26,7 +29,10 @@
             "application_end_date": "2026-04-15",
             "exam_start_date": "2026-05-12",
             "exam_end_date": "2026-05-15",
-            "status": "DRAFT"
+            "status": "DRAFT",
+            "controllerSignatureUrl": null,
+            "boardSealUrl": null,
+            "boardLogoUrl": null
         },
         {
             "examNo": 12,
@@ -40,7 +46,10 @@
             "application_end_date": "2024-07-31",
             "exam_start_date": "2024-09-01",
             "exam_end_date": "2024-09-10",
-            "status": "DRAFT"
+            "status": "DRAFT",
+            "controllerSignatureUrl": null,
+            "boardSealUrl": null,
+            "boardLogoUrl": null
         },
         {
             "examNo": 15,
@@ -54,7 +63,10 @@
             "application_end_date": "2024-07-31",
             "exam_start_date": "2024-09-01",
             "exam_end_date": "2024-09-10",
-            "status": "DRAFT"
+            "status": "DRAFT",
+            "controllerSignatureUrl": null,
+            "boardSealUrl": null,
+            "boardLogoUrl": null
         },
         {
             "examNo": 19,
@@ -68,7 +80,10 @@
             "application_end_date": "2026-07-31",
             "exam_start_date": "2026-09-01",
             "exam_end_date": "2026-09-10",
-            "status": "DRAFT"
+            "status": "DRAFT",
+            "controllerSignatureUrl": null,
+            "boardSealUrl": null,
+            "boardLogoUrl": null
         }
     ],
     "number": 0,

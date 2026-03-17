@@ -22,14 +22,14 @@ export const getAllExams = async () => {
 export const searchExams = async ({
   page = 0,
   size = 20,
-  examName,
-  examCode,
+  exam_name,
+  exam_code,
   status,
   sort,
 } = {}) => {
   const params = new URLSearchParams({ page, size });
-  if (examName) params.append("examName", examName);
-  if (examCode) params.append("examCode", examCode);
+  if (exam_name) params.append("exam_name", exam_name);
+  if (exam_code) params.append("exam_code", exam_code);
   if (status) params.append("status", status);
   if (sort) params.append("sort", sort);
 
@@ -48,8 +48,8 @@ export const getExam = async (id) => {
 /**
  * PUT /exams/{id}
  */
-export const updateExam = async (id, examData) => {
-  const response = await api.put(`/exams/${id}`, examData);
+export const updateExam = async (examData) => {
+  const response = await api.put("/exams", examData);
   return response.data;
 };
 

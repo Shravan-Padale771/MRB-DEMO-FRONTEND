@@ -4,7 +4,7 @@ import { X, Printer } from "lucide-react";
 import toast from "react-hot-toast";
 import { createExamApplication, getStudentProfile } from "../../api";
 
-const ApplyModal = ({ exam, student, onClose, onSuccess }) => {
+const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState("");
   const [profile, setProfile] = useState(null);
@@ -20,6 +20,27 @@ const ApplyModal = ({ exam, student, onClose, onSuccess }) => {
       return [];
     }
   }, [exam?.papers]);
+
+  // Backend stores these as JSON map strings: {"filename":"url"}
+  // This helper extracts the first URL value from the map string
+  const parseUrlFromJsonString = (str) => {
+    if (!str) return null;
+    // If already a plain URL, return as-is
+    if (str.startsWith("http")) return str;
+    try {
+      const parsed = JSON.parse(str);
+      if (typeof parsed === "object" && parsed !== null) {
+        return Object.values(parsed)[0] || null;
+      }
+    } catch {
+      // Not JSON, return as-is
+      return str;
+    }
+    return null;
+  };
+
+  const principalSigUrl = parseUrlFromJsonString(school?.principalSignatureUrl);
+  const schoolStampUrl  = parseUrlFromJsonString(school?.schoolStampUrl);
 
   // All papers are opted by default (student applies for all)
   const optedPapers = papers.map((p) => p.name);
@@ -137,7 +158,15 @@ const ApplyModal = ({ exam, student, onClose, onSuccess }) => {
           className="modal-container"
         >
           {/* Header */}
-          <div className="header">
+          <div className="header" style={{ position: 'relative' }}>
+            {/* Board Seal - top left */}
+            {exam.boardSealUrl && (
+              <img src={exam.boardSealUrl} alt="Board Seal" style={{ position:'absolute', left:0, top:0, width:'80px', height:'80px', objectFit:'contain' }} />
+            )}
+            {/* Board Logo - top right */}
+            {exam.boardLogoUrl && (
+              <img src={exam.boardLogoUrl} alt="Board Logo" style={{ position:'absolute', right:0, top:0, width:'80px', height:'80px', objectFit:'contain' }} />
+            )}
             <h1>Maharashtra Rashtrabhasha Sabha, Pune</h1>
             <p>387, Narayan Peth, Pune – 411 030 | Form No: MRS/2026/A-{Math.floor(Math.random() * 9000) + 1000}</p>
             <p style={{ fontWeight: 'bold', marginTop: '10px', fontSize: '16px' }}>EXAMINATION APPLICATION FORM</p>
@@ -297,11 +326,25 @@ const ApplyModal = ({ exam, student, onClose, onSuccess }) => {
                 <span>Signature of Candidate</span>
               </div>
               <div className="sign-box">
-                <span className="opacity-30">STAMP AREA</span>
-                <span>Principal's Signature & Stamp</span>
+                {principalSigUrl ? (
+                  <img src={principalSigUrl} alt="Principal Signature" className="max-h-16 p-1 object-contain" />
+                ) : (
+                  <span className="opacity-30">SIGN AREA</span>
+                )}
+                {schoolStampUrl && (
+                  <img src={schoolStampUrl} alt="School Stamp" className="max-h-10 p-1 object-contain" />
+                )}
+                <span>Principal's Signature &amp; Stamp</span>
               </div>
               <div className="sign-box">
-                <span className="opacity-30">STAMP AREA</span>
+                {exam.controllerSignatureUrl ? (
+                  <img src={exam.controllerSignatureUrl} alt="Controller Signature" className="max-h-16 p-1 object-contain" />
+                ) : (
+                  <span className="opacity-30">STAMP AREA</span>
+                )}
+                {exam.boardSealUrl && (
+                  <img src={exam.boardSealUrl} alt="Board Seal" className="max-h-10 p-1 object-contain" />
+                )}
                 <span>Sabha Authorized Stamp</span>
               </div>
             </div>

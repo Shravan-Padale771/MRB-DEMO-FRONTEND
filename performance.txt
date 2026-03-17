@@ -176,3 +176,16 @@ indexing + cache
 [2026-03-16 16:28:00] GET /exam-applications | Status: 200 | Duration: 0.1086s
 [2026-03-16 16:43:38] GET /exams | Status: 200 | Duration: 1.7518s
 [2026-03-17 15:04:12] GET /exam-applications | Status: 200 | Duration: 0.3898s
+[2026-03-17 22:29:53] GET /schools | Status: 200 | Duration: 0.3875s
+[2026-03-17 22:30:39] GET /schools | Status: 200 | Duration: 6.5747s
+[2026-03-17 22:31:02] GET /schools | Status: 200 | Duration: 4.8637s
+[2026-03-17 22:36:32] GET /getAllSchools | Status: 200 | Duration: 12.0892s
+[2026-03-17 22:45:17] GET /getAllSchools | Status: 200 | Duration: 0.1809s
+[2026-03-17 22:46:33] GET /getAllExams | Status: 404 | Duration: 0.1225s
+[2026-03-17 22:47:01] GET /exams | Status: 200 | Duration: 3.8125s
+[2026-03-17 23:27:53] POST /exams | Status: 201 | Duration: 2.0931s
+[2026-03-17 23:47:12] GET /getAllStudents | Status: 200 | Duration: 303.0716s
+[2026-03-18 00:19:11] GET /students | Status: 200 | Duration: 7.8865s
+[2026-03-18 00:20:24] GET /students | Status: 200 | Duration: 3.6811s
+[2026-03-18 00:21:52] GET /getAllStudentProfiles | Status: 200 | Duration: 1.9645s
+[2026-03-18 00:33:56] GET /getAllStudents | Status: 200 | Duration: 2.4180s

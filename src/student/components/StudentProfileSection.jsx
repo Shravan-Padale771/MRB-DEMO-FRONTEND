@@ -4,10 +4,10 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { User, MapPin, CheckCircle, AlertCircle, Save, Calendar, Phone, Book, Camera, Upload, XCircle, FileText } from "lucide-react";
 
-const StudentProfileSection = ({ student, onProfileUpdated }) => {
+const StudentProfileSection = ({ student, prefetchedProfile, onProfileUpdated }) => {
   const [loading, setLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(!student?.hasProfile);
-  const [profileId, setProfileId] = useState(null);
+  const [isEditing, setIsEditing] = useState(!student?.hasProfile && !prefetchedProfile);
+  const [profileId, setProfileId] = useState(prefetchedProfile?.profileId || null);
   const [previews, setPreviews] = useState({
     photo: null,
     signature: null,
@@ -48,54 +48,37 @@ const StudentProfileSection = ({ student, onProfileUpdated }) => {
   });
 
   useEffect(() => {
-    if (student?.hasProfile) {
-      fetchProfile();
+    if (prefetchedProfile) {
+      setFormData({
+        dateOfBirth: prefetchedProfile.dateOfBirth || "",
+        gender: prefetchedProfile.gender || "Male",
+        category: prefetchedProfile.category || "General",
+        previousExamName: prefetchedProfile.previousExamName || "",
+        previousExamMarks: prefetchedProfile.previousExamMarks || "",
+        previousExamYear: prefetchedProfile.previousExamYear || "",
+        previousExamRollNo: prefetchedProfile.previousExamRollNo || "",
+        fatherName: prefetchedProfile.fatherName || "",
+        motherName: prefetchedProfile.motherName || "",
+        guardianContact: prefetchedProfile.guardianContact || "",
+        qualification: prefetchedProfile.qualification || "",
+        profilePhotoUrl: prefetchedProfile.profilePhotoUrl || "",
+        signatureUrl: prefetchedProfile.signatureUrl || "",
+        idProofNumber: prefetchedProfile.idProofNumber || "",
+        idProofDocumentUrl: prefetchedProfile.idProofDocumentUrl || "",
+        profileCompletionStatus: prefetchedProfile.profileCompletionStatus || "Complete",
+        address: prefetchedProfile.address || {
+          line1: "",
+          line2: "",
+          villageOrCity: "",
+          taluka: "",
+          district: "",
+          state: "",
+          pincode: "",
+        },
+      });
+      setIsEditing(false);
     }
-  }, [student]);
-
-  const fetchProfile = async () => {
-    try {
-      setLoading(true);
-      // Assuming getStudentProfile takes studentId based on backend conventions
-      const data = await getStudentProfile(student.studentId);
-      if (data) {
-        setProfileId(data.profileId); 
-        setFormData({
-          dateOfBirth: data.dateOfBirth || "",
-          gender: data.gender || "Male",
-          category: data.category || "General",
-          previousExamName: data.previousExamName || "",
-          previousExamMarks: data.previousExamMarks || "",
-          previousExamYear: data.previousExamYear || "",
-          previousExamRollNo: data.previousExamRollNo || "",
-          fatherName: data.fatherName || "",
-          motherName: data.motherName || "",
-          guardianContact: data.guardianContact || "",
-          qualification: data.qualification || "",
-          profilePhotoUrl: data.profilePhotoUrl || "",
-          signatureUrl: data.signatureUrl || "",
-          idProofNumber: data.idProofNumber || "",
-          idProofDocumentUrl: data.idProofDocumentUrl || "",
-          profileCompletionStatus: data.profileCompletionStatus || "Complete",
-          address: data.address || {
-            line1: "",
-            line2: "",
-            villageOrCity: "",
-            taluka: "",
-            district: "",
-            state: "",
-            pincode: "",
-          },
-        });
-        setIsEditing(false);
-      }
-    } catch (error) {
-      console.error("Failed to fetch profile", error);
-      toast.error("Could not load existing profile data.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [prefetchedProfile]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -204,11 +187,14 @@ const StudentProfileSection = ({ student, onProfileUpdated }) => {
 
       console.log("Final profile payload to be saved:", payload);
 
-      if (student.hasProfile && profileId) {
+      if ((student.hasProfile || profileId) && profileId) {
         await updateStudentProfile(profileId, payload);
         toast.success("Profile updated successfully!");
       } else {
-        await createStudentProfileAPI(student.studentId, payload);
+        const response = await createStudentProfileAPI(student.studentId, payload);
+        if (response && response.profileId) {
+          setProfileId(response.profileId);
+        }
         toast.success("Profile created successfully!");
       }
 

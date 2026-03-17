@@ -6,6 +6,7 @@ import {
   getExamResults,
   getExamApplications,
   getStudentProfile,
+  getStudentProfileByStudentIdString,
   getRegions,
   getExamCentres,
   getSchools,
@@ -86,28 +87,49 @@ const StudentDashboard = () => {
     loadMasterData();
   }, []);
 
-  useEffect(() => {
-    if (currentUser) {
-      fetchMyResults();
-      fetchMyApplications();
-      fetchProfile();
-      if (!currentUser.hasProfile) {
-        setActiveTab("profile");
-      } else {
-        setActiveTab("exams");
-      }
-    }
-  }, [currentUser]);
-
-  const fetchProfile = async () => {
-    if (!currentUser?.studentId) return;
+  const fetchProfile = async (studentData) => {
+    const studentIdToFetch = studentData?.studentId || currentUser?.studentId;
+    if (!studentIdToFetch) return null;
     try {
-      const data = await getStudentProfile(currentUser.studentId);
+      // Use the new endpoint instead of the old one
+      const data = await getStudentProfileByStudentIdString(studentIdToFetch);
       setStudentProfile(data);
+      return data;
     } catch (error) {
-      console.error("Failed to fetch profile in dashboard", error);
+      if (error.response && error.response.status === 404) {
+        console.log("Profile not found for student, user needs to complete it.");
+      } else {
+        console.error("Failed to fetch profile in dashboard", error);
+      }
+      return null;
     }
   };
+
+  useEffect(() => {
+    if (currentUser?.studentId) {
+      fetchMyResults();
+      fetchMyApplications();
+      
+      const loadProfileAndSetTab = async () => {
+        const profileData = await fetchProfile(currentUser);
+        if (!profileData) {
+          // Profile not found, guide to completion
+          if (currentUser.hasProfile !== false) {
+            setCurrentUser(prev => ({ ...prev, hasProfile: false }));
+          }
+          setActiveTab("profile");
+        } else {
+          // Profile exists
+          if (currentUser.hasProfile !== true) {
+            setCurrentUser(prev => ({ ...prev, hasProfile: true }));
+          }
+          setActiveTab("exams");
+        }
+      };
+      
+      loadProfileAndSetTab();
+    }
+  }, [currentUser?.studentId]);
 
   const fetchMyApplications = async () => {
     if (!currentUser?.studentId) return;
@@ -130,7 +152,7 @@ const StudentDashboard = () => {
     try {
       const studentPage = await getStudents({ studentId: loginId.trim(), size: 1 });
       const student = studentPage?.content?.[0];
-      
+
       if (student) {
         setCurrentUser(student);
         toast.success(`Welcome back, ${student.firstName || student.username}!`);
@@ -208,9 +230,8 @@ const StudentDashboard = () => {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isLoggingIn}
-              className={`w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 transition-all duration-300 flex items-center justify-center gap-2 ${
-                isLoggingIn ? "opacity-70 cursor-not-allowed" : "hover:shadow-indigo-300"
-              }`}
+              className={`w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 transition-all duration-300 flex items-center justify-center gap-2 ${isLoggingIn ? "opacity-70 cursor-not-allowed" : "hover:shadow-indigo-300"
+                }`}
             >
               {isLoggingIn ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -277,9 +298,10 @@ const StudentDashboard = () => {
         );
       case "profile":
         return (
-          <StudentProfileSection 
-            student={currentUser} 
-            onProfileUpdated={handleProfileUpdated} 
+          <StudentProfileSection
+            student={currentUser}
+            prefetchedProfile={studentProfile}
+            onProfileUpdated={handleProfileUpdated}
           />
         );
       case "exams":
@@ -359,7 +381,7 @@ const StudentDashboard = () => {
       case "hall_ticket":
         {
           const generatedApplications = myApplications.filter(app => app.isHallTicketGenerated);
-          
+
           if (isLoadingApplications) {
             return (
               <div className="flex flex-col items-center justify-center p-20 animate-pulse">
@@ -379,7 +401,7 @@ const StudentDashboard = () => {
                 <p className="text-gray-500 max-w-sm mx-auto leading-relaxed">
                   Your hall tickets are generated after application verification. Please check back 10-15 days before the examination date.
                 </p>
-                <button 
+                <button
                   onClick={fetchMyApplications}
                   className="mt-8 px-6 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-sm hover:bg-blue-100 transition-colors"
                 >
@@ -392,11 +414,13 @@ const StudentDashboard = () => {
           return (
             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
               {generatedApplications.map((app) => (
-                <HallTicket 
-                  key={app.applicationId} 
-                  application={app} 
-                  student={currentUser} 
+                <HallTicket
+                  key={app.applicationId}
+                  application={app}
+                  student={currentUser}
                   profile={studentProfile}
+                  exam={exams.find(e => e.examNo === app.examNo) || null}
+                  school={schools.find(s => s.schoolName === (app.schoolName || currentUser?.schoolName)) || null}
                   regions={regions}
                   centres={centres}
                   schools={schools}
@@ -416,9 +440,9 @@ const StudentDashboard = () => {
               Complete your examinations and achieve qualifying marks to unlock your verifiable digital certificates here.
             </p>
             <div className="mt-10 flex justify-center gap-4">
-               <div className="w-3 h-3 rounded-full bg-indigo-100" />
-               <div className="w-3 h-3 rounded-full bg-indigo-200" />
-               <div className="w-3 h-3 rounded-full bg-indigo-300" />
+              <div className="w-3 h-3 rounded-full bg-indigo-100" />
+              <div className="w-3 h-3 rounded-full bg-indigo-200" />
+              <div className="w-3 h-3 rounded-full bg-indigo-300" />
             </div>
           </div>
         );
@@ -437,9 +461,9 @@ const StudentDashboard = () => {
   };
 
   return (
-    <StudentLayout 
-      activeTab={activeTab} 
-      setActiveTab={setActiveTab} 
+    <StudentLayout
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
       currentUser={currentUser}
       onLogout={() => setCurrentUser(null)}
     >
@@ -472,6 +496,7 @@ const StudentDashboard = () => {
                   <ApplyModal
                     exam={selectedExam}
                     student={currentUser}
+                    school={schools.find(s => s.schoolName === currentUser?.schoolName) || null}
                     onClose={() => setSelectedExam(null)}
                     onSuccess={fetchMyResults}
                   />

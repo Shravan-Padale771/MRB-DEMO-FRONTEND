@@ -1,0 +1,17 @@
+{
+    "examNo": 29,
+    "exam_name": "English Proficiency Exam 2024",
+    "no_of_papers": 2,
+    "exam_fees": 850.0,
+    "papers": "[{\"name\": \"Written Comprehension\", \"maxMarks\": 100}, {\"name\": \"Oral Expression\", \"maxMarks\": 100}]",
+    "exam_details": "{\"identity\": {\"examFullTitle\": \"English Proficiency Certificate\", \"examLevel\": \"ADVANCED\"}, \"rules\": {\"passingCriteria\": \"40% in each paper\"}}",
+    "exam_code": "ENG_PROF_1773770271",
+    "application_start_date": "2024-06-01",
+    "application_end_date": "2024-07-31",
+    "exam_start_date": "2024-09-15",
+    "exam_end_date": "2024-09-20",
+    "status": "DRAFT",
+    "controllerSignatureUrl": "http://100.53.20.30:9000/student-documents/5e2cf42a-113e-4e1e-b62e-25041d0f7dd3_signature.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=sumit%2F20260317%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260317T175751Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=0f0d654aee9945efe09784f2265b4e3d4811b12fdaf7c8773bf46f06754f8c51",
+    "boardSealUrl": "http://100.53.20.30:9000/student-documents/e6ef779f-6794-40fb-ab53-e90c4154c44e_board%20seal.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=sumit%2F20260317%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260317T175750Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=8f42833da67150458441ae4bb6ce0a011eba9f008716379205c861be180b226c",
+    "boardLogoUrl": "http://100.53.20.30:9000/student-documents/3513fcd6-af49-4863-863b-9acd73c4d6e0_board%20logo.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=sumit%2F20260317%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260317T175750Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=9707453e94022f70ea56a3ffc91038ff8f8e01014bb7b5bf84650f6c56388dc9"
+}

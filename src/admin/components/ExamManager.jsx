@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, BookOpen, ChevronRight, ChevronLeft, Check, Edit, Trash2, X, Filter, RefreshCw } from 'lucide-react';
+import { Plus, BookOpen, ChevronRight, ChevronLeft, Check, Edit, Trash2, X, Filter, RefreshCw, Upload, Image as ImageIcon, FileText, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import Pagination from '../../common/components/Pagination';
 import { searchExams as getExams } from '../../api/exam-api';
+import { uploadFiles } from '../../api';
 
 const ExamManager = ({
     examForm,
@@ -20,12 +21,39 @@ const ExamManager = ({
     const [size] = useState(10);
     const [filterName, setFilterName] = useState("");
     const [errors, setErrors] = useState({});
+    const [uploading, setUploading] = useState({});
+
+    const handleFileUpload = async (field, file) => {
+        if (!file) return;
+        setUploading(prev => ({ ...prev, [field]: true }));
+        try {
+            const response = await uploadFiles(file);
+            // Extract URL from Map<String, String> response
+            let url = "";
+            if (typeof response === 'string') {
+                url = response;
+            } else if (Array.isArray(response)) {
+                url = response[0];
+            } else if (response && typeof response === 'object') {
+                // Backend returns Map<Filename, URL>
+                url = Object.values(response)[0] || "";
+            }
+            
+            if (url) {
+                setExamForm(prev => ({ ...prev, [field]: url }));
+            }
+        } catch (error) {
+            console.error("Upload failed", error);
+        } finally {
+            setUploading(prev => ({ ...prev, [field]: false }));
+        }
+    };
 
     // API Query for Exams
     const { data: examsData, isLoading, refetch } = useQuery({
         queryKey: ['exams', filterName, page, size],
         queryFn: () => getExams({
-            examName: filterName || undefined,
+            exam_name: filterName || undefined,
             page,
             size,
         }),
@@ -617,6 +645,77 @@ const ExamManager = ({
                                                  />
                                                  {errors.recognitionText && <p data-testid="error-recognitionText" className="text-red-500 text-[10px] mt-1">{errors.recognitionText}</p>}
                                              </div>
+
+                                             <div className="grid grid-cols-2 gap-4">
+                                                 <div className="space-y-2">
+                                                     <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Board Logo</label>
+                                                     <div className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-xl">
+                                                         {examForm.boardLogoUrl ? (
+                                                             <div className="relative group">
+                                                                 <img src={examForm.boardLogoUrl} alt="Logo" className="w-12 h-12 rounded-lg object-cover border" />
+                                                                 <button 
+                                                                    type="button"
+                                                                    onClick={() => setExamForm({...examForm, boardLogoUrl: ""})}
+                                                                    className="absolute -top-1 -right-1 bg-red-500 text-white p-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                 >
+                                                                     <X size={10} />
+                                                                 </button>
+                                                             </div>
+                                                         ) : (
+                                                             <div className="w-12 h-12 rounded-lg bg-white border border-dashed flex items-center justify-center text-gray-300">
+                                                                 <ImageIcon size={20} />
+                                                             </div>
+                                                         )}
+                                                         <div className="flex-1">
+                                                             <label className="cursor-pointer bg-white border px-3 py-1.5 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-2 transition-all">
+                                                                 {uploading.boardLogoUrl ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                                                                 {uploading.boardLogoUrl ? "Uploading..." : examForm.boardLogoUrl ? "Change" : "Upload Logo"}
+                                                                 <input 
+                                                                    type="file" 
+                                                                    className="hidden" 
+                                                                    accept="image/*" 
+                                                                    onChange={(e) => handleFileUpload('boardLogoUrl', e.target.files[0])}
+                                                                    disabled={uploading.boardLogoUrl}
+                                                                 />
+                                                             </label>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                                 <div className="space-y-2">
+                                                     <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Board Seal</label>
+                                                     <div className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-xl">
+                                                         {examForm.boardSealUrl ? (
+                                                             <div className="relative group">
+                                                                 <img src={examForm.boardSealUrl} alt="Seal" className="w-12 h-12 rounded-lg object-cover border" />
+                                                                 <button 
+                                                                    type="button"
+                                                                    onClick={() => setExamForm({...examForm, boardSealUrl: ""})}
+                                                                    className="absolute -top-1 -right-1 bg-red-500 text-white p-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                 >
+                                                                     <X size={10} />
+                                                                 </button>
+                                                             </div>
+                                                         ) : (
+                                                             <div className="w-12 h-12 rounded-lg bg-white border border-dashed flex items-center justify-center text-gray-300">
+                                                                 <ImageIcon size={20} />
+                                                             </div>
+                                                         )}
+                                                         <div className="flex-1">
+                                                             <label className="cursor-pointer bg-white border px-3 py-1.5 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-2 transition-all">
+                                                                 {uploading.boardSealUrl ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                                                                 {uploading.boardSealUrl ? "Uploading..." : examForm.boardSealUrl ? "Change" : "Upload Seal"}
+                                                                 <input 
+                                                                    type="file" 
+                                                                    className="hidden" 
+                                                                    accept="image/*" 
+                                                                    onChange={(e) => handleFileUpload('boardSealUrl', e.target.files[0])}
+                                                                    disabled={uploading.boardSealUrl}
+                                                                 />
+                                                             </label>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
                                         </div>
                                     </div>
                                 )}
@@ -782,6 +881,43 @@ const ExamManager = ({
                                                      }}
                                                  />
                                                  {errors.instructions && <p data-testid="error-instructions" className="text-red-500 text-[10px] mt-1">{errors.instructions}</p>}
+                                             </div>
+
+                                             <div className="space-y-2">
+                                                 <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Controller Signature</label>
+                                                 <div className="flex items-center gap-4 p-4 bg-gray-50 border border-gray-100 rounded-xl">
+                                                     {examForm.controllerSignatureUrl ? (
+                                                         <div className="relative group">
+                                                             <img src={examForm.controllerSignatureUrl} alt="Signature" className="h-16 w-32 object-contain bg-white border rounded-lg" />
+                                                             <button 
+                                                                type="button"
+                                                                onClick={() => setExamForm({...examForm, controllerSignatureUrl: ""})}
+                                                                className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                                                             >
+                                                                 <X size={12} />
+                                                             </button>
+                                                         </div>
+                                                     ) : (
+                                                         <div className="h-16 w-32 rounded-lg bg-white border border-dashed flex flex-col items-center justify-center text-gray-300">
+                                                             <FileText size={24} />
+                                                             <span className="text-[8px] font-bold uppercase mt-1">No Signature</span>
+                                                         </div>
+                                                     )}
+                                                     <div className="flex-1">
+                                                         <p className="text-[10px] text-gray-500 mb-2 leading-tight">Upload high-quality PNG/JPG of the controller's signature.</p>
+                                                         <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-[#4c84ff] hover:bg-blue-50 hover:border-[#4c84ff] flex items-center justify-center gap-2 transition-all shadow-sm">
+                                                             {uploading.controllerSignatureUrl ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                                                             {uploading.controllerSignatureUrl ? "Uploading..." : examForm.controllerSignatureUrl ? "Change Signature" : "Upload Signature"}
+                                                             <input 
+                                                                type="file" 
+                                                                className="hidden" 
+                                                                accept="image/*" 
+                                                                onChange={(e) => handleFileUpload('controllerSignatureUrl', e.target.files[0])}
+                                                                disabled={uploading.controllerSignatureUrl}
+                                                             />
+                                                         </label>
+                                                     </div>
+                                                 </div>
                                              </div>
                                         </div>
                                     </div>

@@ -17,7 +17,7 @@ import {
     X
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getStudentProfile, updateExamApplication, getExamApplicationByExactId, getStudents } from '../../api';
+import { getStudentProfileByStudentIdString, updateExamApplication, getExamApplicationByExactId, getStudents, getSchools } from '../../api';
 import { getExam as getExamByNo } from '../../api/exam-api';
 import toast from 'react-hot-toast';
 
@@ -59,14 +59,14 @@ const ApplicationDetailView = ({ application: initialApplication, onBack }) => {
         }
     }, [application?.formData]);
 
-    // Fetch Student Profile
+    // Fetch Student Profile via the new studentId endpoint
     const { data: profileResponse } = useQuery({
         queryKey: ['studentProfile', application?.studentId],
-        queryFn: () => getStudentProfile(application?.studentId),
+        queryFn: () => getStudentProfileByStudentIdString(application?.studentId),
         enabled: !!application?.studentId
     });
     
-    // getStudentProfile returns an array for a single profile fetch via student id based on current implementation
+    // getStudentProfile may return array or single object
     const profile = Array.isArray(profileResponse) ? profileResponse[0] : profileResponse;
 
     // Fetch Exam Details
@@ -75,6 +75,32 @@ const ApplicationDetailView = ({ application: initialApplication, onBack }) => {
         queryFn: () => getExamByNo(application?.examNo),
         enabled: !!application?.examNo
     });
+
+    // Fetch all schools to find the student's school for seal/signature
+    const { data: schoolsData } = useQuery({
+        queryKey: ['schools-for-app'],
+        queryFn: () => getSchools({ size: 1000 }),
+        staleTime: 5 * 60 * 1000,
+    });
+    const studentSchool = (schoolsData?.content || []).find(
+        s => s.schoolName === (application?.schoolName || studentData?.schoolName)
+    ) || null;
+
+    // Helper: extract URL from backend JSON map strings like {"filename":"url"}
+    const parseUrlFromJsonString = (str) => {
+        if (!str) return null;
+        if (str.startsWith('http')) return str;
+        try {
+            const parsed = JSON.parse(str);
+            if (typeof parsed === 'object' && parsed !== null) {
+                return Object.values(parsed)[0] || null;
+            }
+        } catch { return str; }
+        return null;
+    };
+
+    const principalSigUrl = parseUrlFromJsonString(studentSchool?.principalSignatureUrl);
+    const schoolStampUrl  = parseUrlFromJsonString(studentSchool?.schoolStampUrl);
 
     const updateStatusMutation = useMutation({
         mutationFn: ({ id, status, remarks }) => updateExamApplication(id, { ...application, status, remarks }),
@@ -198,9 +224,17 @@ const ApplicationDetailView = ({ application: initialApplication, onBack }) => {
                 <div className="lg:col-span-3">
                     <div className="modal-container mx-auto">
                         {/* Header */}
-                        <div className="header-form">
+                        <div className="header-form" style={{ position: 'relative' }}>
+                            {/* Board Seal - top left */}
+                            {examDetails?.boardSealUrl && (
+                                <img src={examDetails.boardSealUrl} alt="Board Seal" style={{ position:'absolute', left:0, top:0, width:'80px', height:'80px', objectFit:'contain' }} />
+                            )}
+                            {/* Board Logo - top right */}
+                            {examDetails?.boardLogoUrl && (
+                                <img src={examDetails.boardLogoUrl} alt="Board Logo" style={{ position:'absolute', right:0, top:0, width:'80px', height:'80px', objectFit:'contain' }} />
+                            )}
                             <h1>Maharashtra Rashtrabhasha Sabha, Pune</h1>
-                            <p>387, Narayan Peth, Pune – 411 030 | Form No: MRS/2026/A-{application.applicationId}</p>
+                            <p>387, Narayan Peth, Pune &ndash; 411 030 | Form No: MRS/2026/A-{application.applicationId}</p>
                             <p style={{ fontWeight: 'bold', marginTop: '10px', fontSize: '16px' }}>EXAMINATION APPLICATION FORM</p>
                         </div>
 
@@ -386,11 +420,25 @@ const ApplicationDetailView = ({ application: initialApplication, onBack }) => {
                                     <span>Signature of Candidate</span>
                                 </div>
                                 <div className="sign-box-form">
-                                    <span className="opacity-30 uppercase font-black">Stamp Area</span>
-                                    <span>Principal's Signature & Stamp</span>
+                                    {principalSigUrl ? (
+                                        <img src={principalSigUrl} alt="Principal Signature" className="max-h-16 p-1 object-contain" />
+                                    ) : (
+                                        <span className="opacity-30 uppercase font-black">Stamp Area</span>
+                                    )}
+                                    {schoolStampUrl && (
+                                        <img src={schoolStampUrl} alt="School Stamp" className="max-h-10 p-1 object-contain" />
+                                    )}
+                                    <span>Principal's Signature &amp; Stamp</span>
                                 </div>
                                 <div className="sign-box-form">
-                                    <span className="opacity-30 uppercase font-black">Stamp Area</span>
+                                    {examDetails?.controllerSignatureUrl ? (
+                                        <img src={examDetails.controllerSignatureUrl} alt="Controller Signature" className="max-h-16 p-1 object-contain" />
+                                    ) : (
+                                        <span className="opacity-30 uppercase font-black">Stamp Area</span>
+                                    )}
+                                    {examDetails?.boardSealUrl && (
+                                        <img src={examDetails.boardSealUrl} alt="Board Seal" className="max-h-10 p-1 object-contain" />
+                                    )}
                                     <span>Sabha Authorized Stamp</span>
                                 </div>
                             </div>

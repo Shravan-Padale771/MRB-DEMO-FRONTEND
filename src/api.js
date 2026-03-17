@@ -246,6 +246,14 @@ export const getSchools = async ({
 };
 
 /**
+ * GET /schools/{id}
+ */
+export const getSchool = async (id) => {
+  const response = await api.get(`/schools/${id}`);
+  return response.data;
+};
+
+/**
  * POST /schools
  */
 export const createSchool = async (schoolData, examCentreId) => {
@@ -257,7 +265,12 @@ export const createSchool = async (schoolData, examCentreId) => {
  * PUT /schools/{id}
  */
 export const updateSchool = async (id, schoolData) => {
-  const response = await api.put(`/schools/${id}`, schoolData);
+  // Ensure we are sending schoolId and other DTO fields
+  const payload = {
+    ...schoolData,
+    schoolId: id
+  };
+  const response = await api.put("/schools", payload);
   return response.data;
 };
 
@@ -339,6 +352,10 @@ export const getStudentProfile = async (id) => {
   return response.data;
 };
 
+export const getStudentProfileByStudentIdString = async (studentId) => {
+  const response = await api.get(`/studentprofile/studentId/${studentId}`);
+  return response.data;
+};
 export const getAllStudentProfiles = async () => {
   const response = await api.get("/getAllStudentProfiles");
   return response.data;
