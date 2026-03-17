@@ -2,11 +2,13 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Filter, XCircle, Search, Printer, List, LayoutGrid, Award, ArrowRight, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ApplicationLedger from './ApplicationLedger';
 import Pagination from '../../common/components/Pagination';
 import { getRegions, getExamCentres, getSchools, getExamApplications } from '../../api';
 import { searchExams as getExams } from '../../api/exam-api';
+import { batchGenerateHallTickets } from '../../api/exam-application-api';
+import { toast } from 'react-hot-toast'; // Assuming toast is used based on other components, or I will use window.alert if not found. Let's check imports in other components.
 
 const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectApplication, reviewApplication }) => {
     // Filter State
@@ -19,6 +21,7 @@ const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectA
     const [size] = useState(isDashboard ? 5 : 12);
     const [viewMode, setViewMode] = useState("table");
     const [isLedgerOpen, setIsLedgerOpen] = useState(false);
+    const queryClient = useQueryClient();
 
     // Queries
     const { data: examsPage } = useQuery({ queryKey: ['exams'], queryFn: () => getExams({ size: 1000 }) });
@@ -85,6 +88,21 @@ const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectA
         setPage(0);
     };
 
+    const handleBatchGenerate = async () => {
+        if (!window.confirm("Are you sure you want to generate hall tickets for all APPROVED applications? This process will assign roll numbers and centers.")) return;
+        
+        const loadingToast = toast.loading("Generating hall tickets...");
+        try {
+            await batchGenerateHallTickets();
+            toast.success("Batch hall ticket generation process completed successfully.", { id: loadingToast });
+            // Invalidate applications query to refresh the list
+            queryClient.invalidateQueries({ queryKey: ['applications'] });
+        } catch (error) {
+            console.error("Error generating hall tickets:", error);
+            toast.error("Failed to generate hall tickets. Please try again.", { id: loadingToast });
+        }
+    };
+
     const getStatusStyle = (status) => {
         switch (status) {
             case 'APPROVED': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
@@ -149,6 +167,13 @@ const ApplicationManager = ({ isDashboard = false, onPublishWithFilters, selectA
                                 className="bg-[#4c84ff] text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20"
                             >
                                 <Award size={16} /> Publish Results
+                            </button>
+
+                            <button
+                                onClick={handleBatchGenerate}
+                                className="bg-emerald-600 text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-500/20"
+                            >
+                                <CheckCircle size={16} /> Generate Hall Tickets
                             </button>
                         </div>
                     </div>

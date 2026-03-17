@@ -4,6 +4,11 @@ import {
   getStudents,
   createExamApplication,
   getExamResults,
+  getExamApplications,
+  getStudentProfile,
+  getRegions,
+  getExamCentres,
+  getSchools,
 } from "../api";
 import { searchExams as getExams } from "../api/exam-api";
 import toast from "react-hot-toast";
@@ -28,6 +33,7 @@ import ApplyModal from "../student/components/ApplyModal";
 
 import StudentProfileSection from "../student/components/StudentProfileSection";
 import StudentLayout from "../student/components/StudentLayout";
+import HallTicket from "../student/components/HallTicket";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -35,9 +41,15 @@ const StudentDashboard = () => {
   const [students, setStudents] = useState([]);
   const [exams, setExams] = useState([]);
   const [myResults, setMyResults] = useState([]);
+  const [myApplications, setMyApplications] = useState([]);
+  const [studentProfile, setStudentProfile] = useState(null);
+  const [regions, setRegions] = useState([]);
+  const [centres, setCentres] = useState([]);
+  const [schools, setSchools] = useState([]);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loginId, setLoginId] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isLoadingApplications, setIsLoadingApplications] = useState(false);
 
   const [selectedExam, setSelectedExam] = useState(null);
   const [applicationForm, setApplicationForm] = useState({
@@ -56,12 +68,29 @@ const StudentDashboard = () => {
         console.error("Failed to load exams", error);
       }
     };
+    const loadMasterData = async () => {
+      try {
+        const [rData, cData, sData] = await Promise.all([
+          getRegions({ size: 1000 }),
+          getExamCentres({ size: 1000 }),
+          getSchools({ size: 1000 })
+        ]);
+        setRegions(rData?.content || []);
+        setCentres(cData?.content || []);
+        setSchools(sData?.content || []);
+      } catch (error) {
+        console.error("Failed to load master data", error);
+      }
+    };
     loadExams();
+    loadMasterData();
   }, []);
 
   useEffect(() => {
     if (currentUser) {
       fetchMyResults();
+      fetchMyApplications();
+      fetchProfile();
       if (!currentUser.hasProfile) {
         setActiveTab("profile");
       } else {
@@ -69,6 +98,29 @@ const StudentDashboard = () => {
       }
     }
   }, [currentUser]);
+
+  const fetchProfile = async () => {
+    if (!currentUser?.studentId) return;
+    try {
+      const data = await getStudentProfile(currentUser.studentId);
+      setStudentProfile(data);
+    } catch (error) {
+      console.error("Failed to fetch profile in dashboard", error);
+    }
+  };
+
+  const fetchMyApplications = async () => {
+    if (!currentUser?.studentId) return;
+    setIsLoadingApplications(true);
+    try {
+      const data = await getExamApplications({ studentId: currentUser.studentId, size: 100 });
+      setMyApplications(data?.content || []);
+    } catch (error) {
+      console.error("Could not fetch applications", error);
+    } finally {
+      setIsLoadingApplications(false);
+    }
+  };
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
@@ -305,20 +357,54 @@ const StudentDashboard = () => {
           </div>
         );
       case "hall_ticket":
-        return (
-          <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center shadow-xl shadow-black/5 animate-in fade-in duration-500">
-            <div className="w-24 h-24 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mx-auto mb-8 -rotate-3 shadow-inner">
-              <Download size={48} />
+        {
+          const generatedApplications = myApplications.filter(app => app.isHallTicketGenerated);
+          
+          if (isLoadingApplications) {
+            return (
+              <div className="flex flex-col items-center justify-center p-20 animate-pulse">
+                <div className="w-16 h-16 bg-gray-100 rounded-full mb-4" />
+                <div className="h-4 w-48 bg-gray-100 rounded" />
+              </div>
+            );
+          }
+
+          if (generatedApplications.length === 0) {
+            return (
+              <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center shadow-xl shadow-black/5 animate-in fade-in duration-500">
+                <div className="w-24 h-24 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mx-auto mb-8 -rotate-3 shadow-inner">
+                  <Download size={48} />
+                </div>
+                <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Hall Ticket Pending</h2>
+                <p className="text-gray-500 max-w-sm mx-auto leading-relaxed">
+                  Your hall tickets are generated after application verification. Please check back 10-15 days before the examination date.
+                </p>
+                <button 
+                  onClick={fetchMyApplications}
+                  className="mt-8 px-6 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-sm hover:bg-blue-100 transition-colors"
+                >
+                  Refresh Status
+                </button>
+              </div>
+            );
+          }
+
+          return (
+            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+              {generatedApplications.map((app) => (
+                <HallTicket 
+                  key={app.applicationId} 
+                  application={app} 
+                  student={currentUser} 
+                  profile={studentProfile}
+                  regions={regions}
+                  centres={centres}
+                  schools={schools}
+                />
+              ))}
             </div>
-            <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Hall Ticket Pending</h2>
-            <p className="text-gray-500 max-w-sm mx-auto leading-relaxed">
-              Your hall tickets are generated after application verification. Please check back 10-15 days before the examination date.
-            </p>
-            <button className="mt-8 px-6 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-sm hover:bg-blue-100 transition-colors">
-              Refresh Status
-            </button>
-          </div>
-        );
+          );
+        }
       case "certificates":
         return (
           <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center shadow-xl shadow-black/5 animate-in fade-in duration-500">

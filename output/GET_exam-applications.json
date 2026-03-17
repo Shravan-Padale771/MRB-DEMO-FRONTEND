@@ -7,7 +7,10 @@
             "studentId": 1,
             "studentName": "Aarav Sharma",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 2,
@@ -16,7 +19,10 @@
             "studentId": 2,
             "studentName": "Aarav Sharma",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 3,
@@ -24,8 +30,11 @@
             "examName": "Rashtrabhasha Prabodh Pariksha (May 2026)",
             "studentId": 3,
             "studentName": "Priya Patil",
-            "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 15\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "status": "APPROVED",
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 15\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": "1113",
+            "centreId": 1,
+            "isHallTicketGenerated": true
         },
         {
             "applicationId": 5,
@@ -34,7 +43,10 @@
             "studentId": 5,
             "studentName": "Sneha Kulkarni",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Pravin based on age 16\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Pravin based on age 16\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 6,
@@ -43,7 +55,10 @@
             "studentId": 6,
             "studentName": "Arjun Mehta",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 7,
@@ -52,7 +67,10 @@
             "studentId": 7,
             "studentName": "Kavya Joshi",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 15\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 15\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 8,
@@ -61,7 +79,10 @@
             "studentId": 8,
             "studentName": "Vikram Rao",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Pravin based on age 17\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Pravin based on age 17\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 10,
@@ -70,7 +91,10 @@
             "studentId": 10,
             "studentName": "Sahil Verma",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Pravin based on age 16\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Pravin based on age 16\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 11,
@@ -79,7 +103,10 @@
             "studentId": 11,
             "studentName": "Pooja Naik",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 12,
@@ -88,7 +115,10 @@
             "studentId": 12,
             "studentName": "Rahul Gupta",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 15\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 15\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 14,
@@ -97,7 +127,10 @@
             "studentId": 14,
             "studentName": "Omkar Jadhav",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 15,
@@ -106,7 +139,10 @@
             "studentId": 15,
             "studentName": "Dipika Pawar",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Pravin based on age 16\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Pravin based on age 16\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 16,
@@ -115,7 +151,10 @@
             "studentId": 16,
             "studentName": "Kunal Singh",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Pravin based on age 17\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Pravin based on age 17\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 17,
@@ -124,7 +163,10 @@
             "studentId": 17,
             "studentName": "Aishwarya Shinde",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 15\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 15\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 18,
@@ -133,7 +175,10 @@
             "studentId": 18,
             "studentName": "Tejas Mane",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 20,
@@ -142,7 +187,10 @@
             "studentId": 20,
             "studentName": "Nikhil Bhosale",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Pravin based on age 16\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Pravin based on age 16\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 21,
@@ -151,7 +199,10 @@
             "studentId": 21,
             "studentName": "Shruti Gaikwad",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 15\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 15\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 22,
@@ -160,7 +211,10 @@
             "studentId": 22,
             "studentName": "Aarav Sharma",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 23,
@@ -169,7 +223,10 @@
             "studentId": 23,
             "studentName": "Aarav Sharma",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 14\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         },
         {
             "applicationId": 24,
@@ -178,10 +235,13 @@
             "studentId": 24,
             "studentName": "Priya Patil",
             "status": "PENDING",
-            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 15\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}"
+            "formData": "{\"remarks\": \"Eligible for Prabodh based on age 15\", \"submissionDate\": \"2026-02-26\", \"applicationType\": \"Auto-Generated\"}",
+            "rollNo": null,
+            "centreId": null,
+            "isHallTicketGenerated": false
         }
     ],
     "number": 0,
     "size": 20,
-    "totalElements": 36
+    "totalElements": 37
 }

@@ -175,3 +175,4 @@ indexing + cache
 [2026-03-16 16:27:30] GET /getAllApplications | Status: 404 | Duration: 0.0565s
 [2026-03-16 16:28:00] GET /exam-applications | Status: 200 | Duration: 0.1086s
 [2026-03-16 16:43:38] GET /exams | Status: 200 | Duration: 1.7518s
+[2026-03-17 15:04:12] GET /exam-applications | Status: 200 | Duration: 0.3898s
