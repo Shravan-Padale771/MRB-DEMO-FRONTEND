@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import MyResults from "../student/components/MyResults";
 import ApplyModal from "../student/components/ApplyModal";
+import ExamList from "../student/components/ExamList";
 
 import StudentProfileSection from "../student/components/StudentProfileSection";
 import StudentLayout from "../student/components/StudentLayout";
@@ -278,20 +279,43 @@ const StudentDashboard = () => {
               <h2 className="text-3xl font-black mb-2">Welcome back, {currentUser?.firstName || 'Student'}!</h2>
               <p className="text-indigo-100 opacity-80">You have {exams.length} available exams and {myResults.length} published results.</p>
             </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => setActiveTab('exams')}>
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4">
-                  <BookOpen size={24} />
+            <div className="grid md:grid-cols-2 gap-3">
+              <div 
+                style={{ background: '#FAFBFF', border: '0.5px solid #E8EAF0', borderRadius: 12, padding: '16px 18px', cursor: 'pointer', transition: 'all 0.15s ease', display: 'flex', flexDirection: 'column', gap: 0 }} 
+                onClick={() => setActiveTab('exams')}
+                className="group"
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: '#EEF3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4361EE' }}>
+                    <BookOpen size={16} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, color: '#1A1D2E', textTransform: 'uppercase', letterSpacing: '0.03em', margin: 0, lineHeight: 1.2 }}>Available Exams</h3>
+                    <p style={{ fontSize: 11, color: '#8B8FA8', margin: '2px 0 0' }}>Data grouped by examination type</p>
+                  </div>
                 </div>
-                <h3 className="font-bold text-lg mb-1">Available Exams</h3>
-                <p className="text-sm text-gray-500">View and apply for upcoming examinations.</p>
+                <div style={{ marginTop: 14, paddingTop: 12, borderTop: '0.5px solid #E8EAF0' }}>
+                   <div style={{ width: '100%', textAlign: 'center', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', color: '#4361EE', letterSpacing: '0.07em' }}>Open Registration</div>
+                </div>
               </div>
-              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => setActiveTab('results_view')}>
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 mb-4">
-                  <Award size={24} />
+
+              <div 
+                style={{ background: '#FAFBFF', border: '0.5px solid #E8EAF0', borderRadius: 12, padding: '16px 18px', cursor: 'pointer', transition: 'all 0.15s ease', display: 'flex', flexDirection: 'column', gap: 0 }} 
+                onClick={() => setActiveTab('results_view')}
+                className="group"
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: '#EBFBEE', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2F9E44' }}>
+                    <Award size={16} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, color: '#1A1D2E', textTransform: 'uppercase', letterSpacing: '0.03em', margin: 0, lineHeight: 1.2 }}>My Results</h3>
+                    <p style={{ fontSize: 11, color: '#8B8FA8', margin: '2px 0 0' }}>Performance marks and circulars</p>
+                  </div>
                 </div>
-                <h3 className="font-bold text-lg mb-1">My Results</h3>
-                <p className="text-sm text-gray-500">Check your latest performance and marks.</p>
+                <div style={{ marginTop: 14, paddingTop: 12, borderTop: '0.5px solid #E8EAF0' }}>
+                   <div style={{ width: '100%', textAlign: 'center', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', color: '#2F9E44', letterSpacing: '0.07em' }}>Check Performance</div>
+                </div>
               </div>
             </div>
           </div>
@@ -305,64 +329,7 @@ const StudentDashboard = () => {
           />
         );
       case "exams":
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-black text-gray-900 border-l-4 border-indigo-600 pl-5 py-1 flex items-center gap-3 tracking-tight uppercase text-sm">
-              <BookOpen size={20} className="text-indigo-600" /> Available Exams
-            </h2>
-            {exams.length === 0 ? (
-              <div className="text-center p-12 bg-white rounded-xl border-2 border-dashed">
-                <BookOpen className="mx-auto text-gray-400 mb-3" size={40} />
-                <p className="text-gray-500 font-medium">No exams available</p>
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-6">
-                {exams.map((exam) => (
-                  <motion.div
-                    key={exam.examNo}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ translateY: -8, shadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
-                    className="bg-white p-8 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 hover:border-blue-100/50 transition-all duration-500 flex flex-col justify-between group"
-                  >
-                    <div className="mb-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <h3 className="text-xl font-bold text-gray-900 flex-1">
-                          {exam.exam_name}
-                        </h3>
-                        <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
-                          Exam #{exam.examNo}
-                        </span>
-                      </div>
-                      <div className="space-y-2 text-sm text-gray-600">
-                        <div className="flex items-center gap-2">
-                          <FileText size={16} className="text-gray-400" />
-                          <span>
-                            <strong>{exam.no_of_papers}</strong> Papers
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <DollarSign size={16} className="text-green-500" />
-                          <span className="font-semibold text-green-600">
-                            ${exam.exam_fees}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <motion.button
-                      whileHover={{ scale: 1.02, translateY: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => openApplyModal(exam)}
-                      className="w-full bg-[#4c84ff] text-white py-3.5 rounded-xl hover:shadow-[0_10px_20px_-5px_rgba(76,132,255,0.4)] font-bold transition-all duration-300 uppercase tracking-wider text-sm shadow-md shadow-blue-500/10"
-                    >
-                      Apply Now
-                    </motion.button>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
+        return <ExamList exams={exams} openApplyModal={openApplyModal} />;
       case "notices":
         return (
           <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center shadow-xl shadow-black/5 animate-in fade-in duration-500">

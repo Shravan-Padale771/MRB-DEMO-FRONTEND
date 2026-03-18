@@ -123,19 +123,19 @@ const Marksheet = ({ result, onClose }) => {
         "
         id="marksheet-container"
       >
-        {/* PRINT CONTROLS */}
-        <div className="absolute top-5 right-5 flex gap-3 print:hidden z-20">
-          <button
-            onClick={handlePrint}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded flex items-center gap-2 font-medium transition-colors"
-          >
-            <Printer size={16} /> Print
-          </button>
+        {/* MODERNIZED PRINT CONTROLS */}
+        <div className="absolute top-8 right-8 flex gap-3 print:hidden z-20" style={{ fontFamily: 'DM Sans, Segoe UI, sans-serif' }}>
           <button
             onClick={onClose}
-            className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded transition-colors"
+            style={{ ...s.baseBtn, ...s.closeBtn }}
           >
-            <X size={20} />
+            <X size={18} />
+          </button>
+          <button
+            onClick={handlePrint}
+            style={{ ...s.baseBtn, ...s.printBtn }}
+          >
+            <Printer size={16} /> PRINT MARKSHEET
           </button>
         </div>
 
@@ -294,5 +294,32 @@ const Marksheet = ({ result, onClose }) => {
     </div>
   )
 }
+
+const s = {
+    baseBtn: {
+        padding: '10px 20px',
+        borderRadius: '10px',
+        fontSize: '11px',
+        fontWeight: '900',
+        letterSpacing: '0.05em',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        border: 'none',
+    },
+    closeBtn: {
+        backgroundColor: '#fff',
+        color: '#94a3b8',
+        border: '1px solid #e2e8f0',
+        padding: '10px',
+    },
+    printBtn: {
+        backgroundColor: '#4c84ff',
+        color: '#fff',
+        boxShadow: '0 4px 12px rgba(76, 132, 255, 0.2)',
+    }
+};
 
 export default Marksheet

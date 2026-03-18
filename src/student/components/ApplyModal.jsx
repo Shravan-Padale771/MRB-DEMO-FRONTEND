@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Printer } from "lucide-react";
+import { X, Printer, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { createExamApplication, getStudentProfile } from "../../api";
 
@@ -118,35 +118,35 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
             position: relative;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
           }
-          .header { text-align: center; border-bottom: 2px solid #1a365d; padding-bottom: 20px; margin-bottom: 30px; }
-          .header h1 { margin: 0; color: #1a365d; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
-          .header p { margin: 5px 0; font-size: 14px; color: #4a5568; }
+          .header { text-align: center; border-bottom: 2px solid #4c84ff; padding-bottom: 20px; margin-bottom: 30px; }
+          .header h1 { margin: 0; color: #1e293b; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+          .header p { margin: 5px 0; font-size: 14px; color: #64748b; }
           .section { margin-bottom: 25px; border: 1px solid #cbd5e0; border-radius: 4px; overflow: hidden; }
-          .section-header { background-color: #edf2f7; padding: 10px 15px; font-weight: bold; text-transform: uppercase; font-size: 13px; border-bottom: 1px solid #cbd5e0; color: #2d3748; }
-          .field-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
-          .label { font-size: 11px; color: #718096; text-transform: uppercase; margin-bottom: 4px; font-weight: 700; }
-          .value { font-size: 14px; font-weight: 500; color: #2d3748; min-height: 20px; padding-bottom: 2px; border-bottom: 1px dashed #e2e8f0; }
-          .photo-box { width: 120px; height: 150px; border: 2px dashed #a0aec0; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px; color: #718096; position: absolute; top: 100px; right: 40px; background: #fdfdfd; }
+          .section-header { background-color: #f8fafc; padding: 10px 15px; font-weight: bold; text-transform: uppercase; font-size: 13px; border-bottom: 1px solid #cbd5e0; color: #1e293b; }
+          .field-group-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
+          .label-form { font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 4px; font-weight: 700; }
+          .value-form { font-size: 14px; font-weight: 500; color: #1e293b; min-height: 20px; padding-bottom: 2px; border-bottom: 1px dashed #e2e8f0; }
+          .photo-box { width: 120px; height: 150px; border: 2px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px; color: #64748b; position: absolute; top: 100px; right: 40px; background: #fafafa; }
           .paper-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; text-align: left; }
           .paper-table th, .paper-table td { border: 1px solid #cbd5e0; padding: 8px 12px; }
-          .paper-table th { background-color: #f8fafc; font-weight: 600; color: #4a5568; text-transform: uppercase; font-size: 11px; }
+          .paper-table th { background-color: #f8fafc; font-weight: 600; color: #475569; text-transform: uppercase; font-size: 11px; }
           .stamp-signature { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; padding: 15px; }
-          .sign-box { height: 100px; border: 1px solid #cbd5e0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 10px; font-size: 12px; color: #4a5568; background-color: #fafafa; }
-          .instruction-box { margin-top: 30px; font-size: 12px; color: #4a5568; background: #fffaf0; padding: 15px; border: 1px solid #feebc8; border-radius: 4px; }
+          .sign-box { height: 100px; border: 1px solid #cbd5e0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 10px; font-size: 12px; color: #475569; background-color: #fafafa; }
+          .instruction-box { margin-top: 30px; font-size: 12px; color: #92400e; background: #fffbeb; padding: 15px; border: 1px solid #fef3c7; border-radius: 4px; }
         `}} />
 
-        {/* Floating Controls - No Print */}
-        <div className="max-w-[850px] mx-auto mb-6 flex justify-between items-center no-print">
-          <div className="flex items-center gap-2">
-            <span className="bg-indigo-600 text-white text-[10px] px-2 py-1 rounded font-black">REF-04</span>
-            <span className="text-sm font-bold text-slate-600">Official Exam Application Form</span>
+        {/* Modernized Floating Controls - No Print */}
+        <div style={s.controls} className="no-print">
+          <div style={s.controlsLeft}>
+            <div style={s.badge}>APPLICATION PORTAL</div>
+            <span style={s.controlsText}>Document Verification & Review</span>
           </div>
-          <div className="flex gap-2">
-            <button onClick={handlePrint} className="bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold border shadow-sm flex items-center gap-2 transition-all">
-              <Printer size={14} /> Print Preview
+          <div style={s.controlsRight}>
+            <button onClick={handlePrint} style={s.secondaryBtn}>
+              <Printer size={16} /> PRINT FORM
             </button>
-            <button onClick={onClose} className="bg-white hover:bg-slate-50 text-slate-400 p-2 rounded-lg border shadow-sm transition-all">
-              <X size={18} />
+            <button onClick={onClose} style={s.closeBtn}>
+              <X size={20} />
             </button>
           </div>
         </div>
@@ -169,7 +169,7 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
             )}
             <h1>Maharashtra Rashtrabhasha Sabha, Pune</h1>
             <p>387, Narayan Peth, Pune – 411 030 | Form No: MRS/2026/A-{Math.floor(Math.random() * 9000) + 1000}</p>
-            <p style={{ fontWeight: 'bold', marginTop: '10px', fontSize: '16px' }}>EXAMINATION APPLICATION FORM</p>
+            <p style={{ fontWeight: 'bold', marginTop: '10px', fontSize: '16px', color: '#10b981' }}>EXAMINATION APPLICATION FORM</p>
           </div>
 
           <div className="photo-box">
@@ -181,23 +181,22 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
           </div>
 
           <div className="flex justify-between items-center text-sm font-bold mb-6">
-            <div>Application ID: <span className="text-red-600">PENDING</span></div>
+            <div className="flex items-center gap-2">Status: <span style={s.statusPill}>APPLYING</span></div>
             <div style={{ marginRight: '140px' }}>Date: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
           </div>
 
           {/* 1. Examination Details */}
           <div className="section">
             <div className="section-header">1. Examination Details</div>
-            <div className="field-group">
+            <div className="field-group-form">
               <Field label="Exam Name" value={exam.exam_name} />
               <Field label="Exam Code" value={exam.exam_code} />
               <Field label="Academic Session" value={new Date().getFullYear()} />
               <Field label="Exam Year" value={new Date().getFullYear()} />
               <Field label="Candidate Type" value="Regular Candidate" />
-              <Field label="Exam Fees Paid" value={`₹ ${exam.exam_fees}.00`} />
-              <Field label="Fee Receipt Number" value={`MRS-RCPT-${Math.floor(Math.random()*9000)+1000}`} />
+              <Field label="Exam Fees Payable" value={`₹ ${exam.exam_fees}.00`} />
               <div style={{ gridColumn: 'span 2' }}>
-                <span className="label block border-b pb-1 mb-2">Papers included in this Examination</span>
+                <span className="label-form block border-b pb-1 mb-2">SCHEME OF EXAMINATION (PAPERS)</span>
                 <table className="paper-table">
                   <thead>
                     <tr>
@@ -229,65 +228,38 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
           {/* 2. Personal Information */}
           <div className="section text-left">
             <div className="section-header">2. Student Personal Information</div>
-            <div className="field-group">
+            <div className="field-group-form">
               <div style={{ gridColumn: 'span 2' }}>
-                <Field label="Student Full Name (Last, First, Middle)" value={`${student.lastName}, ${student.firstName} ${student.middleName || ""}`} />
+                <Field label="Candidate Name" value={`${student.lastName}, ${student.firstName} ${student.middleName || ""}`} />
               </div>
-              <Field label="Father's / Guardian's Name" value={profile?.fatherName || "—"} />
+              <Field label="Father's / Guardian" value={profile?.fatherName || "—"} />
               <Field label="Mother's Name" value={profile?.motherName || "—"} />
               <Field label="Date of Birth" value={profile?.dateOfBirth || "—"} />
-              <Field label="Age (as of Jan 1st)" value="—" />
               <Field label="Gender" value={profile?.gender || "—"} />
               <Field label="Category" value={profile?.category || "—"} />
               <div style={{ gridColumn: 'span 2' }}>
-                <Field label="Permanent / Communication Address" 
+                <Field label="Mailing Address" 
                   value={profile?.address ? 
-                    `${profile.address.line1}${profile.address.line2 ? ', ' + profile.address.line2 : ''}, ${profile.address.villageOrCity}, ${profile.address.taluka ? profile.address.taluka + ', ' : ''}${profile.address.district}, ${profile.address.state} - ${profile.address.pincode}` 
+                    `${profile.address.line1}, ${profile.address.villageOrCity}, ${profile.address.district}, ${profile.address.state} - ${profile.address.pincode}` 
                     : "—"
                   } 
                 />
               </div>
-              <Field label="Mother Tongue" value={student.motherTongue || "—"} />
               <Field label="Contact Number" value={student.contact} />
+              <Field label="Aadhar Profile ID" value={profile?.idProofNumber || "PENDING"} />
             </div>
           </div>
 
           {/* 3. Academic Details */}
           <div className="section text-left">
-            <div className="section-header">3. Contact & Academic Details</div>
-            <div className="field-group">
+            <div className="section-header">3. Application Preferences</div>
+            <div className="field-group-form">
               <div style={{ gridColumn: 'span 2' }}>
-                <Field label="School / Institute Name" value={student.schoolName || "—"} />
+                <Field label="School / Institute Name" value={student.schoolName || "NOT REGISTERED"} />
               </div>
-              <Field label="Class / Standard" value="—" />
-              <Field label="Medium of Instruction" value={medium} />
-              <Field label="Category" value={category} />
-              <Field label="Exam Centre" value="—" />
-              <Field label="Email Address" value={student.email} />
-              
-              {profile?.previousExamName && (
-                <div style={{ gridColumn: 'span 2', marginTop: '10px' }}>
-                  <span className="label block border-b pb-1 mb-2">Previous Exam Details</span>
-                  <table className="paper-table">
-                    <thead>
-                      <tr>
-                        <th>Exam Name</th>
-                        <th>Year</th>
-                        <th>Roll/Reg No</th>
-                        <th>Result/Marks</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td style={{ fontWeight: 'bold' }}>{profile.previousExamName}</td>
-                        <td>{profile.previousExamYear}</td>
-                        <td>{profile.previousExamRollNo}</td>
-                        <td>Passed ({profile.previousExamMarks}%)</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              )}
+              <Field label="Medium Opted" value={medium.toUpperCase()} />
+              <Field label="Application Category" value={category.toUpperCase()} />
+              <Field label="Registered Email" value={student.email} />
             </div>
           </div>
 
@@ -296,15 +268,15 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
             <div className="section-header" style={{ backgroundColor: '#2d3748', color: 'white' }}>FOR OFFICE USE ONLY</div>
             <div className="grid grid-cols-3 gap-6 p-4">
               <div className="flex flex-col">
-                <span className="label">Assigned Roll Number</span>
+                <span className="label-form">Assigned Roll Number</span>
                 <div className="h-6 border-b border-dashed"></div>
               </div>
               <div className="flex flex-col">
-                <span className="label">Registration Number</span>
+                <span className="label-form">Registration Number</span>
                 <div className="h-6 border-b border-dashed"></div>
               </div>
               <div className="flex flex-col">
-                <span className="label">Date of Receipt</span>
+                <span className="label-form">Date of Receipt</span>
                 <div className="h-6 border-b border-dashed"></div>
               </div>
             </div>
@@ -323,29 +295,15 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
                 ) : (
                   <span className="opacity-30">CANDIDATE SIGN</span>
                 )}
-                <span>Signature of Candidate</span>
+                <span>Candidate Signature</span>
               </div>
               <div className="sign-box">
-                {principalSigUrl ? (
-                  <img src={principalSigUrl} alt="Principal Signature" className="max-h-16 p-1 object-contain" />
-                ) : (
-                  <span className="opacity-30">SIGN AREA</span>
-                )}
-                {schoolStampUrl && (
-                  <img src={schoolStampUrl} alt="School Stamp" className="max-h-10 p-1 object-contain" />
-                )}
-                <span>Principal's Signature &amp; Stamp</span>
+                <span className="opacity-30">OFFICIAL STAMP</span>
+                <span>Principal Signature</span>
               </div>
               <div className="sign-box">
-                {exam.controllerSignatureUrl ? (
-                  <img src={exam.controllerSignatureUrl} alt="Controller Signature" className="max-h-16 p-1 object-contain" />
-                ) : (
-                  <span className="opacity-30">STAMP AREA</span>
-                )}
-                {exam.boardSealUrl && (
-                  <img src={exam.boardSealUrl} alt="Board Seal" className="max-h-10 p-1 object-contain" />
-                )}
-                <span>Sabha Authorized Stamp</span>
+                <span className="opacity-30">SABHA SEAL</span>
+                <span>Authorized Official</span>
               </div>
             </div>
           </div>
@@ -360,17 +318,15 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
             </ul>
           </div>
 
-          {/* Submission Footer - No Print */}
-          <div className="pt-10 border-t-2 border-slate-100 mt-10 no-print flex flex-col items-center">
-
-            {/* Medium & Category selection */}
-            <div className="w-full grid grid-cols-2 gap-4 mb-6">
-              <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-bold uppercase text-slate-500">Medium of Instruction</label>
+          {/* submission footer */}
+          <div style={s.submissionFooter} className="no-print">
+            <div style={s.selectionGrid}>
+              <div style={s.fieldGroup}>
+                <label style={s.fieldLabel}>VERIFY MEDIUM</label>
                 <select
                   value={medium}
                   onChange={(e) => setMedium(e.target.value)}
-                  className="border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  style={s.select}
                 >
                   <option value="Hindi">Hindi</option>
                   <option value="Marathi">Marathi</option>
@@ -378,48 +334,51 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
                   <option value="Urdu">Urdu</option>
                 </select>
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-bold uppercase text-slate-500">Category</label>
+              <div style={s.fieldGroup}>
+                <label style={s.fieldLabel}>VERIFY CATEGORY</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  style={s.select}
                 >
                   <option value="General">General</option>
                   <option value="OBC">OBC</option>
                   <option value="SC">SC</option>
                   <option value="ST">ST</option>
-                  <option value="NT">NT</option>
-                  <option value="SBC">SBC</option>
                   <option value="EWS">EWS</option>
                 </select>
               </div>
             </div>
 
-            <label className="flex items-center gap-3 cursor-pointer mb-6">
+            <label style={s.agreeLabel}>
               <input 
                 type="checkbox" 
                 checked={agreed} 
                 onChange={(e) => {setAgreed(e.target.checked); if(e.target.checked) setError("");}}
-                className={`h-5 w-5 rounded border-slate-300 text-indigo-600 ${error ? 'ring-2 ring-red-500' : ''}`}
+                style={s.checkbox}
               />
-              <span className="text-sm font-bold text-slate-700">I agree to the declaration and examination rules.</span>
+              <span style={s.agreeText}>I confirm all details are correct as per my board records.</span>
             </label>
             
-            {error && <p className="text-red-500 text-xs font-bold mb-4">{error}</p>}
+            {error && <div style={s.errorBox}><AlertCircle size={14} /> {error}</div>}
 
-            <div className="flex gap-4 w-full">
-              <button onClick={onClose} className="flex-1 py-4 border-2 border-slate-200 text-slate-500 font-bold rounded-xl hover:bg-slate-50 transition-all">
-                Cancel
+            <div style={s.actionRow}>
+              <button onClick={onClose} style={s.footerCancelBtn}>
+                CANCEL
               </button>
-              <button onClick={handleSubmit} className="flex-[2] bg-indigo-600 text-white py-4 rounded-xl font-black text-lg shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all transform hover:-translate-y-1">
-                Submit Application
+              <button 
+                onClick={handleSubmit} 
+                style={s.footerSubmitBtn}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3b6ddb'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4c84ff'}
+              >
+                SUBMIT FINAL APPLICATION <ArrowRight size={18} />
               </button>
             </div>
           </div>
 
-          <p className="text-center mt-10 text-[9px] text-slate-400 font-medium">
-            Generated on {new Date().toLocaleString()} | System ID: MRS-{Math.floor(Math.random()*99999)}
+          <p className="text-center mt-10 text-[9px] text-slate-400 font-medium tracking-widest uppercase">
+            ELECTRONICALLY GENERATED ON {new Date().toLocaleString()} | MRS PORTAL IDENTITY: {Math.floor(Math.random()*99999)}
           </p>
         </motion.div>
       </div>
@@ -427,12 +386,154 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
   );
 };
 
-/* --- Helper --- */
 const Field = ({ label, value }) => (
   <div className="flex flex-col">
-    <span className="label">{label}</span>
-    <div className="value">{value || "—"}</div>
+    <span className="label-form">{label}</span>
+    <div className="value-form">{value || "—"}</div>
   </div>
 );
+
+/* --- Header Styles for Modern UI --- */
+const s = {
+    controls: {
+        maxWidth: '850px',
+        margin: '0 auto 24px auto',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        fontFamily: 'DM Sans, Segoe UI, sans-serif'
+    },
+    controlsLeft: { display: 'flex', alignItems: 'center', gap: '12px' },
+    badge: {
+        backgroundColor: '#4c84ff',
+        color: '#fff',
+        padding: '5px 10px',
+        borderRadius: '6px',
+        fontSize: '10px',
+        fontWeight: '900',
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em'
+    },
+    controlsText: { fontSize: '13px', fontWeight: '800', color: '#475569', letterSpacing: '0.02em' },
+    controlsRight: { display: 'flex', gap: '12px', alignItems: 'center' },
+    secondaryBtn: {
+        backgroundColor: '#fff',
+        color: '#475569',
+        padding: '10px 16px',
+        borderRadius: '8px',
+        fontSize: '11px',
+        fontWeight: '900',
+        letterSpacing: '0.05em',
+        border: '1px solid #e2e8f0',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+    },
+    closeBtn: {
+        backgroundColor: '#fff',
+        color: '#94a3b8',
+        padding: '10px',
+        borderRadius: '8px',
+        border: '1px solid #f1f5f9',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+    },
+    statusPill: {
+        backgroundColor: '#f0fdfa',
+        color: '#0f766e',
+        padding: '2px 8px',
+        borderRadius: '4px',
+        fontSize: '11px',
+        border: '1px solid #ccfbf1',
+        fontWeight: '900'
+    },
+    submissionFooter: {
+        marginTop: '40px',
+        padding: '32px',
+        backgroundColor: '#f8fafc',
+        borderRadius: '16px',
+        border: '1px solid #f1f5f9',
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    selectionGrid: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '24px',
+        marginBottom: '24px'
+    },
+    fieldGroup: { display: 'flex', flexDirection: 'column', gap: '8px' },
+    fieldLabel: { fontSize: '10px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' },
+    select: {
+        height: '42px',
+        padding: '0 12px',
+        borderRadius: '8px',
+        border: '1px solid #e2e8f0',
+        backgroundColor: '#fff',
+        fontSize: '13px',
+        color: '#1e293b',
+        fontWeight: '600',
+        outline: 'none',
+        cursor: 'pointer'
+    },
+    agreeLabel: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        cursor: 'pointer',
+        marginBottom: '32px'
+    },
+    checkbox: { width: '20px', height: '20px', cursor: 'pointer', accentColor: '#4c84ff' },
+    agreeText: { fontSize: '14px', fontWeight: '700', color: '#1e293b' },
+    errorBox: { 
+        padding: '12px', 
+        backgroundColor: '#fef2f2', 
+        color: '#b91c1c', 
+        borderRadius: '8px', 
+        fontSize: '12px', 
+        fontWeight: '700', 
+        marginBottom: '24px', 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '8px',
+        border: '1px solid #fee2e2'
+    },
+    actionRow: { display: 'flex', gap: '16px' },
+    footerCancelBtn: {
+        flex: 1,
+        padding: '14px',
+        borderRadius: '8px',
+        backgroundColor: '#fff',
+        color: '#64748b',
+        fontSize: '11px',
+        fontWeight: '900',
+        letterSpacing: '0.05em',
+        border: '1px solid #e2e8f0',
+        cursor: 'pointer'
+    },
+    footerSubmitBtn: {
+        flex: 2,
+        padding: '14px',
+        borderRadius: '8px',
+        backgroundColor: '#4c84ff',
+        color: '#fff',
+        fontSize: '12px',
+        fontWeight: '900',
+        letterSpacing: '0.1em',
+        border: 'none',
+        cursor: 'pointer',
+        boxShadow: '0 4px 12px rgba(76, 132, 255, 0.2)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '12px',
+        transition: 'all 0.2s ease'
+    }
+};
 
 export default ApplyModal;

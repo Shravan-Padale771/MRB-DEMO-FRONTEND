@@ -62,7 +62,7 @@ const HallTicket = ({ application, student, profile, exam, school, regions = [],
     };
 
     return (
-        <div className="min-h-screen bg-slate-100 py-10 px-4 print:bg-white print:p-0">
+        <div className="bg-transparent print:bg-white print:p-0">
             {/* Print Styles */}
             <style dangerouslySetInnerHTML={{ __html: `
                 @media print {
@@ -94,7 +94,7 @@ const HallTicket = ({ application, student, profile, exam, school, regions = [],
                 }
 
                 .ht-container { 
-                    max-width: 1000px; 
+                    max-width: 850px; 
                     margin: 0 auto; 
                     background: white; 
                     position: relative; 
@@ -126,26 +126,26 @@ const HallTicket = ({ application, student, profile, exam, school, regions = [],
                 .ht-notice strong { color: #155e75; }
             `}} />
 
-            {/* Action Bar */}
-            <div className="no-print max-w-[1000px] mx-auto mb-8 flex justify-between items-center bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+            {/* Modernized Action Bar */}
+            <div className="no-print max-w-[850px] mx-auto mb-8 flex justify-between items-center bg-white p-6 rounded-xl border border-slate-200 shadow-sm" style={{ fontFamily: 'DM Sans, Segoe UI, sans-serif' }}>
                 <div>
-                    <h2 className="text-2xl font-black text-slate-800 flex items-center gap-3">
-                        <FileText className="text-indigo-600" size={28} /> Admit Card
+                    <h2 className="text-xl font-black text-slate-800 flex items-center gap-3">
+                        <FileText className="text-[#4c84ff]" size={24} /> EXAMINATION ADMIT CARD
                     </h2>
-                    <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">Digital Examination Voucher</p>
+                    <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-[0.15em] mt-1">Official Digital Authorization Voucher</p>
                 </div>
-                <div className="flex gap-4">
-                    <button
-                        onClick={handleDownloadPDF}
-                        className="bg-emerald-600 text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 shadow-xl shadow-emerald-500/20 hover:bg-emerald-700 transition-all hover:scale-105"
-                    >
-                        <Download size={18} /> Download PDF
-                    </button>
+                <div className="flex gap-3">
                     <button
                         onClick={() => window.print()}
-                        className="bg-[#1b223c] text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all hover:scale-105"
+                        className="bg-white text-slate-600 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest flex items-center gap-2 border border-slate-200 hover:bg-slate-50 transition-all"
                     >
-                        <Printer size={18} /> Print Local
+                        <Printer size={16} /> PRINT FORM
+                    </button>
+                    <button
+                        onClick={handleDownloadPDF}
+                        className="bg-[#4c84ff] text-white px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-blue-500/20 hover:bg-[#3b6ddb] transition-all"
+                    >
+                        <Download size={16} /> DOWNLOAD PDF
                     </button>
                 </div>
             </div>

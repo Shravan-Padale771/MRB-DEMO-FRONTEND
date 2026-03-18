@@ -53,26 +53,25 @@ async function seedData() {
                     console.log(`    🏫 Created School: ${schoolName}`);
 
                     const studentPromises = [];
-                    for (let stIndex = 0; stIndex < 20; stIndex++) {
+                    for (let stIndex = 0; stIndex < 5; stIndex++) {
                         const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
                         const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-                        const rollNumber = `R-${regionId}-${centreId}-${schoolId}-${stIndex + 1}`;
                         
                         // 3. Create Students (Bulk in parallel for speed) with query param
                         studentPromises.push(axios.post(`${API_BASE_URL}/students?schoolId=${schoolId}`, {
                             firstName,
                             lastName,
-                            rollNumber,
-                            dob: '2010-01-01',
-                            gender: stIndex % 2 === 0 ? 'MALE' : 'FEMALE',
+                            middleName: '',
+                            contact: `98${Math.floor(Math.random() * 90000000) + 10000000}`,
                             email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${Math.floor(Math.random() * 1000)}@mrb-example.com`,
-                            phoneNumber: `98${Math.floor(Math.random() * 90000000) + 10000000}`,
-                            category: 'GENERAL',
-                            regionId: regionId
+                            age: Math.floor(Math.random() * 20) + 10,
+                            motherTongue: Math.random() > 0.5 ? 'Hindi' : 'Marathi',
+                            password: 'password123',
+                            confirmPassword: 'password123'
                         }));
                     }
                     await Promise.all(studentPromises);
-                    console.log(`      🎓 Added 20 students to ${schoolName}`);
+                    console.log(`      🎓 Added 5 students to ${schoolName}`);
                 }
             }
         }

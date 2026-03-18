@@ -20,18 +20,19 @@ import {
 
 // Sub-components
 import ExamManager from "../admin/components/ExamManager";
-import StudentManager from "../admin/components/StudentManager";
-import ApplicationManager from "../admin/components/ApplicationManager";
+import StudentManager from "../admin/components/modern-ui/StudentManager";
+import ApplicationManager from "../admin/components/modern-ui/ApplicationManager";
 import ResultPublisher from "../admin/components/ResultPublisher";
 import ResultViewer from "../admin/components/ResultViewer";
-import RegionManager from "../admin/components/RegionManager";
-import ExamCentreManager from "../admin/components/ExamCentreManager";
-import SchoolManager from "../admin/components/SchoolManager";
+import RegionManager from "../admin/components/modern-ui/RegionManager";
+import ExamCentreManager from "../admin/components/modern-ui/ExamCentreManager";
+import SchoolManager from "../admin/components/modern-ui/SchoolManager";
 import SchoolDetailView from "../admin/components/SchoolDetailView";
 import ApplicationDetailView from "../admin/components/ApplicationDetailView";
 import DashboardLayout from "../admin/components/DashboardLayout";
 import MetricCard from "../admin/components/MetricCard";
 import GlobalSearch from "../admin/components/GlobalSearch";
+import ModernAdminDashboard from "../admin/components/modern-ui/ModernAdminDashboard";
 
 
 import {
@@ -560,131 +561,43 @@ const AdminDashboard = () => {
 
       {/* Main Content Area */}
       {activeTab === "dashboard" && !id && (
-        <div className="space-y-8">
-          {/* Metric Cards Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <MetricCard
-              label="Total Students"
-              value={(analyticsSummary?.totalStudents || analyticsSummary?.studentCount || studentsPage?.totalElements || students.length).toLocaleString()}
-              color="#4c84ff"
-            />
-            <MetricCard
-              label="Total Exams"
-              value={(analyticsSummary?.totalExams || analyticsSummary?.examCount || examsPage?.totalElements || exams.length).toLocaleString()}
-              color="#fbc02d"
-            />
-            <MetricCard
-              label="Active Applications"
-              value={(analyticsSummary?.totalApplications || analyticsSummary?.applicationCount || applicationsPage?.totalElements || applications.length).toLocaleString()}
-              color="#10b981"
-            />
-            <MetricCard
-              label="Total Results"
-              value={(analyticsSummary?.totalResults || analyticsSummary?.resultCount || resultsPage?.totalElements || results.length).toLocaleString()}
-              color="#8b5cf6"
-            />
-          </div>
-
-          {/* Charts Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 h-[220px] flex flex-col">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-bold text-gray-800 tracking-tight">Application Trends</h3>
-                <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase">7 Days</span>
-              </div>
-              <div className="flex-1 min-h-0">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={applicationTrends} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f5f5f5" />
-                    <XAxis
-                      dataKey="date"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: '#9ca3af', fontSize: 9 }}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: '#9ca3af', fontSize: 9 }}
-                    />
-                    <Tooltip
-                      cursor={{ fill: '#f8fafc' }}
-                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '11px', padding: '4px 8px' }}
-                    />
-                    <Bar
-                      dataKey="count"
-                      fill="#4c84ff"
-                      radius={[4, 4, 0, 0]}
-                      barSize={20}
-                      animationDuration={1000}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 h-[220px] flex flex-col">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-bold text-gray-800 tracking-tight">Region Distribution</h3>
-                <span className="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded uppercase">Students</span>
-              </div>
-              <div className="flex-1 min-h-0 flex items-center justify-center">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={regionData}
-                      cx="50%"
-                      cy="45%"
-                      innerRadius={45}
-                      outerRadius={65}
-                      paddingAngle={4}
-                      dataKey="value"
-                      animationBegin={100}
-                      animationDuration={1000}
-                    >
-                      {regionData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '11px', padding: '4px 8px' }}
-                    />
-                    <Legend
-                      verticalAlign="bottom"
-                      height={20}
-                      iconSize={8}
-                      formatter={(value) => <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{value}</span>}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-
-
-          <div className="space-y-8">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-800">Recent Applications</h3>
-                <button onClick={() => setActiveTab('applications')} className="text-sm font-semibold text-blue-600 hover:text-blue-700">View All</button>
-              </div>
-              <ApplicationManager 
-                isDashboard={true} 
-                selectApplication={selectApplication} 
-                reviewApplication={handleReviewApplication}
-              />
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-800">Recent Results</h3>
-                <button onClick={() => setActiveTab('results')} className="text-sm font-semibold text-blue-600 hover:text-blue-700">View All</button>
-              </div>
-              <ResultViewer isDashboard={true} />
-            </div>
-          </div>
-        </div>
+        <ModernAdminDashboard 
+          stats={{
+            totalStudents: analyticsSummary?.totalStudents || analyticsSummary?.studentCount || studentsPage?.totalElements || students.length,
+            totalExams: analyticsSummary?.totalExams || analyticsSummary?.examCount || examsPage?.totalElements || exams.length,
+            activeApplications: analyticsSummary?.totalApplications || analyticsSummary?.applicationCount || applicationsPage?.totalElements || applications.length,
+            totalResults: analyticsSummary?.totalResults || analyticsSummary?.resultCount || resultsPage?.totalElements || results.length
+          }}
+          applicationTrends={applicationTrends.map(t => ({ label: t.date, value: t.count }))}
+          regionData={(() => {
+            const total = regionData.reduce((sum, r) => sum + r.value, 0);
+            return regionData.map(r => ({
+              name: r.name,
+              pct: total > 0 ? Math.round((r.value / total) * 100) : 0
+            }));
+          })()}
+          recentApplications={applications.slice(0, 6).map(a => ({
+            name: a.studentName || (a.student?.full_name) || "Unknown",
+            meta: `App #${a.applicationId} · ${a.examName || a.exam?.exam_name || "N/A"}`,
+            status: a.status === 'APPROVED' ? 'Approved' : (a.status === 'PENDING' ? 'Pending' : (a.status === 'SUBMITTED' ? 'Pending' : 'Review')),
+            original: a
+          }))}
+          recentResults={results.slice(0, 6).map(r => {
+            return {
+              exam: r.examName || r.application?.exam?.exam_name || "N/A",
+              date: r.publishedAt ? new Date(r.publishedAt).toLocaleDateString() : "N/A",
+              score: Math.round(r.percentage || 0),
+              original: r
+            };
+          })}
+          onViewAllApplications={() => setActiveTab('applications')}
+          onViewAllResults={() => setActiveTab('results')}
+          onReviewApplication={handleReviewApplication}
+          onViewResult={(res) => {
+            // Logic to view result - might need to set activeTab or similar
+            setActiveTab('results');
+          }}
+        />
       )}
       
       {/* Exclusive Detail Views (via URL) */}

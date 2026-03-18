@@ -189,3 +189,4 @@ indexing + cache
 [2026-03-18 00:20:24] GET /students | Status: 200 | Duration: 3.6811s
 [2026-03-18 00:21:52] GET /getAllStudentProfiles | Status: 200 | Duration: 1.9645s
 [2026-03-18 00:33:56] GET /getAllStudents | Status: 200 | Duration: 2.4180s
+[2026-03-18 13:54:28] GET /getAllStudents | Status: 200 | Duration: 78.0114s

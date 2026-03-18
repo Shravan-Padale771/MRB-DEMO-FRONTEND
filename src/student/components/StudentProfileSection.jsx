@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getStudentProfile, createStudentProfileAPI, updateStudentProfile, uploadFiles } from "../../api";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { User, MapPin, CheckCircle, AlertCircle, Save, Calendar, Phone, Book, Camera, Upload, XCircle, FileText } from "lucide-react";
+import { User, MapPin, CheckCircle, AlertCircle, Save, Calendar, Phone, Book, Camera, Upload, XCircle, FileText, GraduationCap, ArrowRight, ShieldCheck } from "lucide-react";
 
 const StudentProfileSection = ({ student, prefetchedProfile, onProfileUpdated }) => {
   const [loading, setLoading] = useState(false);
@@ -103,7 +103,6 @@ const StudentProfileSection = ({ student, prefetchedProfile, onProfileUpdated })
     const file = e.target.files[0];
     if (!file) return;
 
-    // Create local preview URL
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreviews((prev) => ({
@@ -113,7 +112,6 @@ const StudentProfileSection = ({ student, prefetchedProfile, onProfileUpdated })
     };
     reader.readAsDataURL(file);
     
-    // Store actual file for upload later
     setSelectedFiles((prev) => ({
       ...prev,
       [type]: file,
@@ -128,8 +126,6 @@ const StudentProfileSection = ({ student, prefetchedProfile, onProfileUpdated })
 
     try {
       let finalFormData = { ...formData };
-
-      // 1. Check if there are files to upload
       const uploadQueue = [];
       if (selectedFiles.photo) {
         uploadQueue.push(new File([selectedFiles.photo], `photo_${selectedFiles.photo.name}`, { type: selectedFiles.photo.type }));
@@ -142,12 +138,11 @@ const StudentProfileSection = ({ student, prefetchedProfile, onProfileUpdated })
       }
       
       if (uploadQueue.length > 0) {
-        toast.loading("Uploading documents...", { id: "uploading" });
+        const tid = toast.loading("Uploading documents...");
         try {
           const uploadResponse = await uploadFiles(uploadQueue);
-          toast.success("Documents uploaded successfully!", { id: "uploading" });
+          toast.success("Documents uploaded!", { id: tid });
 
-          // 2. Map returned URLs using our unique prefixes
           if (selectedFiles.photo) {
             finalFormData.profilePhotoUrl = uploadResponse[`photo_${selectedFiles.photo.name}`];
           }
@@ -157,18 +152,14 @@ const StudentProfileSection = ({ student, prefetchedProfile, onProfileUpdated })
           if (selectedFiles.idProof) {
             finalFormData.idProofDocumentUrl = uploadResponse[`idproof_${selectedFiles.idProof.name}`];
           }
-          
-          // Clear selected files after successful upload
           setSelectedFiles({ photo: null, signature: null, idProof: null });
         } catch (uploadError) {
-          console.error("Upload failed:", uploadError);
-          toast.error("Document upload failed. Profile not saved.", { id: "uploading" });
+          toast.error("Upload failed", { id: tid });
           setLoading(false);
           return;
         }
       }
 
-      // Basic completion check
       const isComplete =
         finalFormData.dateOfBirth &&
         finalFormData.gender &&
@@ -185,548 +176,510 @@ const StudentProfileSection = ({ student, prefetchedProfile, onProfileUpdated })
         profileCompletionStatus: isComplete ? "Complete" : "Incomplete",
       };
 
-      console.log("Final profile payload to be saved:", payload);
-
       if ((student.hasProfile || profileId) && profileId) {
         await updateStudentProfile(profileId, payload);
-        toast.success("Profile updated successfully!");
+        toast.success("Profile updated!");
       } else {
         const response = await createStudentProfileAPI(student.studentId, payload);
         if (response && response.profileId) {
           setProfileId(response.profileId);
         }
-        toast.success("Profile created successfully!");
+        toast.success("Profile created!");
       }
 
       setIsEditing(false);
       if (onProfileUpdated) onProfileUpdated();
     } catch (error) {
-      console.error("Error saving profile:", error);
-      toast.error("Failed to save profile. Please try again.");
+      toast.error("Failed to save profile");
     } finally {
       setLoading(false);
     }
   };
 
   if (loading && !formData.fatherName) {
-    return <div className="p-8 text-center text-gray-500">Loading Profile...</div>;
+    return <div style={{ padding: '80px 40px', textAlign: 'center', color: '#94a3b8', fontWeight: '800', letterSpacing: '0.1em' }}>SYNCHRONIZING PROFILE...</div>;
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 border-b border-gray-100 flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <User className="text-indigo-600" />
-            Student Profile Details
+    <div style={s.container}>
+      {/* Header with Admin Stats feel */}
+      <div style={s.header}>
+        <div style={s.headerLeft}>
+          <h2 style={s.title}>
+            <User size={24} style={s.titleIcon} /> Student Profile
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Manage your personal and contact information
-          </p>
+          <p style={s.subtitle}>MANAGE YOUR PERSONAL AND ACADEMIC CREDENTIALS</p>
         </div>
         {!isEditing && (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="text-sm font-semibold bg-white border border-indigo-200 text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors"
-          >
-            Edit Profile
+          <button onClick={() => setIsEditing(true)} style={s.editBtn}>
+            EDIT INFORMATION
           </button>
         )}
       </div>
 
-      <div className="p-6">
-        {!student?.hasProfile && (
-          <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl flex items-start gap-3">
-            <AlertCircle className="shrink-0 mt-0.5" size={20} />
-            <div>
-              <h4 className="font-semibold">Profile Incomplete</h4>
-              <p className="text-sm mt-1">
-                You must complete your profile information before applying for any exams. Please fill out the form below.
-              </p>
+      {!student?.hasProfile && (
+        <div style={s.alertBox}>
+          <AlertCircle size={20} color="#f59e0b" />
+          <div style={s.alertContent}>
+            <h4 style={s.alertTitle}>PROFILE ACTION REQUIRED</h4>
+            <p style={s.alertText}>Your permanent record is incomplete. Please furnish all details below to activate exam registration.</p>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} style={s.form}>
+        {/* Identity Section */}
+        <div style={s.card}>
+          <div style={s.cardHeader}>
+            <ShieldCheck size={16} color="#4c84ff" />
+            <span style={s.cardTitle}>Identity & Core Details</span>
+          </div>
+          
+          <div style={s.flexRow}>
+            <div style={s.formArea}>
+              <div style={s.grid2}>
+                <div style={s.fieldGroup}>
+                  <label style={s.label}>FULL NAME</label>
+                  <input
+                    type="text"
+                    value={`${student?.firstName || ""} ${student?.lastName || ""}`}
+                    disabled
+                    style={s.inputDisabled}
+                  />
+                </div>
+                <div style={s.fieldGroup}>
+                  <label style={s.label}>DATE OF BIRTH</label>
+                  <input
+                    type="date"
+                    name="dateOfBirth"
+                    value={formData.dateOfBirth}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    style={isEditing ? s.input : s.inputDisabled}
+                    required
+                  />
+                </div>
+                <div style={s.fieldGroup}>
+                  <label style={s.label}>FATHER'S NAME</label>
+                  <input
+                    type="text"
+                    name="fatherName"
+                    value={formData.fatherName}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    style={isEditing ? s.input : s.inputDisabled}
+                    required
+                  />
+                </div>
+                <div style={s.fieldGroup}>
+                  <label style={s.label}>MOTHER'S NAME</label>
+                  <input
+                    type="text"
+                    name="motherName"
+                    value={formData.motherName}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    style={isEditing ? s.input : s.inputDisabled}
+                    required
+                  />
+                </div>
+                <div style={s.fieldGroup}>
+                  <label style={s.label}>GENDER</label>
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    style={isEditing ? s.input : s.inputDisabled}
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div style={s.fieldGroup}>
+                  <label style={s.label}>CATEGORY</label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    style={isEditing ? s.input : s.inputDisabled}
+                  >
+                    <option value="General">General</option>
+                    <option value="OBC">OBC</option>
+                    <option value="SC">SC</option>
+                    <option value="ST">ST</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
             </div>
+
+            <div style={s.photoArea}>
+                <label style={s.labelCentered}>PASSPORT PHOTO</label>
+                <div style={s.photoBox}>
+                    {(previews.photo || formData.profilePhotoUrl) ? (
+                        <div style={s.imagePreview}>
+                            <img src={previews.photo || formData.profilePhotoUrl} alt="Photo" style={s.img} />
+                            {isEditing && (
+                                <label style={s.uploadOverlay}>
+                                    <Camera size={20} color="#fff" />
+                                    <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleFileChange(e, 'photo')} />
+                                </label>
+                            )}
+                        </div>
+                    ) : (
+                        <div style={s.placeholderBox}>
+                            <Camera size={40} color="#cbd5e1" />
+                            <span style={s.placeholderText}>No Photo</span>
+                            {isEditing && (
+                                <input type="file" style={s.hiddenFile} accept="image/*" onChange={(e) => handleFileChange(e, 'photo')} />
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Assets Section */}
+        <div style={s.sideBySide}>
+          <div style={s.card}>
+            <div style={s.cardHeader}>
+                <FileText size={16} color="#4c84ff" />
+                <span style={s.cardTitle}>Supporting Evidence</span>
+            </div>
+            <div style={s.docsStack}>
+                <div style={s.fieldGroup}>
+                  <label style={s.label}>SIGNATURE SPECIMEN</label>
+                  <div style={s.sigBox}>
+                    {(previews.signature || formData.signatureUrl) ? (
+                        <div style={s.imagePreview}>
+                            <img src={previews.signature || formData.signatureUrl} alt="Sig" style={s.imgContain} />
+                            {isEditing && (
+                                <label style={s.uploadOverlay}>
+                                    <Upload size={16} color="#fff" />
+                                    <input type="file" style={{ display: 'none' }} accept="image/*" onChange={(e) => handleFileChange(e, 'signature')} />
+                                </label>
+                            )}
+                        </div>
+                    ) : (
+                        <div style={s.placeholderBoxCompact}>
+                            <Upload size={20} color="#cbd5e1" />
+                            {isEditing && (
+                                <input type="file" style={s.hiddenFile} accept="image/*" onChange={(e) => handleFileChange(e, 'signature')} />
+                            )}
+                        </div>
+                    )}
+                  </div>
+                </div>
+
+                <div style={s.fieldGroup}>
+                    <label style={s.label}>ID PROOF DOCUMENT</label>
+                    <div style={s.docStatusBox}>
+                        {(previews.idProof || formData.idProofDocumentUrl) ? (
+                            <div style={s.docDetails}>
+                                <div style={s.docIcon}><FileText size={18} color="#4c84ff" /></div>
+                                <div style={s.docMeta}>
+                                    <div style={s.docName}>{previews.idProof ? "NEW SELECTION" : "ID_PROOF_SAVED.PDF"}</div>
+                                    <div style={s.docStatus}>{previews.idProof ? "READY TO UPLOAD" : "VERIFIED RECORD"}</div>
+                                </div>
+                                {isEditing && (
+                                    <button type="button" onClick={() => {setPreviews(p => ({...p, idProof: null})); setSelectedFiles(s => ({...s, idProof: null}));}} style={s.clearBtn}>
+                                        <XCircle size={14} />
+                                    </button>
+                                )}
+                            </div>
+                        ) : (
+                            <div style={s.docEmpty}>
+                                <Upload size={16} color="#94a3b8" />
+                                <span style={s.emptyMsg}>SELECT DOCUMENT (PDF/IMAGE)</span>
+                                {isEditing && (
+                                    <input type="file" style={s.hiddenFile} accept=".pdf,image/*" onChange={(e) => handleFileChange(e, 'idProof')} />
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+          </div>
+
+          <div style={s.card}>
+            <div style={s.cardHeader}>
+              <GraduationCap size={16} color="#4c84ff" />
+              <span style={s.cardTitle}>Academic Background</span>
+            </div>
+            <div style={s.grid2}>
+                <div style={s.fieldGroup}>
+                    <label style={s.label}>PREVIOUS EXAM</label>
+                    <input type="text" name="previousExamName" value={formData.previousExamName} onChange={handleChange} disabled={!isEditing} style={isEditing ? s.input : s.inputDisabled} placeholder="e.g. Higher Secondary" />
+                </div>
+                <div style={s.fieldGroup}>
+                    <label style={s.label}>PERCENTAGE (%)</label>
+                    <input type="number" name="previousExamMarks" value={formData.previousExamMarks || ""} onChange={handleChange} disabled={!isEditing} style={isEditing ? s.input : s.inputDisabled} placeholder="85.5" />
+                </div>
+                <div style={s.fieldGroup}>
+                    <label style={s.label}>YEAR OF PASSING</label>
+                    <input type="number" name="previousExamYear" value={formData.previousExamYear || ""} onChange={handleChange} disabled={!isEditing} style={isEditing ? s.input : s.inputDisabled} placeholder="2023" />
+                </div>
+                <div style={s.fieldGroup}>
+                    <label style={s.label}>ROLL NUMBER / REF</label>
+                    <input type="text" name="previousExamRollNo" value={formData.previousExamRollNo || ""} onChange={handleChange} disabled={!isEditing} style={isEditing ? s.input : s.inputDisabled} placeholder="UK-1029-X" />
+                </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Location Section */}
+        <div style={s.card}>
+          <div style={s.cardHeader}>
+            <MapPin size={16} color="#4c84ff" />
+            <span style={s.cardTitle}>Communication & Residential Address</span>
+          </div>
+          <div style={s.grid4}>
+              <div style={{gridColumn: 'span 2'}}>
+                <div style={s.fieldGroup}>
+                    <label style={s.label}>STREET ADDRESS / LINE 1</label>
+                    <input type="text" name="addr_line1" value={formData.address.line1} onChange={handleChange} disabled={!isEditing} style={isEditing ? s.input : s.inputDisabled} required />
+                </div>
+              </div>
+              <div style={s.fieldGroup}>
+                <label style={s.label}>GUARDIAN CONTACT</label>
+                <div style={{position: 'relative'}}>
+                    <Phone size={14} style={s.innerIcon} />
+                    <input type="tel" name="guardianContact" value={formData.guardianContact} onChange={handleChange} disabled={!isEditing} style={{...(isEditing ? s.input : s.inputDisabled), paddingLeft: '34px'}} />
+                </div>
+              </div>
+              <div style={s.fieldGroup}>
+                <label style={s.label}>VILLAGE / CITY</label>
+                <input type="text" name="addr_villageOrCity" value={formData.address.villageOrCity} onChange={handleChange} disabled={!isEditing} style={isEditing ? s.input : s.inputDisabled} required />
+              </div>
+              <div style={s.fieldGroup}>
+                <label style={s.label}>DISTRICT</label>
+                <input type="text" name="addr_district" value={formData.address.district} onChange={handleChange} disabled={!isEditing} style={isEditing ? s.input : s.inputDisabled} />
+              </div>
+              <div style={s.fieldGroup}>
+                <label style={s.label}>STATE / REGION</label>
+                <input type="text" name="addr_state" value={formData.address.state} onChange={handleChange} disabled={!isEditing} style={isEditing ? s.input : s.inputDisabled} required />
+              </div>
+              <div style={s.fieldGroup}>
+                <label style={s.label}>POSTAL PINCODE</label>
+                <input type="text" name="addr_pincode" value={formData.address.pincode} onChange={handleChange} disabled={!isEditing} style={isEditing ? s.input : s.inputDisabled} required />
+              </div>
+              <div style={s.fieldGroup}>
+                <label style={s.label}>GOVT ID NUMBER (UID)</label>
+                <input type="text" name="idProofNumber" value={formData.idProofNumber} onChange={handleChange} disabled={!isEditing} style={isEditing ? s.input : s.inputDisabled} />
+              </div>
+          </div>
+        </div>
+
+        {isEditing && (
+          <div style={s.footer}>
+            {student?.hasProfile && (
+              <button type="button" onClick={() => setIsEditing(false)} style={s.cancelBtn} disabled={loading}>
+                DISCARD CHANGES
+              </button>
+            )}
+            <button type="submit" disabled={loading} style={s.saveBtn}>
+              {loading ? "SAVING..." : <><Save size={18} /> UPDATE PROFILE</>}
+            </button>
           </div>
         )}
-
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Top Section: Identity & Photo */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Main Info Column */}
-            <div className="lg:col-span-3 space-y-8">
-              <section>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2 text-sm uppercase tracking-wider">
-                  <User size={18} className="text-gray-400" /> Basic Identity
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Student Name</label>
-                    <input
-                      type="text"
-                      value={`${student?.firstName || ""} ${student?.lastName || ""}`}
-                      disabled
-                      className="w-full border border-gray-200 rounded-lg p-2.5 bg-gray-100 text-gray-500 font-semibold cursor-not-allowed"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-                    <input
-                      type="date"
-                      name="dateOfBirth"
-                      value={formData.dateOfBirth}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Father's Name</label>
-                    <input
-                      type="text"
-                      name="fatherName"
-                      value={formData.fatherName}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      placeholder="Full Name"
-                      className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Mother's Name</label>
-                    <input
-                      type="text"
-                      name="motherName"
-                      value={formData.motherName}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      placeholder="Full Name"
-                      className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-                    <select
-                      name="gender"
-                      value={formData.gender}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100"
-                    >
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100"
-                    >
-                      <option value="General">General</option>
-                      <option value="OBC">OBC</option>
-                      <option value="SC">SC</option>
-                      <option value="ST">ST</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                </div>
-              </section>
-
-              <section>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2 text-sm uppercase tracking-wider">
-                  <Phone size={18} className="text-gray-400" /> Additional Details
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Guardian Contact</label>
-                    <input
-                      type="tel"
-                      name="guardianContact"
-                      value={formData.guardianContact}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      placeholder="10-digit number"
-                      className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">ID Proof Number (Aadhar/PAN)</label>
-                    <input
-                      type="text"
-                      name="idProofNumber"
-                      value={formData.idProofNumber}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      placeholder="Document ID"
-                      className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Qualification</label>
-                    <input
-                      type="text"
-                      name="qualification"
-                      value={formData.qualification}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      placeholder="E.g., 10th Pass"
-                      className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100"
-                    />
-                  </div>
-                </div>
-              </section>
-            </div>
-
-            {/* Photo Column */}
-            <div className="lg:col-span-1 border-l lg:pl-8 pt-8 lg:pt-0">
-              <label className="block text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider text-center">Profile Photo</label>
-              <div 
-                className={`relative aspect-[3/4] w-full max-w-[240px] mx-auto rounded-3xl border-2 border-dashed transition-all flex flex-col items-center justify-center overflow-hidden shadow-sm
-                  ${previews.photo || formData.profilePhotoUrl ? 'border-indigo-200 bg-white' : 'border-gray-200 bg-gray-50'}`}
-              >
-                {(previews.photo || formData.profilePhotoUrl) ? (
-                  <>
-                    <img 
-                      src={previews.photo || formData.profilePhotoUrl} 
-                      alt="Profile Preview" 
-                      className="w-full h-full object-cover"
-                    />
-                    {isEditing && (
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                        <label className="cursor-pointer bg-white text-gray-800 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-lg">
-                          <Upload size={14} /> Change
-                          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'photo')} />
-                        </label>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="text-center p-6 relative w-full h-full flex flex-col items-center justify-center">
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                      <Camera className="text-gray-300" size={32} />
-                    </div>
-                    <p className="text-sm text-gray-500 font-bold mb-1">Upload Photo</p>
-                    <p className="text-[10px] text-gray-400">Passport size (Max 1MB)</p>
-                    {isEditing && (
-                      <input 
-                        type="file" 
-                        className="absolute inset-0 opacity-0 cursor-pointer" 
-                        accept="image/*" 
-                        onChange={(e) => handleFileChange(e, 'photo')} 
-                      />
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4">
-            {/* Signature & ID Section */}
-            <section className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2 border-b pb-2 text-sm uppercase tracking-wider">
-                <Camera size={18} className="text-gray-400" /> Essential Documents
-              </h3>
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Candidate Signature</label>
-                  <div 
-                    className={`relative aspect-[5/2] w-full rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center overflow-hidden
-                      ${previews.signature || formData.signatureUrl ? 'border-indigo-200 bg-white shadow-sm' : 'border-gray-200 bg-gray-100'}`}
-                  >
-                    {(previews.signature || formData.signatureUrl) ? (
-                      <>
-                        <img 
-                          src={previews.signature || formData.signatureUrl} 
-                          alt="Signature Preview" 
-                          className="w-full h-full object-contain p-2"
-                        />
-                        {isEditing && (
-                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                            <label className="cursor-pointer bg-white text-gray-800 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-lg">
-                              <Upload size={14} /> Change
-                              <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'signature')} />
-                            </label>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="text-center p-4">
-                        <Upload className="mx-auto text-gray-400 mb-2" size={24} />
-                        <p className="text-xs text-gray-500 font-bold">Select Signature copy</p>
-                        {isEditing && (
-                          <input 
-                            type="file" 
-                            className="absolute inset-0 opacity-0 cursor-pointer" 
-                            accept="image/*" 
-                            onChange={(e) => handleFileChange(e, 'signature')} 
-                          />
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">ID Proof Document</label>
-                  <div 
-                    className={`relative h-20 w-full rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center overflow-hidden
-                      ${previews.idProof || formData.idProofDocumentUrl ? 'border-indigo-200 bg-white shadow-sm' : 'border-gray-200 bg-gray-100'}`}
-                  >
-                    {(previews.idProof || formData.idProofDocumentUrl) ? (
-                      <div className="flex items-center gap-3 px-4 w-full">
-                        <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
-                          <FileText size={20} />
-                        </div>
-                        <div className="flex-1 overflow-hidden">
-                          <p className="text-xs font-bold text-gray-800 truncate">
-                            {previews.idProof ? "New Document Selected" : "ID Proof Document"}
-                          </p>
-                          <p className="text-[10px] text-green-600 font-bold tracking-tight uppercase">
-                            {previews.idProof ? "Ready to Upload" : "Verified & Stored"}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {formData.idProofDocumentUrl && (
-                            <a 
-                              href={formData.idProofDocumentUrl} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-xs bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-100 transition-colors"
-                            >
-                              View
-                            </a>
-                          )}
-                          {isEditing && (
-                            <button 
-                              type="button"
-                              onClick={(e) => { 
-                                e.stopPropagation(); 
-                                setPreviews(p => ({...p, idProof: null}));
-                                setSelectedFiles(p => ({...p, idProof: null}));
-                              }}
-                              className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                            >
-                              <XCircle size={18} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-center flex items-center gap-3 px-6">
-                        <FileText className="text-gray-400" size={24} />
-                        <div className="text-left">
-                          <p className="text-xs text-gray-500 font-bold">Select Aadhar/PAN</p>
-                          <p className="text-[10px] text-gray-400">PDF or JPG (Max 2MB)</p>
-                        </div>
-                        {isEditing && (
-                          <input 
-                            type="file" 
-                            className="absolute inset-0 opacity-0 cursor-pointer" 
-                            accept=".pdf,image/*" 
-                            onChange={(e) => handleFileChange(e, 'idProof')} 
-                          />
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Academic History Section */}
-            <section className="bg-white p-6 rounded-2xl border border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2 border-b pb-2 text-sm uppercase tracking-wider">
-                <Book size={18} className="text-gray-400" /> Academic History
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Previous Exam Name</label>
-                  <input
-                    type="text"
-                    name="previousExamName"
-                    value={formData.previousExamName}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    placeholder="E.g., Monthly Test 1"
-                    className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Previous Exam Marks (%)</label>
-                  <input
-                    type="number"
-                    name="previousExamMarks"
-                    value={formData.previousExamMarks || ""}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    placeholder="E.g., 85"
-                    className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Previous Exam Year</label>
-                  <input
-                    type="number"
-                    name="previousExamYear"
-                    value={formData.previousExamYear || ""}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    placeholder="E.g., 2024"
-                    className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Previous Exam Roll No</label>
-                  <input
-                    type="text"
-                    name="previousExamRollNo"
-                    value={formData.previousExamRollNo || ""}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    placeholder="E.g., PRB-9921"
-                    className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100"
-                  />
-                </div>
-              </div>
-            </section>
-          </div>
-
-          {/* Address Section */}
-          <section className="pt-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2 text-sm uppercase tracking-wider">
-              <MapPin size={18} className="text-gray-400" /> Permanent Address
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-blue-50/30 p-6 rounded-2xl border border-blue-100/50">
-              <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address Line 1</label>
-                <input
-                  type="text"
-                  name="addr_line1"
-                  value={formData.address.line1}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  placeholder="House/Flat No., Street, Area"
-                  className="w-full border border-gray-300 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100 shadow-sm"
-                  required
-                />
-              </div>
-              <div className="lg:col-span-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address Line 2</label>
-                <input
-                  type="text"
-                  name="addr_line2"
-                  value={formData.address.line2}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  placeholder="Landmark (Optional)"
-                  className="w-full border border-gray-300 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100 shadow-sm"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Village/City</label>
-                <input
-                  type="text"
-                  name="addr_villageOrCity"
-                  value={formData.address.villageOrCity}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full border border-gray-300 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100 shadow-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Taluka</label>
-                <input
-                  type="text"
-                  name="addr_taluka"
-                  value={formData.address.taluka}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full border border-gray-300 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100 shadow-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">District</label>
-                <input
-                  type="text"
-                  name="addr_district"
-                  value={formData.address.district}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full border border-gray-300 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100 shadow-sm"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                <input
-                  type="text"
-                  name="addr_state"
-                  value={formData.address.state}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full border border-gray-300 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100 shadow-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
-                <input
-                  type="text"
-                  name="addr_pincode"
-                  value={formData.address.pincode}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full border border-gray-300 rounded-xl p-3 bg-white focus:ring-2 focus:ring-indigo-500 outline-none disabled:opacity-70 disabled:bg-gray-100 shadow-sm"
-                  required
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* Profile Documents Section */}
-          <section className="hidden">
-            {/* Redundant, handled above in redesigned layout */}
-          </section>
-
-          {isEditing && (
-            <div className="flex justify-end gap-4 border-t pt-6">
-              {student?.hasProfile && (
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(false)}
-                  className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-semibold transition-colors disabled:opacity-50"
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-              )}
-              <button
-                type="submit"
-                disabled={loading}
-                className="bg-indigo-600 text-white px-8 py-2.5 rounded-xl hover:bg-indigo-700 font-bold shadow-md flex items-center gap-2 transition-colors disabled:opacity-70"
-              >
-                {loading ? (
-                  "Saving..."
-                ) : (
-                  <>
-                    <Save size={18} /> Save Profile
-                  </>
-                )}
-              </button>
-            </div>
-          )}
-        </form>
-      </div>
+      </form>
     </div>
   );
 };
 
+const s = {
+    container: { fontFamily: 'DM Sans, Segoe UI, sans-serif' },
+    header: {
+        marginBottom: '32px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+        paddingBottom: '20px',
+        borderBottom: '1px solid #eee',
+    },
+    headerLeft: { display: 'flex', flexDirection: 'column', gap: '4px' },
+    title: { 
+        fontSize: '24px', 
+        fontWeight: '900', 
+        color: '#1e293b', 
+        margin: 0, 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '12px' 
+    },
+    titleIcon: { color: '#4c84ff' },
+    subtitle: { 
+        fontSize: '10px', 
+        fontWeight: '800', 
+        color: '#94a3b8', 
+        letterSpacing: '0.2em', 
+        margin: 0 
+    },
+    editBtn: {
+        padding: '10px 20px',
+        borderRadius: '8px',
+        backgroundColor: '#f1f5f9',
+        color: '#475569',
+        fontSize: '11px',
+        fontWeight: '900',
+        letterSpacing: '0.05em',
+        border: '1px solid #e2e8f0',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+    },
+    alertBox: {
+        backgroundColor: '#fffbeb',
+        border: '1px solid #fef3c7',
+        borderRadius: '12px',
+        padding: '20px',
+        display: 'flex',
+        gap: '16px',
+        marginBottom: '32px',
+    },
+    alertContent: { flex: 1 },
+    alertTitle: { fontSize: '12px', fontWeight: '900', color: '#92400e', margin: 0, letterSpacing: '0.05em' },
+    alertText: { fontSize: '13px', color: '#b45309', margin: '4px 0 0 0', lineHeight: '1.5' },
+    form: { display: 'flex', flexDirection: 'column', gap: '24px' },
+    card: {
+        backgroundColor: '#fff',
+        borderRadius: '12px',
+        border: '1px solid #f1f5f9',
+        padding: '24px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+    },
+    cardHeader: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' },
+    cardTitle: { fontSize: '10px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em' },
+    flexRow: { display: 'flex', gap: '40px' },
+    formArea: { flex: 1 },
+    photoArea: { width: '220px', display: 'flex', flexDirection: 'column', alignItems: 'center' },
+    labelCentered: { fontSize: '10px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px' },
+    photoBox: {
+        width: '180px',
+        height: '240px',
+        borderRadius: '12px',
+        border: '1px dashed #e2e8f0',
+        backgroundColor: '#f8fafc',
+        position: 'relative',
+        overflow: 'hidden',
+    },
+    imagePreview: { width: '100%', height: '100%', position: 'relative' },
+    img: { width: '100%', height: '100%', objectFit: 'cover' },
+    imgContain: { width: '100%', height: '100%', objectFit: 'contain', padding: '12px' },
+    uploadOverlay: {
+        position: 'absolute',
+        inset: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        opacity: 0,
+        transition: 'opacity 0.2s',
+        ":hover": { opacity: 1 }
+    },
+    placeholderBox: { 
+        width: '100%', 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        gap: '12px'
+    },
+    placeholderText: { fontSize: '11px', fontWeight: '800', color: '#cbd5e1', letterSpacing: '0.05em' },
+    hiddenFile: { position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' },
+    sideBySide: { display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '24px' },
+    grid2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' },
+    grid4: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' },
+    fieldGroup: { display: 'flex', flexDirection: 'column', gap: '8px' },
+    label: { fontSize: '10px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' },
+    input: {
+        height: '42px',
+        padding: '0 12px',
+        borderRadius: '8px',
+        border: '1px solid #e2e8f0',
+        backgroundColor: '#f8fafc',
+        fontSize: '13px',
+        color: '#1e293b',
+        fontWeight: '600',
+        outline: 'none',
+        transition: 'border-color 0.2s ease',
+        ":focus": { borderColor: '#4c84ff' }
+    },
+    inputDisabled: {
+        height: '42px',
+        padding: '0 12px',
+        borderRadius: '8px',
+        border: '1px solid #f1f5f9',
+        backgroundColor: '#fcfcfd',
+        fontSize: '13px',
+        color: '#64748b',
+        fontWeight: '600',
+        cursor: 'not-allowed'
+    },
+    innerIcon: { position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' },
+    docsStack: { display: 'flex', flexDirection: 'column', gap: '24px' },
+    sigBox: {
+        height: '100px',
+        borderRadius: '8px',
+        border: '1px dashed #e2e8f0',
+        backgroundColor: '#f8fafc',
+        overflow: 'hidden',
+        position: 'relative'
+    },
+    placeholderBoxCompact: { width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+    docStatusBox: {
+        height: '56px',
+        borderRadius: '8px',
+        backgroundColor: '#f8fafc',
+        border: '1px solid #e2e8f0',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 12px',
+        position: 'relative'
+    },
+    docDetails: { display: 'flex', alignItems: 'center', gap: '12px', width: '100%' },
+    docIcon: { width: '32px', height: '32px', borderRadius: '6px', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #e2e8f0' },
+    docMeta: { flex: 1, display: 'flex', flexDirection: 'column' },
+    docName: { fontSize: '11px', fontWeight: '900', color: '#0f172a', letterSpacing: '0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+    docStatus: { fontSize: '9px', fontWeight: '800', color: '#10b981', letterSpacing: '0.05em' },
+    clearBtn: { border: 'none', backgroundColor: 'transparent', color: '#94a3b8', cursor: 'pointer', padding: '4px' },
+    docEmpty: { display: 'flex', alignItems: 'center', gap: '10px', width: '100%', justifyContent: 'center' },
+    emptyMsg: { fontSize: '10px', fontWeight: '800', color: '#94a3b8', letterSpacing: '0.02em' },
+    footer: { display: 'flex', justifyContent: 'flex-end', gap: '16px', marginTop: '16px' },
+    cancelBtn: {
+        padding: '12px 24px',
+        borderRadius: '8px',
+        backgroundColor: '#fff',
+        color: '#64748b',
+        fontSize: '11px',
+        fontWeight: '900',
+        letterSpacing: '0.05em',
+        border: '1px solid #e2e8f0',
+        cursor: 'pointer',
+    },
+    saveBtn: {
+        padding: '12px 32px',
+        borderRadius: '8px',
+        backgroundColor: '#4c84ff',
+        color: '#fff',
+        fontSize: '11px',
+        fontWeight: '900',
+        letterSpacing: '0.05em',
+        border: 'none',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        boxShadow: '0 4px 12px rgba(76, 132, 255, 0.2)',
+        transition: 'all 0.2s ease',
+        ":hover": { backgroundColor: '#3b6ddb' }
+    }
+};
+
 export default StudentProfileSection;
+
