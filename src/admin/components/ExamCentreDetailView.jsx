@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-    ArrowLeft, 
-    Building2, 
-    School, 
-    Users, 
+import {
+    ArrowLeft,
+    Building2,
+    School,
+    Users,
     Edit2,
     Trash2,
     Check,
@@ -13,9 +13,9 @@ import {
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { 
-    getSchools, 
-    deleteSchool, 
+import {
+    getSchools,
+    deleteSchool,
     updateExamCentre,
     getSchoolCountByExamCentre,
     getStudentCountByExamCentre
@@ -23,7 +23,7 @@ import {
 
 const ExamCentreDetailView = ({ centre, onBack }) => {
     const queryClient = useQueryClient();
-    
+
     // Edit State
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({
@@ -93,7 +93,7 @@ const ExamCentreDetailView = ({ centre, onBack }) => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <button 
+                    <button
                         onClick={onBack}
                         className="p-2 hover:bg-gray-100 rounded-full transition-colors group"
                         title="Back to Region"
@@ -103,28 +103,28 @@ const ExamCentreDetailView = ({ centre, onBack }) => {
                     <div>
                         <div className="flex items-center gap-3">
                             <Building2 className="text-indigo-600" size={24} />
-                            
+
                             {isEditing ? (
                                 <div className="flex items-center gap-2">
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={editData.centreName}
-                                        onChange={(e) => setEditData({...editData, centreName: e.target.value})}
+                                        onChange={(e) => setEditData({ ...editData, centreName: e.target.value })}
                                         className="text-2xl font-black text-gray-900 border-b-2 border-indigo-500 outline-none bg-transparent px-1"
                                         placeholder="Centre Name"
                                     />
                                     <span className="text-gray-300">|</span>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={editData.centreCode}
-                                        onChange={(e) => setEditData({...editData, centreCode: e.target.value})}
+                                        onChange={(e) => setEditData({ ...editData, centreCode: e.target.value })}
                                         className="text-lg font-bold text-gray-500 border-b-2 border-indigo-500 outline-none bg-transparent px-1 w-24"
                                         placeholder="Code"
                                     />
                                 </div>
                             ) : (
                                 <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight flex items-center gap-3">
-                                    {editData.centreName} 
+                                    {editData.centreName}
                                     <span className="text-sm font-bold bg-indigo-50 text-indigo-600 px-2 py-1 rounded-lg">
                                         {editData.centreCode}
                                     </span>
@@ -136,18 +136,18 @@ const ExamCentreDetailView = ({ centre, onBack }) => {
                         </p>
                     </div>
                 </div>
-                
+
                 <div className="flex items-center gap-3 px-4 md:px-0">
                     {isEditing ? (
                         <>
-                            <button 
+                            <button
                                 onClick={handleSaveEdit}
                                 disabled={updateCentreMutation.isPending}
                                 className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest shadow-sm transition-all"
                             >
                                 <Check size={16} /> Save
                             </button>
-                            <button 
+                            <button
                                 onClick={() => {
                                     setIsEditing(false);
                                     setEditData({ centreName: centre.centreName, centreCode: centre.centreCode }); // reset
@@ -158,7 +158,7 @@ const ExamCentreDetailView = ({ centre, onBack }) => {
                             </button>
                         </>
                     ) : (
-                        <button 
+                        <button
                             onClick={() => setIsEditing(true)}
                             className="flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-sm"
                         >
@@ -189,7 +189,7 @@ const ExamCentreDetailView = ({ centre, onBack }) => {
                         <p className="text-3xl font-black text-gray-900 mt-1">{studentCount || '0'}</p>
                     </div>
                 </div>
-                
+
                 <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center relative overflow-hidden">
                     <div className="relative z-10 text-center">
                         <p className="text-[10px] font-black text-indigo-100 uppercase tracking-widest mb-1">Operational Status</p>

@@ -615,11 +615,11 @@ const ResultPublisher = ({
         try { papers = typeof exam.papers === 'string' ? JSON.parse(exam.papers) : exam.papers; } catch { }
         const totalObtained = Object.values(data.marks || {}).reduce((s, m) => s + m, 0);
         const totalMax = papers.reduce((s, p) => s + (p.maxMarks || 0), 0);
-        const pct = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
+        const percentage = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
         handlePublishResult(null, {
             totalMarks: parseFloat(totalMax.toFixed(2)),
-            percentage: parseFloat(pct.toFixed(2)),
-            resultData: JSON.stringify({ score: `${pct.toFixed(2)}%`, remarks: data.remarks || 'Pass', totalObtained, totalMax, breakdown: data.marks }),
+            percentage: parseFloat(percentage.toFixed(2)),
+            resultData: JSON.stringify({ score: `${percentage.toFixed(2)}%`, remarks: data.remarks || 'Pass', totalObtained, totalMax, breakdown: data.marks }),
             publishedAt: new Date().toISOString(),
         }, appId);
     };
