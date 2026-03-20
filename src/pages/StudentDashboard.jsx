@@ -36,6 +36,7 @@ import ExamList from "../student/components/ExamList";
 import StudentProfileSection from "../student/components/StudentProfileSection";
 import StudentLayout from "../student/components/StudentLayout";
 import HallTicket from "../student/components/HallTicket";
+import MyCertificates from "../student/components/MyCertificates";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -398,20 +399,7 @@ const StudentDashboard = () => {
         }
       case "certificates":
         return (
-          <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center shadow-xl shadow-black/5 animate-in fade-in duration-500">
-            <div className="w-24 h-24 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-8 shadow-inner">
-              <Award size={48} />
-            </div>
-            <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Digital Certificates</h2>
-            <p className="text-gray-500 max-w-sm mx-auto leading-relaxed">
-              Complete your examinations and achieve qualifying marks to unlock your verifiable digital certificates here.
-            </p>
-            <div className="mt-10 flex justify-center gap-4">
-              <div className="w-3 h-3 rounded-full bg-indigo-100" />
-              <div className="w-3 h-3 rounded-full bg-indigo-200" />
-              <div className="w-3 h-3 rounded-full bg-indigo-300" />
-            </div>
-          </div>
+          <MyCertificates myResults={myResults} applications={myApplications} exams={exams} student={currentUser} />
         );
       case "results_view":
         return (
