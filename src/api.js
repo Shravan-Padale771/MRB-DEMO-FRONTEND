@@ -5,7 +5,7 @@ const API_URL2 = "http://100.53.20.30:8080";
 const API_URL = "http://localhost:8080";
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: API_URL2,
   headers: {
     "Content-Type": "application/json",
   },
@@ -41,7 +41,10 @@ export const getStudents = async ({
  * POST /students
  */
 export const createStudent = async (studentData, schoolId) => {
-  const response = await api.post(`/students?schoolId=${schoolId}`, studentData);
+  const response = await api.post(
+    `/students?schoolId=${schoolId}`,
+    studentData,
+  );
   return response.data;
 };
 
@@ -60,7 +63,6 @@ export const deleteStudent = async (id) => {
   const response = await api.delete(`/students/${id}`);
   return response.data;
 };
-
 
 // --- EXAM APPLICATION ENDPOINTS ---
 /**
@@ -92,12 +94,13 @@ export const getExamApplications = async ({
   return response.data;
 };
 
-
 /**
  * GET application by ID and Exam No
  */
 export const getExamApplicationByExactId = async (applicationId, examNo) => {
-  const response = await api.get(`/exam-applications-byId?applicationId=${applicationId}&examNo=${examNo}`);
+  const response = await api.get(
+    `/exam-applications-byId?applicationId=${applicationId}&examNo=${examNo}`,
+  );
   return response.data;
 };
 
@@ -203,7 +206,10 @@ export const getExamCentres = async ({
  * POST /exam-centres
  */
 export const createExamCentre = async (centreData, regionId) => {
-  const response = await api.post(`/exam-centres?regionId=${regionId}`, centreData);
+  const response = await api.post(
+    `/exam-centres?regionId=${regionId}`,
+    centreData,
+  );
   return response.data;
 };
 
@@ -257,7 +263,10 @@ export const getSchool = async (id) => {
  * POST /schools
  */
 export const createSchool = async (schoolData, examCentreId) => {
-  const response = await api.post(`/schools?centreId=${examCentreId}`, schoolData);
+  const response = await api.post(
+    `/schools?centreId=${examCentreId}`,
+    schoolData,
+  );
   return response.data;
 };
 
@@ -268,7 +277,7 @@ export const updateSchool = async (id, schoolData) => {
   // Ensure we are sending schoolId and other DTO fields
   const payload = {
     ...schoolData,
-    schoolId: id
+    schoolId: id,
   };
   const response = await api.put("/schools", payload);
   return response.data;
@@ -284,7 +293,10 @@ export const deleteSchool = async (id) => {
 
 // --- RESULT ENDPOINTS ---
 export const createExamResult = async (resultData, applicationId) => {
-  const response = await api.post(`/exam-results?applicationId=${applicationId}`, resultData);
+  const response = await api.post(
+    `/exam-results?applicationId=${applicationId}`,
+    resultData,
+  );
   return response.data;
 };
 
@@ -312,7 +324,7 @@ export const getExamResults = async ({
 
 // --- ANALYTICS ENDPOINTS ---
 export const getAnalyticsSummary = async () => {
-  const response = await api.get('/summary');
+  const response = await api.get("/summary");
   return response.data;
 };
 
@@ -362,12 +374,18 @@ export const getAllStudentProfiles = async () => {
 };
 
 export const addStudentProfile = async (studentId, profileData) => {
-  const response = await api.post(`/addStudentProfile?studentId=${studentId}`, profileData);
+  const response = await api.post(
+    `/addStudentProfile?studentId=${studentId}`,
+    profileData,
+  );
   return response.data;
 };
 
 export const createStudentProfileAPI = async (studentId, profileData) => {
-  const response = await api.post(`/studentProfiles?studentId=${studentId}`, profileData);
+  const response = await api.post(
+    `/studentProfiles?studentId=${studentId}`,
+    profileData,
+  );
   return response.data;
 };
 
@@ -424,7 +442,7 @@ export const uploadFiles = async (files) => {
  */
 export const deleteFile = async (objectName) => {
   const response = await api.delete(`/files/upload`, {
-    params: { objectName }
+    params: { objectName },
   });
   return response.data;
 };
