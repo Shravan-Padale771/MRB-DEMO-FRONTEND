@@ -5,7 +5,7 @@ const API_URL2 = "http://100.53.20.30:8080";
 const API_URL = "http://localhost:8080";
 
 const api = axios.create({
-  baseURL: API_URL2,
+  baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -447,4 +447,18 @@ export const deleteFile = async (objectName) => {
   return response.data;
 };
 
+// --- AUTH ENDPOINTS ---
+/**
+ * POST /auth/student/login
+ * Accepts { username: email, password } and returns StudentDTO or throws on 401
+ */
+export const studentLogin = async (email, password) => {
+  const response = await api.post("/auth/student/login", {
+    username: email,
+    password: password,
+  });
+  return response.data;
+};
+
 export default api;
+
