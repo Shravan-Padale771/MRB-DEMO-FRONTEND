@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import {
   getStudents,
+  studentLogin,
   createExamApplication,
   getExamResults,
   getExamApplications,
@@ -50,7 +52,9 @@ const StudentDashboard = () => {
   const [centres, setCentres] = useState([]);
   const [schools, setSchools] = useState([]);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [loginId, setLoginId] = useState("");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isLoadingApplications, setIsLoadingApplications] = useState(false);
 
@@ -148,22 +152,21 @@ const StudentDashboard = () => {
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
-    if (!loginId.trim()) return toast.error("Please enter a Student ID");
+    if (!loginEmail.trim()) return toast.error("Please enter your email address");
+    if (!loginPassword.trim()) return toast.error("Please enter your password");
 
     setIsLoggingIn(true);
     try {
-      const studentPage = await getStudents({ studentId: loginId.trim(), size: 1 });
-      const student = studentPage?.content?.[0];
-
-      if (student) {
-        setCurrentUser(student);
-        toast.success(`Welcome back, ${student.firstName || student.username}!`);
-      } else {
-        toast.error("Invalid Student ID. Please try again.");
-      }
+      const student = await studentLogin(loginEmail.trim(), loginPassword);
+      setCurrentUser(student);
+      toast.success(`Welcome back, ${student.firstName || student.email}!`);
     } catch (error) {
-      console.error("Login failed", error);
-      toast.error("Something went wrong. Please try again later.");
+      if (error.response?.status === 401) {
+        toast.error("Invalid email or password. Please try again.");
+      } else {
+        console.error("Login failed", error);
+        toast.error("Something went wrong. Please try again later.");
+      }
     } finally {
       setIsLoggingIn(false);
     }
@@ -203,27 +206,57 @@ const StudentDashboard = () => {
             <User size={48} className="mx-auto text-indigo-600 mb-3" />
             <h2 className="text-3xl font-bold text-gray-800">Student Portal</h2>
             <p className="text-gray-500 text-sm mt-2">
-              Login or create a new account
+              Sign in with your registered email and password
             </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
+            {/* Email Field */}
             <div>
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
-                Student ID Number
+                Email Address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <User size={18} />
                 </div>
                 <input
-                  type="text"
-                  value={loginId}
-                  onChange={(e) => setLoginId(e.target.value)}
-                  placeholder="e.g. 101"
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="your@email.com"
                   className="w-full pl-11 pr-4 py-4 bg-gray-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl transition-all duration-300 outline-none font-bold text-gray-700"
                   required
+                  autoComplete="email"
                 />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  <LogOut size={18} className="rotate-180" />
+                </div>
+                <input
+                  type={showLoginPassword ? "text" : "password"}
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full pl-11 pr-12 py-4 bg-gray-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-xl transition-all duration-300 outline-none font-bold text-gray-700"
+                  required
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowLoginPassword(!showLoginPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showLoginPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 
@@ -263,7 +296,7 @@ const StudentDashboard = () => {
 
           <div className="mt-8 pt-6 border-t border-gray-100">
             <p className="text-[10px] text-gray-400 text-center uppercase tracking-widest leading-relaxed">
-              If you don't have an ID, please register or contact your school administrator.
+              Use the email and password you registered with. Contact your school admin if you need help.
             </p>
           </div>
         </div>
