@@ -28,6 +28,7 @@ import RegionManager from "../admin/components/modern-ui/RegionManager";
 import ExamCentreManager from "../admin/components/modern-ui/ExamCentreManager";
 import SchoolManager from "../admin/components/modern-ui/SchoolManager";
 import SchoolDetailView from "../admin/components/SchoolDetailView";
+import StudentDetailView from "../admin/components/StudentDetailView";
 import ApplicationDetailView from "../admin/components/ApplicationDetailView";
 import DashboardLayout from "../admin/components/DashboardLayout";
 import MetricCard from "../admin/components/MetricCard";
@@ -605,6 +606,15 @@ const AdminDashboard = () => {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <SchoolDetailView 
             schoolId={id} 
+            onBack={() => navigate("/admin")}
+          />
+        </div>
+      )}
+
+      {type === "student" && id && (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <StudentDetailView 
+            studentId={id} 
             onBack={() => navigate("/admin")}
           />
         </div>

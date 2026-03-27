@@ -368,10 +368,10 @@ def test_student_profile_endpoints():
         make_request("GET", "/getAllStudentProfiles")
     elif choice == "2":
         s_id = get_input("Student Profile ID")
-        make_request("GET", "/getStudentProfile", params={"id": s_id})
+        make_request("GET", f"/studentProfiles/{s_id}")
     elif choice == "3":
         s_id = get_input("Student Profile ID")
-        make_request("GET", "/getStudentProfileById", params={"id": s_id})
+        make_request("GET", f"/studentProfiles/{s_id}")
     elif choice == "4":
         s_id = get_input("Student ID")
         profile_data = {

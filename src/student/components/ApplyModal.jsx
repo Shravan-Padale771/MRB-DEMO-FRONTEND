@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Printer, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
-import { createExamApplication, getStudentProfile } from "../../api";
+import { createExamApplication, getStudentProfileByStudentIdString } from "../../api";
 
 const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
   const [agreed, setAgreed] = useState(false);
@@ -48,7 +48,7 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data = await getStudentProfile(student.studentId);
+        const data = await getStudentProfileByStudentIdString(student.studentId);
         setProfile(data);
       } catch (err) {
         console.error("Failed to fetch profile:", err);

@@ -360,7 +360,7 @@ export const getStudentCountByExamCentre = async (centreId) => {
 
 // --- STUDENT PROFILE ENDPOINTS ---
 export const getStudentProfile = async (id) => {
-  const response = await api.get(`/getStudentProfile?id=${id}`);
+  const response = await api.get(`/studentProfiles/${id}`);
   return response.data;
 };
 
@@ -390,7 +390,7 @@ export const createStudentProfileAPI = async (studentId, profileData) => {
 };
 
 export const getStudentProfileById = async (id) => {
-  const response = await api.get(`/getStudentProfileById?id=${id}`);
+  const response = await api.get(`/studentProfiles/${id}`);
   return response.data;
 };
 
