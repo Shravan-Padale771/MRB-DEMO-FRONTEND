@@ -96,18 +96,224 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
     window.print();
   };
 
+  
+  const renderModernView = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -30 }}
+      className="max-w-[850px] mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden font-sans border border-slate-200"
+    >
+      {/* Header Area */}
+      <div className="bg-gradient-to-r from-blue-600 to-[#1b223c] p-10 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -mr-10 -mt-20"></div>
+        <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
+          <div className="w-24 h-24 bg-white rounded-2xl shadow-lg p-2 flex items-center justify-center shrink-0 border border-blue-400/30">
+            {(exam.boardLogoUrl || exam.boardSealUrl) ? (
+              <img src={exam.boardLogoUrl || exam.boardSealUrl} alt="Logo" className="w-full h-full object-contain" />
+            ) : (
+              <span className="text-3xl font-black text-slate-800 tracking-tighter">MRB</span>
+            )}
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <span className="inline-block px-3 py-1 bg-blue-500/30 backdrop-blur-md border border-blue-400/50 rounded-full text-[10px] font-bold tracking-widest uppercase mb-3">
+              Exam Application Portal
+            </span>
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2 leading-tight">{exam.exam_name}</h1>
+            <p className="text-blue-100/80 font-medium text-sm md:text-base flex items-center justify-center md:justify-start gap-2">
+              <Calendar size={16} /> Maharashtra Rashtrabhasha Sabha, Pune &bull; {new Date().getFullYear()}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-8 md:p-10 space-y-10 bg-slate-50/50">
+        {/* Candidate Info Card */}
+        <section>
+          <div className="flex items-center gap-3 mb-5">
+            <div className="p-2 bg-blue-100 text-blue-600 rounded-lg"><User size={20} /></div>
+            <h2 className="text-xl font-bold text-slate-800">Candidate Information</h2>
+          </div>
+          
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-8">
+            <div className="w-32 h-40 shrink-0 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden shadow-inner flex items-center justify-center text-slate-400 text-xs text-center p-4">
+              {profile?.profilePhotoUrl ? (
+                <img src={profile.profilePhotoUrl} alt="Photo" className="w-full h-full object-cover" />
+              ) : "No Photo Available"}
+            </div>
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-4">
+              <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Student ID</p>
+                <p className="font-semibold text-slate-800">{student.studentId || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Full Name</p>
+                <p className="font-semibold text-slate-800">
+                  {student.firstName ? `${student.firstName} ${student.middleName || ''} ${student.lastName || ''}`.trim() : (student.username || "—")}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Date of Birth</p>
+                <p className="font-semibold text-slate-800">{profile?.dateOfBirth || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Contact / Email</p>
+                <p className="font-semibold text-slate-800">{profile?.guardianContact || "—"} / {profile?.guardianEmail || "—"}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Father / Mother</p>
+                <p className="font-semibold text-slate-800">{profile?.fatherName || "—"} / {profile?.motherName || "—"}</p>
+              </div>
+              <div className="col-span-1 md:col-span-2">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Address & Aadhaar</p>
+                <p className="font-semibold text-slate-800">
+                  {profile?.address ? Object.values(profile.address).filter(Boolean).join(', ') : "—"} | <span className="text-slate-500 font-normal">UIDAI: {profile?.aadhaarNo || "—"}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Papers / Subjects Card */}
+        <section>
+          <div className="flex items-center gap-3 mb-5">
+            <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg"><CheckSquare size={20} /></div>
+            <h2 className="text-xl font-bold text-slate-800">Selected Papers</h2>
+          </div>
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            {papers.map((p, idx) => (
+              <div key={idx} className={`p-4 md:p-5 flex items-center justify-between ${idx !== papers.length - 1 ? 'border-b border-slate-100' : ''}`}>
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs">
+                    {idx + 1}
+                  </div>
+                  <span className="font-bold text-slate-700">{p.name}</span>
+                </div>
+                <div className="px-3 py-1 bg-slate-100 rounded-full text-xs font-bold text-slate-500">
+                  {p.maxMarks} Marks
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Form Options */}
+        <section>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Examination Medium</label>
+              <select value={medium} onChange={(e) => setMedium(e.target.value)} className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
+                <option value="Hindi">Hindi</option>
+                <option value="Marathi">Marathi</option>
+                <option value="English">English</option>
+                <option value="Urdu">Urdu</option>
+              </select>
+            </div>
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Candidature Category</label>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
+                <option value="General">General</option>
+                <option value="OBC">OBC</option>
+                <option value="SC">SC</option>
+                <option value="ST">ST</option>
+                <option value="EWS">EWS</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        {/* Signatures Review */}
+        <section>
+          <div className="flex items-center gap-3 mb-5">
+            <div className="p-2 bg-amber-100 text-amber-600 rounded-lg"><FileSignature size={20} /></div>
+            <h2 className="text-xl font-bold text-slate-800">Verification / Signatures</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col items-center justify-center text-center gap-2 h-32">
+              {profile?.signatureUrl ? (
+                <img src={profile.signatureUrl} alt="Sign" className="max-h-12 opacity-80" />
+              ) : <span className="text-xs text-amber-500 font-bold bg-amber-50 px-2 py-1 rounded">Missing</span>}
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Candidate</span>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col items-center justify-center text-center gap-2 h-32">
+              {principalSigUrl ? (
+                <img src={principalSigUrl} alt="Sign" className="max-h-12 opacity-80" />
+              ) : <span className="text-xs text-amber-500 font-bold bg-amber-50 px-2 py-1 rounded">Missing</span>}
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Principal</span>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col items-center justify-center text-center gap-2 h-32 col-span-2 md:col-span-1">
+              {schoolStampUrl ? (
+                <img src={schoolStampUrl} alt="Sign" className="max-h-12 opacity-80" />
+              ) : <span className="text-xs text-amber-500 font-bold bg-amber-50 px-2 py-1 rounded">Missing</span>}
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">School Stamp</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Submission Area */}
+        <div className="mt-10 bg-white p-8 rounded-2xl border-2 border-blue-100 shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
+          
+          <label className="flex items-start gap-4 cursor-pointer group mb-6">
+            <div className="mt-1 relative flex items-center justify-center">
+              <input type="checkbox" checked={agreed} onChange={(e) => {setAgreed(e.target.checked); if(e.target.checked) setError("");}} className="w-6 h-6 peer appearance-none border-2 border-slate-300 rounded-lg checked:border-blue-500 checked:bg-blue-500 transition-all cursor-pointer shadow-sm" />
+              <CheckCircle size={16} className="absolute text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
+            </div>
+            <div>
+              <span className="text-base font-bold text-slate-800 group-hover:text-blue-600 transition-colors">I confirm all details are authentic and true.</span>
+              <p className="text-xs text-slate-500 mt-1">By checking this box, I acknowledge that any falsification of records may result in disqualification from the exam session without refund.</p>
+            </div>
+          </label>
+
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 text-sm font-bold flex items-center gap-2">
+              <AlertCircle size={18} /> {error}
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-100">
+            <button onClick={onClose} className="px-6 py-4 rounded-xl font-bold text-slate-500 bg-slate-50 hover:bg-slate-100 transition-colors">
+              Cancel
+            </button>
+            <button onClick={handleSubmit} className="flex-1 flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 transition-all">
+              Submit Digital Application <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </motion.div>
+  );
+
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 bg-slate-100/90 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-10 print:p-0 print:bg-white print:relative print:overflow-visible">
-        {/* CSS Reset for Print and Scoped Styles */}
+      <div className="fixed inset-0 bg-slate-200/90 backdrop-blur-sm z-50 overflow-y-auto p-4 sm:p-10 print:p-0 print:bg-white print:relative print:overflow-visible">
         <style dangerouslySetInnerHTML={{ __html: `
           @media print {
             @page { size: A4; margin: 10mm; }
             body { background: white; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .no-print { display: none !important; }
-            .modal-container { box-shadow: none !important; border: 1px solid #cbd5e0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; padding: 20px !important; transform: none !important; position: static !important; }
+            
+          .modal-container.paper-mode {
+            background-color: #fdfbf7 !important;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png") !important;
+            background-blend-mode: multiply !important;
+            border: 1px solid #e5e0d5 !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+          }
+
+          .modal-container { box-shadow: none !important; border: 1px solid #cbd5e0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; padding: 20px !important; transform: none !important; position: static !important; }
             .photo-box { top: 80px !important; right: 20px !important; }
           }
+          
+          .modal-container.paper-mode {
+            background-color: #fdfbf7 !important;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png") !important;
+            background-blend-mode: multiply !important;
+            border: 1px solid #e5e0d5 !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+          }
+
           .modal-container {
             max-width: 850px;
             margin: 0 auto;
@@ -135,27 +341,28 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
           .instruction-box { margin-top: 30px; font-size: 12px; color: #92400e; background: #fffbeb; padding: 15px; border: 1px solid #fef3c7; border-radius: 4px; }
         `}} />
 
-        {/* Modernized Floating Controls - No Print */}
-        <div style={s.controls} className="no-print">
-          <div style={s.controlsLeft}>
-            <div style={s.badge}>APPLICATION PORTAL</div>
-            <span style={s.controlsText}>Document Verification & Review</span>
-          </div>
-          <div style={s.controlsRight}>
-            <button onClick={handlePrint} style={s.secondaryBtn}>
-              <Printer size={16} /> PRINT FORM
+        <div className="max-w-[850px] w-full mx-auto mb-6 flex justify-between items-center no-print bg-white p-3 rounded-xl shadow-sm border border-slate-200 font-sans sticky top-0 z-[100] print:hidden">
+           <div className="flex bg-slate-100 p-1 rounded-lg">
+             <button onClick={() => setViewMode('paper')} className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-md transition-all flex items-center gap-2 ${viewMode === 'paper' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}><FileText size={16}/> Paper Form</button>
+             <button onClick={() => setViewMode('modern')} className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-md transition-all flex items-center gap-2 ${viewMode === 'modern' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}><LayoutDashboard size={16}/> Modern UI</button>
+           </div>
+           
+           <div className="flex gap-2">
+            <button onClick={handlePrint} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-lg transition-colors">
+              <Printer size={16} /> Print
             </button>
-            <button onClick={onClose} style={s.closeBtn}>
-              <X size={20} />
+            <button onClick={onClose} className="flex items-center justify-center w-8 h-8 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-lg transition-colors">
+              <X size={18} />
             </button>
-          </div>
+           </div>
         </div>
 
-        <motion.div
+        {viewMode === 'paper' ? (
+          <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.98 }}
-          className="modal-container"
+          className="modal-container paper-mode"
         >
           {/* Header */}
           <div className="header" style={{ position: 'relative' }}>
@@ -392,10 +599,12 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
             ELECTRONICALLY GENERATED ON {new Date().toLocaleString()} | MRS PORTAL IDENTITY: {Math.floor(Math.random()*99999)}
           </p>
         </motion.div>
+        ) : renderModernView()}
       </div>
     </AnimatePresence>
   );
-};
+}
+
 
 const Field = ({ label, value }) => (
   <div className="flex flex-col">

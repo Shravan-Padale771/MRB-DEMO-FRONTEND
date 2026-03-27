@@ -1,8 +1,9 @@
-import React from 'react'
-import { motion } from 'framer-motion'
-import { Printer, X } from 'lucide-react'
+import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Printer, X, LayoutDashboard, FileText, CheckCircle, AlertCircle, Award, Target, BookOpen } from 'lucide-react'
 
 const Marksheet = ({ result, onClose }) => {
+  const [viewMode, setViewMode] = useState('modern')
   if (!result) return null
 
   const app = result.application || {}
@@ -93,52 +94,28 @@ const Marksheet = ({ result, onClose }) => {
 
   const oralMarks = resultData.oralMarks || breakdown.oralMarks || breakdown['मौखिक'] || 0
   const projectMarks = breakdown.projectMarks || breakdown['परियोजना'] || 0
-
   const computedTotalMax = mainPapers.reduce((sum, p) => sum + (p.maxMarks || 0), 0)
 
-  return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center overflow-y-auto print:p-0 print:bg-white p-4">
-      <motion.div
+  // Status computation for Modern View
+  const isPass = resultData.remarks === 'Pass' || resultData.remarks === 'उत्तीर्ण'
+  const isFail = resultData.remarks === 'Fail' || resultData.remarks === 'अनुत्तीर्ण'
+
+  const totalScore = resultData.totalObtained || resultData.score
+  const totalMaxScore = computedTotalMax || resultData.totalMax
+  const scorePercent = ((totalScore / totalMaxScore) * 100).toFixed(1)
+
+  const renderPaperView = () => (
+    <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0 }}
         style={{
           backgroundColor: '#fdfbf7',
           backgroundImage: `url("https://www.transparenttextures.com/patterns/natural-paper.png")`,
           backgroundBlendMode: 'multiply'
         }}
-        className="
-          w-full
-          max-w-[850px]
-          shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)]
-          relative
-          print:shadow-none
-          print:max-w-full
-          m-auto
-          min-h-[1100px]
-          border border-[#e5e0d5]
-          rounded-sm
-          p-12
-          font-serif
-          text-[#1a1a1a]
-        "
-        id="marksheet-container"
+        className="w-full relative shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] print:shadow-none min-h-[1100px] border border-[#e5e0d5] rounded-sm p-12 font-serif text-[#1a1a1a]"
       >
-        {/* MODERNIZED PRINT CONTROLS */}
-        <div className="absolute top-8 right-8 flex gap-3 print:hidden z-20" style={{ fontFamily: 'DM Sans, Segoe UI, sans-serif' }}>
-          <button
-            onClick={onClose}
-            style={{ ...s.baseBtn, ...s.closeBtn }}
-          >
-            <X size={18} />
-          </button>
-          <button
-            onClick={handlePrint}
-            style={{ ...s.baseBtn, ...s.printBtn }}
-          >
-            <Printer size={16} /> PRINT MARKSHEET
-          </button>
-        </div>
-
         {/* DOCUMENT HEADER */}
         <div className="text-center space-y-1 mb-10">
           <h1 className="text-2xl font-bold">
@@ -172,11 +149,15 @@ const Marksheet = ({ result, onClose }) => {
           <div className="space-y-2 w-1/3">
             <div className="flex justify-end">
               <span className="w-20">क्रमांक</span>
-              <span className="w-32 font-bold">: {app.applicationId || "36"}</span>
+              <span className="w-32 font-bold text-right">: {app.applicationId || "—"}</span>
             </div>
             <div className="flex justify-end">
               <span className="w-16">सत्र</span>
-              <span className="w-32 font-bold">: {schedule.session}</span>
+              <span className="w-32 font-bold text-right">: {schedule.session}</span>
+            </div>
+            <div className="flex justify-end">
+              <span className="w-16">प्रतिशत</span>
+              <span className="w-32 font-bold text-right">: {scorePercent}%</span>
             </div>
           </div>
         </div>
@@ -203,9 +184,9 @@ const Marksheet = ({ result, onClose }) => {
 
             <tr className="border-t border-black h-10 font-bold">
               <td>कुल</td>
-              <td>{computedTotalMax || resultData.totalMax}/</td>
+              <td>{totalMaxScore}/</td>
               <td></td>
-              <td>{resultData.totalObtained || resultData.score}</td>
+              <td>{totalScore}</td>
             </tr>
           </tbody>
         </table>
@@ -284,42 +265,164 @@ const Marksheet = ({ result, onClose }) => {
           </p>
         </div>
 
-        {/* Security Overlay - Optional, keeping for consistency with logic */}
+        {/* Security Overlay */}
         {result && !result.publishedAt && (
           <div className="absolute inset-0 pointer-events-none border-[12px] border-red-500/5 z-[100] flex items-center justify-center overflow-hidden">
             <span className="text-[60px] font-bold text-red-500/5 -rotate-45 uppercase border-8 border-red-500/5 p-8 select-none">PREVIEW ONLY</span>
           </div>
         )}
       </motion.div>
+  );
+
+  const renderModernView = () => (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0 }}
+      className="bg-slate-50 w-full min-h-[900px] rounded-3xl overflow-hidden shadow-2xl border border-slate-200"
+    >
+      {/* Dynamic Header */}
+      <div className={`relative p-10 overflow-hidden ${isFail ? 'bg-gradient-to-r from-rose-600 to-rose-400' : isPass ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-gradient-to-r from-blue-600 to-indigo-500'}`}>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6 text-white">
+          <div className="flex-1 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-bold tracking-widest uppercase mb-4 border border-white/30">
+              <Award size={14} /> Official Result Record
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2 drop-shadow-sm">{identity.examFullTitle}</h1>
+            <p className="text-white/80 font-bold tracking-wider">{identity.conductingBody}</p>
+          </div>
+
+          <div className="bg-white text-slate-800 rounded-3xl p-6 shadow-xl flex flex-col items-center min-w-[200px] border-4 border-white/20 transform hover:scale-105 transition-transform duration-300">
+            <span className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Total Score</span>
+            <div className={`text-5xl font-black ${isFail ? 'text-rose-500' : 'text-emerald-500'} tracking-tighter`}>
+              {totalScore}
+            </div>
+            <div className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest bg-slate-100 px-3 py-1 rounded-full">
+              Out of {totalMaxScore}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-8 md:p-12 space-y-8 max-w-5xl mx-auto">
+        
+        {/* Quick Highlights Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Verdict</span>
+            {isPass ? (
+              <div className="flex items-center gap-2 text-emerald-500 font-black text-xl bg-emerald-50 px-4 py-1 rounded-full"><CheckCircle size={20} /> PASS</div>
+            ) : isFail ? (
+              <div className="flex items-center gap-2 text-rose-500 font-black text-xl bg-rose-50 px-4 py-1 rounded-full"><AlertCircle size={20} /> FAIL</div>
+            ) : (
+               <div className="font-black text-xl text-slate-700">{resultData.remarks}</div>
+            )}
+          </div>
+          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Percentage</span>
+            <div className="font-black text-2xl text-slate-700">{scorePercent}%</div>
+          </div>
+          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">App ID</span>
+            <div className="font-black text-lg text-slate-700">#{app.applicationId || "—"}</div>
+          </div>
+          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Session</span>
+            <div className="font-black text-lg text-slate-700">{schedule.session}</div>
+          </div>
+        </div>
+
+        {/* Candidate Detail Card */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-6">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-4">
+            <div>
+              <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Candidate Full Name</span>
+              <span className="text-lg font-bold text-slate-800">{resultData.fullName || (student.firstName ? `${student.firstName} ${student.middleName || ''} ${student.lastName || ''}`.trim() : student.username)}</span>
+            </div>
+            <div>
+              <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Registration Venue (Centre)</span>
+              <span className="text-lg font-bold text-slate-800">{student.centreName || (typeof student.school?.examCentre?.centreName === 'string' ? student.school.examCentre.centreName : admin.departmentName)}</span>
+            </div>
+          </div>
+          <div className="w-full md:w-32 h-32 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center shadow-inner shrink-0 overflow-hidden">
+             {profile?.profilePhotoUrl ? (
+                <img src={profile.profilePhotoUrl} alt="Candidate" className="w-full h-full object-cover" />
+             ) : <Target size={32} className="text-slate-300"/>}
+          </div>
+        </div>
+
+        {/* Detailed Breakdown */}
+        <div>
+          <h3 className="text-lg font-black text-slate-800 flex items-center gap-2 mb-4"><BookOpen size={20} className="text-blue-500" /> Score Breakdown By Subject</h3>
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            {mainPapers.map((paper, idx) => (
+              <div key={idx} className={`flex items-center justify-between p-5 ${idx !== mainPapers.length - 1 ? 'border-b border-slate-100' : ''}`}>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-sm border border-blue-100">
+                    P{idx + 1}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-lg">{paper.name}</h4>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Maximum Marks: {paper.maxMarks}</p>
+                  </div>
+                </div>
+                <div className="text-3xl font-black text-slate-700 w-24 text-right">
+                  {paper.obtained}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Oral / Project if applicable */}
+        {(examDetails.structure?.hasOral || examDetails.structure?.hasProject) && (
+          <div className="bg-slate-800 rounded-2xl p-6 text-white shadow-xl bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-blend-soft-light relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
+            <div className="relative z-10 flex divide-x divide-white/20">
+              {examDetails.structure?.hasOral && (
+                <div className="flex-1 px-4 text-center">
+                  <span className="block text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1">Oral Evaluation</span>
+                  <div className="text-3xl font-black text-emerald-400">{oralMarks} <span className="text-lg text-white/30">/ {examDetails.structure?.oralMax || 50}</span></div>
+                </div>
+              )}
+              {examDetails.structure?.hasProject && (
+                <div className="flex-1 px-4 text-center">
+                  <span className="block text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1">Project Score</span>
+                  <div className="text-3xl font-black text-emerald-400">{projectMarks} <span className="text-lg text-white/30">/ {examDetails.structure?.projectMax || 50}</span></div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+      </div>
+    </motion.div>
+  );
+
+  return (
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center overflow-y-auto print:p-0 print:bg-white p-4 font-sans">
+      <div className="w-full max-w-[850px] m-auto flex flex-col pt-10 pb-10 print:pt-0 print:pb-0">
+        
+        {/* View Controls - Hidden on Print */}
+        <div className="bg-white p-3 rounded-xl shadow-lg border border-slate-200 mb-6 flex justify-between items-center print:hidden z-20 sticky top-4 max-w-[850px] w-full mx-auto">
+          <div className="flex bg-slate-100 p-1 rounded-lg">
+             <button onClick={() => setViewMode('modern')} className={`px-5 py-2.5 text-[11px] font-black uppercase tracking-wider rounded-md transition-all flex items-center gap-2 ${viewMode === 'modern' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}><LayoutDashboard size={16}/> Modern UI</button>
+             <button onClick={() => setViewMode('paper')} className={`px-5 py-2.5 text-[11px] font-black uppercase tracking-wider rounded-md transition-all flex items-center gap-2 ${viewMode === 'paper' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}><FileText size={16}/> Trad. Paper</button>
+          </div>
+          <div className="flex gap-2">
+             <button onClick={handlePrint} className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 font-bold text-[11px] uppercase tracking-wider rounded-lg transition-all"><Printer size={16} /> Print</button>
+             <button onClick={onClose} className="flex items-center justify-center p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 rounded-lg transition-colors"><X size={20} /></button>
+          </div>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {viewMode === 'paper' ? renderPaperView() : renderModernView()}
+        </AnimatePresence>
+
+      </div>
     </div>
   )
 }
-
-const s = {
-    baseBtn: {
-        padding: '10px 20px',
-        borderRadius: '10px',
-        fontSize: '11px',
-        fontWeight: '900',
-        letterSpacing: '0.05em',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        border: 'none',
-    },
-    closeBtn: {
-        backgroundColor: '#fff',
-        color: '#94a3b8',
-        border: '1px solid #e2e8f0',
-        padding: '10px',
-    },
-    printBtn: {
-        backgroundColor: '#4c84ff',
-        color: '#fff',
-        boxShadow: '0 4px 12px rgba(76, 132, 255, 0.2)',
-    }
-};
 
 export default Marksheet
