@@ -297,13 +297,24 @@ const ApplyModal = ({ exam, student, school, onClose, onSuccess }) => {
                 )}
                 <span>Candidate Signature</span>
               </div>
-              <div className="sign-box">
-                <span className="opacity-30">OFFICIAL STAMP</span>
-                <span>Principal Signature</span>
+              <div className="sign-box" style={{ backgroundColor: 'transparent', border: 'none', position: 'relative' }}>
+                {schoolStampUrl && (
+                  <img src={schoolStampUrl} alt="School Stamp" className="absolute opacity-20 max-w-full max-h-[80px] object-contain" />
+                )}
+                {principalSigUrl ? (
+                  <img src={principalSigUrl} alt="Principal Signature" className="max-h-[60px] p-1 object-contain mb-1 z-10" />
+                ) : (
+                  <span className="opacity-30">OFFICIAL STAMP</span>
+                )}
+                <span className="z-10" style={{ fontSize: '10px', fontWeight: 'bold' }}>Principal Signature</span>
               </div>
-              <div className="sign-box">
-                <span className="opacity-30">SABHA SEAL</span>
-                <span>Authorized Official</span>
+              <div className="sign-box" style={{ backgroundColor: 'transparent', border: 'none' }}>
+                {(exam.boardLogoUrl || exam.boardSealUrl) ? (
+                  <img src={exam.boardLogoUrl || exam.boardSealUrl} alt="Sabha Seal" className="max-h-[70px] p-1 object-contain opacity-50 mb-1" />
+                ) : (
+                  <span className="opacity-30">SABHA SEAL</span>
+                )}
+                <span style={{ fontSize: '10px', fontWeight: 'bold' }}>Authorized Official</span>
               </div>
             </div>
           </div>

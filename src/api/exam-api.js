@@ -48,8 +48,8 @@ export const getExam = async (id) => {
 /**
  * PUT /exams/{id}
  */
-export const updateExam = async (examData) => {
-  const response = await api.put("/exams", examData);
+export const updateExam = async (id, examData) => {
+  const response = await api.put(`/exams/${id}`, examData);
   return response.data;
 };
 

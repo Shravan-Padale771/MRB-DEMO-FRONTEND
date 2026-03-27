@@ -327,7 +327,7 @@ const AdminDashboard = () => {
   });
 
   const updateExamMutation = useMutation({
-    mutationFn: (payload) => updateExam(payload),
+    mutationFn: (payload) => updateExam(payload.examNo, payload),
     onSuccess: () => {
       toast.success("Exam Updated!");
       resetExamForm();
